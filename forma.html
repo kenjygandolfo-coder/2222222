@@ -545,6 +545,12 @@ body.sov-open{overflow:hidden}
 .bt-cre .crb{margin-top:auto!important}
 .bt-cre .kpi{margin-top:16px!important;margin-bottom:auto!important}
 
+/* ===== v13: selected / active states are solid wine, not a wine-to-black gradient ===== */
+.tab.on,.tab.on:hover,.btn.p,.btn.p:hover,.seg .btn.on,.fab.on,.dpc.sel,.crd i.on,.ddo.on,.fo.on{background:var(--pri)}
+/* the gradient's dark end was doing contrast work for the label; dark mode --pri is a
+   lighter wine, so the on-wine text tone is pinned here instead */
+.tab.on,.btn.p,.seg .btn.on,.ddo.on,.fo.on{color:var(--onpri)}
+
 /* ===== v12: reduced motion (must stay last) =====
    Kills entry travel and every hover/press displacement, keeps colour feedback.
    Deliberately NOT a blanket `*{transform:none}` - transform is load-bearing for the
