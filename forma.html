@@ -4,7 +4,7 @@
 <title>Forma — Gym Companion</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--pri-l:#5C1A22;--pri-d:#A8404F;--acc-l:#4B4D2C;--acc-d:#8E9358;--bgd:#171813;--cardd:#20211A;--lined:#34362A;--onpd:#F3EAD9;--bg:#ECE5D6;--card:#F8F2E7;--ink:#2B2C1A;--mut:#5A5C36;--pri:var(--pri-l);--onpri:#F8F2E7;--acc:var(--acc-l);--olv-t:#4B4D2C;--olv-s:#4B4D2C;--gold:#7C8048;--line:#D6CDB6;--sh:0 4px 14px rgba(42,42,28,.08);--shh:0 14px 32px rgba(42,42,28,.16);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--pri-l:#5C1A22;--pri-d:#A8404F;--acc-l:#4B4D2C;--acc-d:#8E9358;--bgd:#171813;--cardd:#20211A;--lined:#34362A;--onpd:#F3EAD9;--bg:#ECE5D6;--card:#F8F2E7;--ink:#2B2C1A;--mut:hsl(63 26% 26%);--pri:var(--pri-l);--onpri:#F8F2E7;--acc:var(--acc-l);--olv-t:#4B4D2C;--olv-s:#4B4D2C;--gold:#7C8048;--line:#D6CDB6;--sh:0 4px 14px rgba(42,42,28,.08);--shh:0 14px 32px rgba(42,42,28,.16);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 :root:not([data-theme="light"]){color-scheme:light dark}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--ink:#EDE6D6;--mut:#B5B28F;--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8E9358;--olv-t:#A9AE78;--olv-s:#2E301E;--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}}
 :root[data-theme="dark"]{--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--ink:#EDE6D6;--mut:#B5B28F;--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8E9358;--olv-t:#A9AE78;--olv-s:#2E301E;--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}
@@ -108,7 +108,6 @@ input[type=range]{accent-color:var(--olv-t);padding:0;border:0;background:none;b
 .fabs{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;flex-direction:column;gap:16px}
 .fab{width:56px;height:56px;border-radius:50%;border:0;font-size:26px;line-height:1;cursor:pointer;background:var(--card);box-shadow:var(--shh);transition:transform .25s,background .25s;padding:0}
 .fab:hover{transform:scale(1.1)}.fab.on{background:var(--pri)}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* ===== Forma v2 redesign ===== */
 *{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
@@ -444,10 +443,122 @@ nav,.fab,#toast,.rt,.ddl,.dpl,.sov-p,.mdl .card{box-shadow:var(--shp)}
 .cal{gap:2px}.cal .hc{min-height:44px;aspect-ratio:auto;border-radius:8px}
 }
 @media(max-width:640px),(pointer:coarse){button.chip{min-width:44px}input[style*="padding"]{min-height:44px}.dpg{gap:2px}}
+
+/* ===== v7: focal point - Hero dominates by area + elevation; secondary modules recede ===== */
+.bt-hero{min-height:clamp(400px,34vw,520px);padding:clamp(24px,2.4vw,40px);gap:clamp(24px,3vw,48px);align-content:center;position:relative;z-index:1;
+box-shadow:inset 0 1px 0 rgb(255 255 255 / .12),var(--shp)}
+.bt-hero:hover{box-shadow:inset 0 1px 0 rgb(255 255 255 / .12),var(--shp)}
+.bt-hero .ring{width:clamp(176px,16vw,240px)}.bt-hero .ring b{font-size:clamp(2.75rem,2.2rem + 1.8vw,3.75rem)}
+.bt-hero .stats{gap:16px;margin-bottom:24px}.bt-hero .stats b{font-size:clamp(1.75rem,1.4rem + 1vw,2.25rem)}
+:is(.bt-wat,.bt-stp,.bt-slp,.bt-cre),:is(.bt-wat,.bt-stp,.bt-slp,.bt-cre):hover{box-shadow:inset 0 1px 0 var(--edge),0 1px 2px rgb(43 44 26 / .05)}
+:is(.bt-wat,.bt-stp,.bt-slp,.bt-cre) .big{font-size:clamp(1.75rem,1.6rem + .6vw,2.125rem)}
+:is(.bt-wat,.bt-stp,.bt-slp,.bt-cre) h3{font-size:clamp(1.125rem,1.05rem + .3vw,1.25rem)}
+@media(max-width:640px){.bt-hero{min-height:0}.bt-hero .ring{width:176px}}
+
+/* ===== v7: measure - continuous text capped at ~60 characters per line ===== */
+p,.note{max-width:60ch}
+p[style*="text-align:center"],[style*="text-align:center"]>p{margin-left:auto!important;margin-right:auto!important}
+
+/* ===== v8: WCAG 2.2 contrast - focus rings (>=3:1) and secondary text (>=4.5:1) ===== */
+/* Solid outline instead of a translucent box-shadow: survives .btn{box-shadow:none} and forced-colors mode */
+:root{--focus:var(--olv-t);--onpri-mut:hsl(40 42% 86%)}
+input:focus,select:focus,textarea:focus,button:focus-visible{box-shadow:none}
+:focus-visible,button:focus-visible,.wnt:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
+/* On olive / wine surfaces the olive ring would vanish (1:1) - switch to cream */
+:is(.hero,.phero,.rt,.fo.on) :focus-visible{--focus:var(--onpri)}
+/* Muted text on dark surfaces: solid colour instead of opacity */
+.hero .mut,.phero span,.pbig small,.fo.on .mut,.rt .rtl span{color:var(--onpri-mut);opacity:1}
+/* Fat macro bar: solid tone instead of cream at .55 (non-text contrast >=3:1 vs its track) */
+.hero .bar.f i{background:hsl(40 30% 78%);opacity:1}
+
+/* ===== v9: desaturated semantic states (sage / clay / ochre / slate) =====
+   Two tiers on purpose: the pure tone is a SURFACE/HAIRLINE colour (it only reaches
+   ~2.1-3.3:1 on cream, so it can never carry text), the -fg tone is the text/icon
+   colour (>=4.5:1 on both cream surfaces). */
+:root{--ok:#7A8B76;--err:#C27365;--warn:#CBA363;--info:#748796;
+--ok-fg:#525E50;--err-fg:#8E4538;--warn-fg:#775828;--info-fg:#4F5D69}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ok-fg:#96A493;--err-fg:#CF9186;--warn-fg:#CBA362;--info-fg:#94A2AE}}
+:root[data-theme="dark"]{--ok-fg:#96A493;--err-fg:#CF9186;--warn-fg:#CBA362;--info-fg:#94A2AE}
+.note.ok{--sx:var(--ok);--sx-fg:var(--ok-fg)}
+.note.warn{--sx:var(--warn);--sx-fg:var(--warn-fg)}
+.note.err{--sx:var(--err);--sx-fg:var(--err-fg)}
+.note.info{--sx:var(--info);--sx-fg:var(--info-fg)}
+.note:is(.ok,.warn,.err,.info){background:color-mix(in srgb,var(--sx) 12%,var(--card));border:1px solid color-mix(in srgb,var(--sx) 45%,transparent);border-left:5px solid var(--sx-fg)}
+.note:is(.ok,.warn,.err,.info)>b:first-child,.note:is(.ok,.warn,.err,.info)>.sxt{color:var(--sx-fg)}
+/* status pills */
+.hst.w{background:color-mix(in srgb,var(--warn) 18%,var(--card));color:var(--warn-fg)}
+.hst.ok{background:color-mix(in srgb,var(--ok) 18%,var(--card));color:var(--ok-fg)}
+/* 7-day habit bars: the -fg tier, not the pure tone - a pure-tone fill only reaches
+   2.29:1 (sage) / 1.48:1 (ochre) against the empty-bar track and fails 1.4.11 */
+.hb i.ok{background:var(--ok-fg)}
+.hb i.mid{background:var(--warn-fg)}
+/* gym alerts: stalling = warning, recovery issue = danger */
+.note.al{background:color-mix(in srgb,var(--warn) 12%,var(--card));border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);border-left:5px solid var(--warn-fg)}
+.note.al>b:first-child{color:var(--warn-fg)}
+.note.al.high{background:color-mix(in srgb,var(--err) 12%,var(--card));border-color:color-mix(in srgb,var(--err) 45%,transparent);border-left-color:var(--err-fg)}
+.note.al.high>b:first-child{color:var(--err-fg)}
+/* invalid field: clay instead of the hardcoded #c0392b */
+.lx.err{border-color:var(--err-fg)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--err) 40%,transparent)}
+
+/* ===== v10: motion system - inertia curve, calibrated durations, staggered entry ===== */
+:root{--ease:cubic-bezier(.2,.8,.2,1);--t-micro:180ms;--t-press:100ms;--t-data:360ms;--t-panel:300ms;--stagger:60ms}
+.btn,.tab,.chip,button.chip,.fo,.ddo,.sw,.ftog,.ddb,.wkn,.opt,.hc,.dpc,.crb,.fab{transition-duration:var(--t-micro);transition-timing-function:var(--ease)}
+.card{transition:transform var(--t-micro) var(--ease),box-shadow var(--t-micro) var(--ease)}
+:is(.btn,.tab,.fab,.chip,.opt,.fo,.ddo,.dpc,.dpn,.hc,.sw):active{transition-duration:var(--t-press)}
+/* data components: long enough for the eye to register the delta */
+.bar i,.pbar i{transition:width var(--t-data) var(--ease)}
+.hb i{transition:height var(--t-data) var(--ease)}
+.ring circle{transition:stroke-dashoffset 400ms var(--ease)}
+.drops i{transition:background var(--t-micro) var(--ease),box-shadow var(--t-micro) var(--ease)}
+/* panels, dropdowns, toasts: same inertia curve */
+.ddl,#toast{transition:opacity var(--t-panel) var(--ease),transform var(--t-panel) var(--ease)}
+.fw{transition:grid-template-rows var(--t-panel) var(--ease)}
+.sov-p{transition:transform var(--t-panel) var(--ease)}
+main{animation:in var(--t-panel) var(--ease)}
+.card,.tile,.note,.phero,main>h2{animation-timing-function:var(--ease)}
+/* staggered entry: --i lives on the card classes (not inline) so the mobile
+   reorder below can override it without an !important fight */
+.bento :is(.card,.tile,.note){animation-delay:calc(var(--i,0) * var(--stagger))}
+.bt-hero{--i:0}.bt-stp{--i:1}.bt-slp{--i:2}.bt-wat{--i:3}.bt-cre{--i:4}.bt-log{--i:5}.bt-lgd{--i:6}.bt-exe{--i:7}
+@media(max-width:640px){.bt-hero{--i:0}.bt-log{--i:1}.bt-lgd{--i:2}.bt-exe{--i:3}.bt-wat{--i:4}.bt-stp{--i:5}.bt-slp{--i:6}.bt-cre{--i:7}}
+
+/* ===== v11: progressive disclosure - core KPI on the surface, detail in the panel ===== */
+.card>.hdr:first-child{margin-bottom:8px}
+.hdr .dtl{color:var(--olv-t);font-size:18px}
+.kpi{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.kpi .big{flex:none}
+body.sov-open{overflow:hidden}
+.sov-s{margin-top:24px}
+.sov-s:first-child{margin-top:0}
+.sov-s>h4{font:600 1.125rem/1.2 'Cormorant Garamond',Georgia,serif;margin:0 0 8px;color:var(--olv-t)}
+.sov-p .note{margin-bottom:0}
+.sov-p .how{margin-bottom:0}
+.sov-p:focus-visible{outline:none}
+/* the slimmed cards are stretched by the grid: header + KPI stay top, the
+   primary action is pinned to the bottom so the breathing room sits in between */
+.bt-stp,.bt-slp{display:flex;flex-direction:column}
+.bt-stp .hq,.bt-slp .hq{margin-top:auto;margin-bottom:0}
+.bt-slp .note{margin-top:16px!important;margin-bottom:0!important}
+/* creatine holds only a toggle + streak now: auto margins above and below centre
+   the group in the stretched grid cell instead of stranding it at the bottom */
+.bt-cre .crb{margin-top:auto!important}
+.bt-cre .kpi{margin-top:16px!important;margin-bottom:auto!important}
+
+/* ===== v12: reduced motion (must stay last) =====
+   Kills entry travel and every hover/press displacement, keeps colour feedback.
+   Deliberately NOT a blanket `*{transform:none}` - transform is load-bearing for the
+   dropdown chevrons, the water-drop glyphs, the toast centering and the FAB tooltips. */
+@media(prefers-reduced-motion:reduce){
+*{animation-duration:1ms!important;animation-delay:0ms!important;animation-iteration-count:1!important;
+transition-duration:1ms!important;transition-delay:0ms!important;scroll-behavior:auto!important}
+.card,.tile,.note,.phero,main,main>h2,#gout .card,.rt.done{animation:none!important}
+:is(.card,.tile,.btn,.tab,.fab,.sw,.ddb,.ftog,.chip,button.chip,.opt,.wkn,.fo,.ddo,.dpc,.hc,.crb,.dpn):is(:hover,:active,:focus-visible){transform:none!important}
+}
 </style></head><body>
 <header><h1>Forma</h1><div class="hd"><button class="btn s lgb" data-lg="en" aria-label="English">EN</button><button class="btn s lgb" data-lg="es" aria-label="Español">ES</button><button class="btn s" id="th" aria-label="Toggle light or dark">🌗</button></div></header>
 <nav id="nav"></nav><main id="main"></main><div id="toast"></div><div class="mdl" id="mdl" hidden><div class="card"><div style="font-size:44px">📏</div><h3>Monthly measurements</h3><p class="mut" id="mdt2"></p><div class="row" style="flex-wrap:nowrap"><button class="btn p" data-a="mgo">Measure now</button><button class="btn t" data-a="mlater">Tomorrow</button></div></div></div>
-<div class="sov" id="sov"><button class="sov-b" data-a="sclose" aria-label="Close" tabindex="-1"></button><aside class="sov-p" role="dialog" aria-modal="true" aria-labelledby="sovt"><div class="sov-h"><h3 id="sovt">How your goal is calculated</h3><button class="btn s" data-a="sclose" aria-label="Close">✕</button></div><div id="sovc"></div></aside></div>
+<div class="sov" id="sov"><button class="sov-b" data-a="sclose" aria-label="Close" tabindex="-1"></button><aside class="sov-p" role="dialog" aria-modal="true" aria-labelledby="sovt" tabindex="-1"><div class="sov-h"><h3 id="sovt">How your goal is calculated</h3><button class="btn s" data-a="sclose" aria-label="Close">✕</button></div><div id="sovc"></div></aside></div>
 <div class="ob" id="ob" hidden><div class="obc" id="obc"></div></div>
 <div class="fabs"><button class="fab" data-t="week" aria-label="Week" title="Week">📅</button><button class="fab" data-t="stats" aria-label="Stats" title="Stats">📊</button><button class="fab" data-t="plan" aria-label="Settings" title="Settings">⚙️</button></div>
 <div class="rt" id="rt" hidden><div class="rtt" id="rtt">0:00</div><div class="rtl"><b id="rtn"></b><span id="rtk"></span></div><div class="rbs"><button class="rb" data-a="rta" data-v="-30">−30s</button><button class="rb" data-a="rta" data-v="30">+30s</button><button class="rb" data-a="rtx" aria-label="Stop timer">✕</button></div><div class="rp" id="rtp"></div></div>
@@ -477,50 +588,57 @@ const meter=(l,v,g,u,c)=>`<div class="mtr"><div class="row" style="justify-conte
 
 const spark=ks=>{ks=ks.slice(-30);if(ks.length<2)return'';const v=ks.map(k=>S.wt[k]),a=Math.min(...v),R=Math.max(...v)-a||1,Y=y=>70-(y-a)/R*60,xy=v.map((y,i)=>[i/(v.length-1)*280+10,Y(y)]),pt=xy.map(q=>q.join(',')).join(' '),av=v.reduce((t,x)=>t+x,0)/v.length,l=xy[xy.length-1];return`<svg viewBox="0 0 300 80" style="width:100%;margin-bottom:8.0px" role="img"><defs><linearGradient id="sgf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--pri);stop-opacity:.24"/><stop offset="1" style="stop-color:var(--card);stop-opacity:.04"/></linearGradient></defs><polygon points="10,76 ${pt} 290,76" fill="url(#sgf)"/><line x1="10" x2="290" y1="${Y(av)}" y2="${Y(av)}" stroke="var(--olv-t)" stroke-width="1.5" stroke-dasharray="4 4" opacity=".75"/><polyline points="${pt}" fill="none" stroke="var(--pri)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${l[0]}" cy="${l[1]}" r="5" fill="var(--olv-t)" stroke="var(--card)" stroke-width="2"/></svg>`};
 
-/* ---- Daily habits: steps, sleep & recovery, creatine ---- */
+/* ---- Daily habits: core KPI on the card, detail in the slide-over ---- */
 const STEP_MIN=8000,STEP_MAX=10000;
 const l7=d=>[...Array(7)].map((_,i)=>{const x=new Date(d+'T00:00');x.setDate(x.getDate()-6+i);return fmt(x)});
 const dl=x=>DOW[(new Date(x+'T00:00').getDay()+6)%7];
 function hmini(d,get,max,cls){return`<div class="hb">${l7(d).map(x=>{const v=get(x)||0;return`<div class="${x==d?'cur':''}"><i class="${v?cls(v):''}" style="height:${v?Math.max(6,Math.min(100,v/max*100)):6}%"></i><span>${dl(x)}</span></div>`}).join('')}</div>`}
-function hab(d){
+const dtl=(k,l)=>`<button class="btn s ibtn dtl" data-a="sov" data-v="${k}" aria-haspopup="dialog" aria-label="${l}" title="${l}">\u22ef</button>`;
+function habd(d){
 const st=(S.stp||{})[d]||0,sl=(S.slp||{})[d]||0,sr=(S.str||{})[d]||0,cr=!!(S.cre||{})[d];
-const stCls=st>=STEP_MIN?'ok':'mid',slCls=v=>v>=7&&v<=9?'ok':v>=6?'mid':'';
-const avg=(m,v)=>{const a=l7(d).map(x=>(S[m]||{})[x]||0).filter(Boolean);return a.length?a.reduce((p,q)=>p+q,0)/a.length:0};
+const slCls=v=>v>=7&&v<=9?'ok':v>=6?'mid':'';
+const avg=m=>{const a=l7(d).map(x=>(S[m]||{})[x]||0).filter(Boolean);return a.length?a.reduce((p,q)=>p+q,0)/a.length:0};
 const sa=avg('stp'),la=avg('slp');
 let cs=0;{const x=new Date(d+'T00:00');if(!(S.cre||{})[fmt(x)])x.setDate(x.getDate()-1);while((S.cre||{})[fmt(x)]){cs++;x.setDate(x.getDate()-1)}}
-const stS=!st?['Not logged yet','']:st<STEP_MIN?['Keep walking','w']:st<=STEP_MAX?['In the target range ✅','']:['Above target 🔥',''];
-const slS=!sl?['Not logged yet','']:sl<6?['Under-recovered ⚠️','w']:sl<7?['Almost there','w']:sl<=9?['In the zone ✅','']:['Long sleep','w'];
-const low=(sl&&sl<6)||sr>=4;
-return[`<div class="card bt-stp"><h3>👟 Steps</h3>
-<div class="hv"><span class="big">${n0(st)}</span><span class="mut" style="text-align:right">Target 8,000–10,000 steps/day</span></div>
-<div class="bar tg"><i style="width:${Math.min(100,st/STEP_MAX*100)}%"></i><b class="tk" style="left:${STEP_MIN/STEP_MAX*100}%"></b></div>
-<div class="row" style="justify-content:space-between;margin-bottom:16px"><span class="hst ${stS[1]}" style="flex:none">${stS[0]}</span>${st&&st<STEP_MIN?`<span class="mut" style="text-align:right">${n0(STEP_MIN-st)} steps to reach 8,000</span>`:'<span></span>'}</div>
-<div class="row" style="flex-wrap:nowrap;align-items:flex-end"><label class="f" style="margin:0">Steps today<input id="stv" type="number" min="0" max="100000" step="1" inputmode="numeric" value="${st||''}" placeholder="Total steps"></label><button class="btn p" style="flex:none" data-a="stset">Save</button></div>
-<div class="hq"><button class="btn" data-a="stadd" data-v="1000">+1,000</button><button class="btn" data-a="stadd" data-v="2000">+2,000</button><button class="btn" data-a="stadd" data-v="5000">+5,000</button></div>
-<div class="mut" style="margin-top:16px">Last 7 days</div>${hmini(d,x=>(S.stp||{})[x],STEP_MAX,v=>v>=STEP_MIN?'ok':'mid')}
-<div class="hav"><span class="mut">Avg</span><b>${sa?n0(sa):'–'}</b></div>
-<p class="mut" style="margin:8px 0 0">Walking burns fat without taxing your muscle recovery or nervous system.</p></div>`,`<div class="card bt-slp"><h3>😴 Sleep &amp; recovery</h3>
-<div class="hv"><span class="big">${sl?r1(sl):'–'}<span class="mut" style="font:inherit;font-size:16px"> </span></span><span class="mut" style="text-align:right">Target 7–9 hours of quality sleep</span></div>
-<div class="bar tg"><i style="width:${Math.min(100,sl/9*100)}%"></i><b class="tk" style="left:${7/9*100}%"></b></div>
-<div style="margin-bottom:16px"><span class="hst ${slS[1]}">${slS[0]}</span></div>
-<div class="row" style="flex-wrap:nowrap;align-items:flex-end"><label class="f" style="margin:0">Hours slept<input id="slv" type="number" min="0" max="24" step="0.25" inputmode="decimal" value="${sl||''}" placeholder="e.g. 7.5"></label><button class="btn p" style="flex:none" data-a="slset">Save</button></div>
-<div class="hq">${[6,7,8,9].map(h=>`<button class="btn" data-a="slq" data-v="${h}">${h}</button>`).join('')}</div>
-<div class="mut" style="margin:16px 0 8px">Stress today</div>
-<div class="seg" style="margin-bottom:4px">${[1,2,3,4,5].map(n=>`<button class="btn ${sr==n?'on':''}" data-a="slst" data-v="${n}">${n}</button>`).join('')}</div>
-<div class="mut" style="margin-bottom:16px">1 = calm · 5 = very stressed</div>
-${low?`<div class="note" style="margin-bottom:16px">Low sleep or high stress: consider trimming volume or intensity today.</div>`:''}
-<div class="mut">Last 7 days</div>${hmini(d,x=>(S.slp||{})[x],9,slCls)}
-<div class="hav"><span class="mut">Avg</span><b>${la?r1(la):'–'}</b></div>
-<p class="mut" style="margin:8px 0 0">Sleep and stress set how much training volume you can tolerate and how well you build muscle.</p></div>`,`<div class="card bt-cre"><h3>💊 Creatine</h3>
-<button class="btn crb ${cr?'':'p'}" data-a="crtog">${cr?'Taken today ✅':'Mark as taken'}</button>
-<div class="crd">${l7(d).map(x=>`<div class="${x==d?'cur':''}"><i class="${(S.cre||{})[x]?'on':''}"></i><span>${dl(x)}</span></div>`).join('')}</div>
-<div class="tiles" style="grid-template-columns:repeat(2,1fr);margin:16.0px 0 0"><div class="tile"><b style="font:600 26px 'Cormorant Garamond',Georgia,serif;display:block">${cs}</b><span class="mut">Day streak</span></div><div class="tile"><b style="font:600 26px 'Cormorant Garamond',Georgia,serif;display:block">${l7(d).filter(x=>(S.cre||{})[x]).length}/7</b><span class="mut">This week</span></div></div>
-<p class="mut" style="margin:16px 0 0">Creatine monohydrate, 3–5 g daily. Consistency matters more than timing.</p></div>`]}
+const stS=!st?['Not logged yet','']:st<STEP_MIN?['Keep walking','w']:st<=STEP_MAX?['In the target range \u2705','ok']:['Above target 🔥','ok'];
+const slS=!sl?['Not logged yet','']:sl<6?['Under-recovered \u26a0\ufe0f','w']:sl<7?['Almost there','w']:sl<=9?['In the zone \u2705','ok']:['Long sleep','w'];
+return{st,sl,sr,cr,slCls,sa,la,cs,stS,slS,low:(sl&&sl<6)||sr>=4}}
+function hab(d){const h=habd(d);
+return[`<div class="card bt-stp"><div class="hdr"><h3>👟 Steps</h3>${dtl('steps','Steps history and details')}</div>
+<div class="kpi"><span class="big">${n0(h.st)}</span><span class="mut">of 8,000\u201310,000</span></div>
+<div class="bar tg"><i style="width:${Math.min(100,h.st/STEP_MAX*100)}%"></i><b class="tk" style="left:${STEP_MIN/STEP_MAX*100}%"></b></div>
+<div><span class="hst ${h.stS[1]}">${h.stS[0]}</span></div>
+<div class="hq"><button class="btn" data-a="stadd" data-v="1000">+1,000</button><button class="btn" data-a="stadd" data-v="2000">+2,000</button><button class="btn" data-a="stadd" data-v="5000">+5,000</button></div></div>`,
+`<div class="card bt-slp"><div class="hdr"><h3>😴 Sleep &amp; recovery</h3>${dtl('sleep','Sleep history and details')}</div>
+<div class="kpi"><span class="big">${h.sl?r1(h.sl):'\u2013'}</span><span class="mut">of 7\u20139 h</span></div>
+<div class="bar tg"><i style="width:${Math.min(100,h.sl/9*100)}%"></i><b class="tk" style="left:${7/9*100}%"></b></div>
+<div><span class="hst ${h.slS[1]}">${h.slS[0]}</span></div>
+<div class="hq">${[6,7,8,9].map(x=>`<button class="btn" data-a="slq" data-v="${x}">${x}</button>`).join('')}</div>
+${h.low?`<div class="note warn" style="margin-top:16px"><b>Ease off today</b><div class="mut" style="margin-top:4px">Low sleep or high stress: consider trimming volume or intensity.</div></div>`:''}</div>`,
+`<div class="card bt-cre"><div class="hdr"><h3>💊 Creatine</h3>${dtl('creatine','Creatine history and details')}</div>
+<button class="btn crb ${h.cr?'':'p'}" data-a="crtog">${h.cr?'Taken today \u2705':'Mark as taken'}</button>
+<div class="kpi" style="margin:16px 0 0"><span class="big">${h.cs}</span><span class="mut">day streak</span></div></div>`]}
+function stepsDetail(d){const h=habd(d);
+return`<div class="sov-s"><h4>Log today</h4><div class="row" style="flex-wrap:nowrap;align-items:flex-end"><label class="f" style="margin:0">Steps today<input id="stv" type="number" min="0" max="100000" step="1" inputmode="numeric" value="${h.st||''}" placeholder="Total steps"></label><button class="btn p" style="flex:none" data-a="stset">Save</button></div>
+<div><span class="hst ${h.stS[1]}">${h.stS[0]}</span></div>${h.st&&h.st<STEP_MIN?`<p class="mut" style="margin:8px 0 0">${n0(STEP_MIN-h.st)} steps to reach 8,000.</p>`:''}</div>
+<div class="sov-s"><h4>Last 7 days</h4>${hmini(d,x=>(S.stp||{})[x],STEP_MAX,v=>v>=STEP_MIN?'ok':'mid')}<div class="hav"><span class="mut">Avg</span><b>${h.sa?n0(h.sa):'\u2013'}</b></div></div>
+<div class="sov-s"><div class="note info"><b class="sxt">Why steps</b><div class="mut" style="margin-top:4px">Walking burns fat without taxing your muscle recovery or nervous system.</div></div></div>`}
+function sleepDetail(d){const h=habd(d);
+return`<div class="sov-s"><h4>Log today</h4><div class="row" style="flex-wrap:nowrap;align-items:flex-end"><label class="f" style="margin:0">Hours slept<input id="slv" type="number" min="0" max="24" step="0.25" inputmode="decimal" value="${h.sl||''}" placeholder="e.g. 7.5"></label><button class="btn p" style="flex:none" data-a="slset">Save</button></div>
+<div><span class="hst ${h.slS[1]}">${h.slS[0]}</span></div></div>
+<div class="sov-s"><h4>Stress today</h4><div class="seg" style="margin-bottom:4px">${[1,2,3,4,5].map(n=>`<button class="btn ${h.sr==n?'on':''}" data-a="slst" data-v="${n}">${n}</button>`).join('')}</div><div class="mut">1 = calm \u00b7 5 = very stressed</div></div>
+<div class="sov-s"><h4>Last 7 days</h4>${hmini(d,x=>(S.slp||{})[x],9,h.slCls)}<div class="hav"><span class="mut">Avg</span><b>${h.la?r1(h.la):'\u2013'}</b></div></div>
+<div class="sov-s"><div class="note info"><b class="sxt">Why it matters</b><div class="mut" style="margin-top:4px">Sleep and stress set how much training volume you can tolerate and how well you build muscle.</div></div></div>`}
+function creDetail(d){const h=habd(d);
+return`<div class="sov-s"><h4>Last 7 days</h4><div class="crd" style="margin-top:0">${l7(d).map(x=>`<div class="${x==d?'cur':''}"><i class="${(S.cre||{})[x]?'on':''}"></i><span>${dl(x)}</span></div>`).join('')}</div></div>
+<div class="sov-s"><div class="tiles" style="grid-template-columns:repeat(2,1fr);margin:0"><div class="tile"><b style="font:600 26px 'Cormorant Garamond',Georgia,serif;display:block">${h.cs}</b><span class="mut">Day streak</span></div><div class="tile"><b style="font:600 26px 'Cormorant Garamond',Georgia,serif;display:block">${l7(d).filter(x=>(S.cre||{})[x]).length}/7</b><span class="mut">This week</span></div></div></div>
+<div class="sov-s"><div class="note info"><b class="sxt">How to take it</b><div class="mut" style="margin-top:4px">Creatine monohydrate, 3\u20135 g daily. Consistency matters more than timing.</div></div></div>`}
+
 const V={
 today(){const hb=hab(day),d=day,c=calc(),t=tot(d),ex=S.ex[d]||0,bud=c.target+ex,left=Math.round(bud-t.k),pr=Math.min(1,t.k/bud),over=left<0,goal={cut:'Losing fat',maint:'Maintaining',bulk:'Building muscle'}[S.p.goal],nb='style="min-width:48px;flex:none"';
 return`<div class="row" style="justify-content:space-between;margin-bottom:16px"><div><h2 style="margin:0">${d==today()?'Today':d}</h2><div class="mut" style="margin-top:8px">${new Date(d+'T00:00').toLocaleDateString(LOC,{weekday:'long',month:'long',day:'numeric'})}</div></div><div class="row" style="flex:none;gap:8.0px"><button class="btn s" ${nb} data-a="dback">‹</button><button class="btn s" ${nb} data-a="dnext">›</button></div></div>
 <div class="bt-alt">${galmini()}</div><div class="bento">
-<div class="bt-L"><div class="card hero split bt-hero"><div><div class="ring"><svg viewBox="0 0 120 120"><defs><linearGradient id="rgf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:#C9CC9A"/><stop offset="1" style="stop-color:color-mix(in srgb,#A8404F 78%,#F3EAD9)"/></linearGradient></defs><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(243,234,217,.3)" stroke-width="10"/><circle cx="60" cy="60" r="52" fill="none" stroke="${over?'var(--gold)':'url(#rgf)'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="${326.7*(1-pr)}" transform="rotate(-90 60 60)"/></svg><b>${Math.abs(left)}<span class="mut" style="font:13px Montserrat">${over?'kcal over':'kcal left'}</span></b></div><p class="mut" style="text-align:center;margin:8px 0 0">${goal}</p></div>
+<div class="bt-L"><div class="card hero split bt-hero"><div><div class="ring"><svg viewBox="0 0 120 120"><defs><linearGradient id="rgf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:#C9CC9A"/><stop offset="1" style="stop-color:color-mix(in srgb,#A8404F 78%,#F3EAD9)"/></linearGradient></defs><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(243,234,217,.3)" stroke-width="10"/><circle cx="60" cy="60" r="52" fill="none" stroke="${over?'var(--warn)':'url(#rgf)'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="${326.7*(1-pr)}" transform="rotate(-90 60 60)"/></svg><b>${Math.abs(left)}<span class="mut" style="font:13px Montserrat">${over?'kcal over':'kcal left'}</span></b></div><p class="mut" style="text-align:center;margin:8px 0 0">${goal}</p></div>
 <div><div class="stats"><div><span class="mut">Budget</span><b>${bud}</b></div><div><span class="mut">Eaten</span><b>${Math.round(t.k)}</b></div><div><span class="mut">Burned</span><b>${ex}</b></div></div><div class="hmac">${meter('Protein',t.p,c.P,'g','')}${meter('Carbs',t.c,c.C,'g','c')}${meter('Fat',t.f,c.F,'g','f')}</div></div></div><div class="bt-pair">${hb[0]}${hb[1]}</div></div>
 <div class="bt-R">${wcard(d)}${hb[2]}</div>
 <div class="card bt-log"><h3>🍽️ Log a meal</h3><div class="seg">${[['pick','🔎 Pick'],['desc','🧮 Describe'],['new','✍️ Create']].map(([v,l])=>`<button class="btn ${lm==v?'on':''}" data-a="lm" data-v="${v}">${l}</button>`).join('')}</div>
@@ -528,8 +646,8 @@ return`<div class="row" style="justify-content:space-between;margin-bottom:16px"
 <div ${lm=='pick'?'hidden':''}><div ${lm!='desc'?'hidden':''}><label class="f">What did you eat?<input id="dq" value="${esc(dqv)}" placeholder="e.g. 200 g chicken breast fried in vegetable oil"></label><button class="btn a" data-a="est" style="margin-bottom:16px">🧮 Estimate nutrition</button></div>
 <div ${lm=='new'||nf.est?'':'hidden'}>${nf.note?`<p class="note">${esc(nf.note)}</p>`:''}${ffm(nf,'l')}<button class="btn p" data-a="lsave" style="margin-bottom:16px">Save food &amp; use it</button></div></div>
 <div class="row"><label class="f"><span id="ql">Amount</span><input id="qty" type="number" min="0" value="100"></label><label class="f">Meal<select id="ml">${MEALS.map(m=>`<option>${m}</option>`).join('')}</select></label></div><button class="btn p" data-a="add">Add to day</button></div>
-<div class="bt-S"><div class="card bt-lgd"><h3>🧾 Logged meals</h3><div class="scr">${MEALS.map(M=>{const it=(S.log[d]||[]).map((e,i)=>({e,i})).filter(x=>(x.e.m||'Snack')==M);return it.length?`<div class="mt">${M}</div>`+it.map(({e,i})=>{const f=S.foods.find(x=>x.id==e.i);if(!f)return'';const m=f.b=='g'?e.q/100:e.q;return`<div class="li"><div>${esc(f.name)}<div class="mut">${e.q}${f.b=='g'?' g':' units'} · ${Math.round(f.k*m)} kcal · P${r1(f.p*m)} C${r1(f.c*m)} F${r1(f.f*m)}</div></div><button class="btn s t" data-a="del" data-i="${i}">Remove</button></div>`}).join(''):''}).join('')||'<p class="mut">Nothing logged yet. Add your first meal on the left.</p>'}</div></div>
-<div class="card bt-exe"><h3>🔥 Exercise</h3><label class="f">Activity<select id="exa">${ACTV.map((a,i)=>`<option value="${i}">${a[0]} (MET ${a[1]})</option>`).join('')}</select></label><div class="row" style="flex-wrap:nowrap;align-items:flex-end"><label class="f" style="margin:0">Minutes<input id="exm" type="number" min="1" value="45"></label><button class="btn p" style="flex:none" data-a="exadd">Add</button></div>${((S.exl||{})[d]||[]).map((e,i)=>`<div class="li"><div>${esc(e.t)}<div class="mut">${e.m} min · ${e.k} kcal</div></div><button class="btn s t" data-a="exdel" data-i="${i}">Remove</button></div>`).join('')}<p class="mut" style="margin:8px 0 0">kcal = MET × weight (kg) × hours. Added to your daily budget.</p></div></div></div>`},
+<div class="bt-S"><div class="card bt-lgd"><div class="hdr"><h3>🧾 Logged meals</h3></div><div class="kpi"><span class="big">${(S.log[d]||[]).length}</span><span class="mut">items · ${n0(t.k)} kcal</span></div><div class="scr">${MEALS.map(M=>{const it=(S.log[d]||[]).map((e,i)=>({e,i})).filter(x=>(x.e.m||'Snack')==M);return it.length?`<div class="mt">${M}</div>`+it.map(({e,i})=>{const f=S.foods.find(x=>x.id==e.i);if(!f)return'';const m=f.b=='g'?e.q/100:e.q;return`<div class="li"><div>${esc(f.name)}<div class="mut">${e.q}${f.b=='g'?' g':' units'} · ${Math.round(f.k*m)} kcal · P${r1(f.p*m)} C${r1(f.c*m)} F${r1(f.f*m)}</div></div><button class="btn s t" data-a="del" data-i="${i}">Remove</button></div>`}).join(''):''}).join('')||'<p class="mut">Nothing logged yet. Add your first meal on the left.</p>'}</div></div>
+<div class="card bt-exe"><div class="hdr"><h3>🔥 Exercise</h3>${dtl('exercise','Exercise log and details')}</div><div class="kpi"><span class="big">${n0(ex)}</span><span class="mut">kcal burned${((S.exl||{})[d]||[]).length?` · ${((S.exl||{})[d]||[]).length} logged`:''}</span></div><label class="f">Activity<select id="exa">${ACTV.map((a,i)=>`<option value="${i}">${a[0]} (MET ${a[1]})</option>`).join('')}</select></label><div class="row" style="flex-wrap:nowrap;align-items:flex-end"><label class="f" style="margin:0">Minutes<input id="exm" type="number" min="1" value="45"></label><button class="btn p" style="flex:none" data-a="exadd">Add</button></div></div></div></div>`},
 
 plan(){const p=S.p,sel=(k,o)=>`<select data-k="p.${k}" data-n="1">${o.map(([v,l])=>`<option value="${v}" ${p[k]==v?'selected':''}>${l}</option>`).join('')}</select>`;
 return`<h2>Plan settings</h2><div class="g"><div class="card"><h3>🧬 Your data</h3><div class="seg">${[['m','Male'],['f','Female']].map(([v,l])=>`<button class="btn ${p.sex==v?'on':''}" data-a="sex" data-v="${v}">${l}</button>`).join('')}</div>
@@ -713,20 +831,32 @@ let wdrag=0;const wset=e=>{const sv=$('#wsv');if(!sv)return;const r=sv.getBoundi
 document.addEventListener('pointerdown',e=>{const sv=e.target.closest&&e.target.closest('#wsv');if(!sv)return;wdrag=1;try{sv.setPointerCapture(e.pointerId)}catch(x){}wset(e)});
 document.addEventListener('pointermove',e=>{if(wdrag)wset(e)});
 document.addEventListener('pointerup',()=>{if(wdrag){wdrag=0;save()}});
-function wcard(d){const g=wgoal(d),gs=wgs(),w=S.wa[d]||0,r=S.wr,sc=wsched(),c=calc(),inp=(id,v)=>`<input id="${id}" type="time" value="${v}" style="width:auto;flex:1">`;
-const R=!r?`<div class="note"><b>🔔 Want water reminders?</b><div class="mut" style="margin:4px 0 8px">We can spread your glasses across your day.</div><div class="row"><button class="btn p" data-a="wry">Yes, remind me</button><button class="btn t" data-a="wrn">Not now</button></div></div>`
-:r.on&&(!r.wake||r.edit)?`<div class="note"><b>🌙 When do you usually sleep?</b><div class="row" style="margin:8px 0;flex-wrap:nowrap"><label class="f" style="margin:0">Wake up${inp('wwk',r.wake||'07:00')}</label><label class="f" style="margin:0">Bed time${inp('wbd',r.bed||'23:00')}</label></div><button class="btn p" data-a="wrs">Save schedule</button></div>`
-:r.on?`<div><div class="mut" style="margin-bottom:8.0px">🔔 Your ${sc.length} glasses of ${gs} ml, ${r.wake} to ${r.bed}</div><div class="chips">${sc.map((m,i)=>`<span class="chip ${i<w?'on':''}">${fT(m)}</span>`).join('')}</div><div class="row" style="gap:8px"><button class="btn s" data-a="wre">Change times</button><button class="btn s t" data-a="wro">Turn off</button></div></div>`
-:`<button class="btn s" data-a="wry">🔔 Turn on reminders</button>`;
-return`<div class="card wat bt-wat"><div class="hdr"><h3>💧 Water</h3><button class="btn s ibtn" data-a="winfo" aria-label="How your goal is calculated" title="How your goal is calculated">ℹ️</button></div>${wgauge(d)}<div class="wrow"><button class="btn s wb" data-a="wm" aria-label="Remove a glass">−</button><span id="wnx" class="mut" style="flex:1;text-align:center">${wnext(d)}</span><button class="btn s wb" data-a="wp" aria-label="Add a glass">+</button></div>${R}
-</div>`}
+function wcard(d){
+return`<div class="card wat bt-wat"><div class="hdr"><h3>💧 Water</h3>${dtl('water','Water goal, reminders and details')}</div>${wgauge(d)}<div class="wrow"><button class="btn s wb" data-a="wm" aria-label="Remove a glass">\u2212</button><span id="wnx" class="mut" style="flex:1;text-align:center">${wnext(d)}</span><button class="btn s wb" data-a="wp" aria-label="Add a glass">+</button></div></div>`}
+function wremind(d){const gs=wgs(),w=S.wa[d]||0,r=S.wr,sc=wsched(),ti=(id,v)=>`<input id="${id}" type="time" value="${v}" style="width:auto;flex:1">`;
+return!r?`<div class="note info"><b class="sxt">🔔 Want water reminders?</b><div class="mut" style="margin:4px 0 8px">We can spread your glasses across your day.</div><div class="row"><button class="btn p" data-a="wry">Yes, remind me</button><button class="btn t" data-a="wrn">Not now</button></div></div>`
+:r.on&&(!r.wake||r.edit)?`<div class="note info"><b class="sxt">🌙 When do you usually sleep?</b><div class="row" style="margin:8px 0;flex-wrap:nowrap"><label class="f" style="margin:0">Wake up${ti('wwk',r.wake||'07:00')}</label><label class="f" style="margin:0">Bed time${ti('wbd',r.bed||'23:00')}</label></div><button class="btn p" data-a="wrs">Save schedule</button></div>`
+:r.on?`<div><div class="mut" style="margin-bottom:8px">Your ${sc.length} glasses of ${gs} ml, ${r.wake} to ${r.bed}</div><div class="chips">${sc.map((m,i)=>`<span class="chip ${i<w?'on':''}">${fT(m)}</span>`).join('')}</div><div class="row" style="gap:8px"><button class="btn s" data-a="wre">Change times</button><button class="btn s t" data-a="wro">Turn off</button></div></div>`
+:`<button class="btn s" data-a="wry">🔔 Turn on reminders</button>`}
+function waterDetail(d){return`<div class="sov-s"><h4>How your goal is calculated</h4>${winfo(d)}</div><div class="sov-s"><h4>Reminders</h4>${wremind(d)}</div>`}
+function exDetail(d){const l=(S.exl||{})[d]||[];
+return`<div class="sov-s"><h4>Logged today</h4>${l.map((e,i)=>`<div class="li"><div>${esc(e.t)}<div class="mut">${e.m} min \u00b7 ${e.k} kcal</div></div><button class="btn s t" data-a="exdel" data-i="${i}">Remove</button></div>`).join('')||'<p class="mut">Nothing logged yet.</p>'}</div>
+<div class="sov-s"><div class="note info"><b class="sxt">How it is counted</b><div class="mut" style="margin-top:4px">kcal = MET \u00d7 weight (kg) \u00d7 hours. Added to your daily calorie budget.</div></div></div>`}
+
 function winfo(d){const g=wgoal(d),gs=wgs(),c=calc();return`<div class="how"><div><div>Weight<small>${c.kg?r1(c.kg)+' kg × 32.5 ml'+(S.p.sex=='m'?', +10% for men':''):'Add your weight in Settings (using 2,000 ml)'}</small></div><b>${n0(g.base)}</b></div><div><div>Exercise<small>${g.mins} min logged, +425 ml per 30 min</small></div><b>+${n0(g.ex)}</b></div><div><div>Climate<small>Adds ${g.cl} ml</small></div><b>+${n0(g.cl)}</b></div><div><div>Total need<small>Drink about 80%, the other 20% comes from food</small></div><b>${n0(g.total)}</b></div><div><div>Your drinking goal<small>${r1(g.goal/gs)} glasses</small></div><b>${n0(g.goal)} ml</b></div></div>
 <label class="f" style="margin-top:16px">Climate<select id="wcl">${['Mild','Warm (+375 ml)','Hot or humid (+750 ml)'].map((x,i)=>`<option value="${i}" ${(S.wcl||0)==i?'selected':''}>${x}</option>`).join('')}</select></label><label class="gsz">Glass size<input id="gsz" type="number" min="50" max="2000" step="50" inputmode="numeric" value="${gs}" aria-label="Glass size in ml">ml</label>`}
 function wtick(){const w=S.wr;if(!w||!w.on||!w.wake)return;const n=new Date(),hm=n.getHours()*60+n.getMinutes(),k=today();if(!S.wn||S.wn.d!=k)S.wn={d:k,l:[]};wsched().forEach((m,i)=>{if(((m%1440)+1440)%1440==hm&&!S.wn.l.includes(i)){S.wn.l.push(i);const t='💧 Time for a glass of water';toast(t);try{if(Notification.permission=='granted')new Notification('Forma',{body:t})}catch(e){}}});save()}
-let sovO=0;
-function sovr(){const c=$('#sovc');if(!c)return;if(sovO){c.innerHTML=winfo(day);dd()}$('#sov').classList.toggle('on',!!sovO)}
-function sov(v){sovO=v;sovr();if(v){const b=$('#sov .sov-p .btn');if(b)b.focus()}}
-document.addEventListener('keydown',e=>{if(e.key=='Escape'&&sovO)sov(0)});
+const SOVS={water:['💧 Water',waterDetail],steps:['👟 Steps',stepsDetail],sleep:['😴 Sleep & recovery',sleepDetail],creatine:['💊 Creatine',creDetail],exercise:['🔥 Exercise',exDetail]};
+let sovO=null;
+function sovr(){const c=$('#sovc');if(!c)return;const s=SOVS[sovO];if(s){$('#sovt').textContent=s[0];c.innerHTML=s[1](day);dd()}$('#sov').classList.toggle('on',!!s);document.body.classList.toggle('sov-open',!!s)}
+function sov(v){if(v&&!SOVS[v])return;if(v){sovO=v;sovr();requestAnimationFrame(()=>{const f=$('#sov .sov-p');if(f&&sovO)f.focus()})}
+else{const k=sovO;sovO=null;sovr();const b=k&&document.querySelector(`[data-a="sov"][data-v="${k}"]`);if(b)b.focus()}}
+document.addEventListener('keydown',e=>{if(e.key=='Escape'&&sovO){sov(null);return}
+if(e.key!='Tab'||!sovO)return;const p=$('#sov .sov-p');if(!p)return;
+const f=[...p.querySelectorAll('button,input,select,textarea,[href]')].filter(x=>!x.disabled&&x.offsetParent);if(!f.length)return;
+const a=f[0],z=f[f.length-1];
+if(e.shiftKey&&document.activeElement==a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement==z){e.preventDefault();a.focus()}});
+
 let wdt=today(),mdt=today(),mk='waist';
 function syncw(){const ks=Object.keys(S.wt).sort();if(ks.length)S.p.w=S.wt[ks[ks.length-1]]}
 function mdue(){const ks=Object.keys(S.ms).sort(),l=ks[ks.length-1];if(!l)return true;const n=new Date(l+'T00:00');n.setMonth(n.getMonth()+1);return fmt(n)<=today()}
@@ -803,8 +933,8 @@ if(a=='rts'){const dy=glg!=null&&GR[gdn()][glg];if(!dy)return;const j=+b.dataset
 if(a=='rtq'){rtStart(b.dataset.v=='H'?'Heavy compound':'Isolation lift',b.dataset.v=='H');return}
 if(a=='rta'){rtAdj(+b.dataset.v);return}
 if(a=='rtx'){rtStop();return}
-if(a=='winfo'){sov(1);return}
-if(a=='sclose'){sov(0);return}
+if(a=='sov'){sov(b.dataset.v);return}
+if(a=='sclose'){sov(null);return}
 if(a=='gauto'){S.gym.auto=S.gym.auto===false;save();b.classList.toggle('on',S.gym.auto!==false);return}
 if(a=='gcv'){gcv[b.dataset.f]=b.dataset.v;$('#gch').innerHTML=gcharts();return}
 if(b.dataset.th){S.th=b.dataset.th;save();return ap()}
