@@ -4,7 +4,7 @@
 <title>Forma — Gym Companion</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--pri-l:#5C1A22;--pri-d:#A8404F;--acc-l:#4B4D2C;--acc-d:#8E9358;--bgd:#171813;--cardd:#20211A;--lined:#34362A;--onpd:#F3EAD9;--bg:#ECE5D6;--card:#F8F2E7;--ink:#2B2C1A;--mut:#5A5C36;--pri:var(--pri-l);--onpri:#F8F2E7;--acc:var(--acc-l);--olv-t:#4B4D2C;--olv-s:#4B4D2C;--gold:#7C8048;--line:#D6CDB6;--sh:0 4px 14px rgba(42,42,28,.08);--shh:0 14px 32px rgba(42,42,28,.16);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--pri-l:#5C1A22;--pri-d:#A8404F;--acc-l:#4B4D2C;--acc-d:#8E9358;--bgd:#171813;--cardd:#20211A;--lined:#34362A;--onpd:#F3EAD9;--bg:#ECE5D6;--card:#F8F2E7;--ink:#2B2C1A;--mut:hsl(63 26% 26%);--pri:var(--pri-l);--onpri:#F8F2E7;--acc:var(--acc-l);--olv-t:#4B4D2C;--olv-s:#4B4D2C;--gold:#7C8048;--line:#D6CDB6;--sh:0 4px 14px rgba(42,42,28,.08);--shh:0 14px 32px rgba(42,42,28,.16);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 :root:not([data-theme="light"]){color-scheme:light dark}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--ink:#EDE6D6;--mut:#B5B28F;--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8E9358;--olv-t:#A9AE78;--olv-s:#2E301E;--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}}
 :root[data-theme="dark"]{--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--ink:#EDE6D6;--mut:#B5B28F;--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8E9358;--olv-t:#A9AE78;--olv-s:#2E301E;--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}
@@ -459,6 +459,19 @@ box-shadow:inset 0 1px 0 rgb(255 255 255 / .12),var(--shp)}
 /* ===== v7: measure - continuous text capped at ~60 characters per line ===== */
 p,.note{max-width:60ch}
 p[style*="text-align:center"],[style*="text-align:center"]>p{margin-left:auto!important;margin-right:auto!important}
+
+/* ===== v8: WCAG 2.2 contrast - focus rings (>=3:1) and secondary text (>=4.5:1) ===== */
+/* Solid outline instead of a translucent box-shadow: survives .btn{box-shadow:none} and forced-colors mode */
+:root{--focus:var(--olv-t);--onpri-mut:hsl(40 42% 86%)}
+input:focus,select:focus,textarea:focus,button:focus-visible{box-shadow:none}
+:focus-visible,button:focus-visible,.wnt:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
+/* On olive / wine surfaces the olive ring would vanish (1:1) - switch to cream */
+:is(.hero,.phero,.rt,.fo.on) :focus-visible{--focus:var(--onpri)}
+/* Muted text on dark surfaces: solid colour instead of opacity */
+.hero .mut,.phero span,.pbig small,.fo.on .mut,.rt .rtl span{color:var(--onpri-mut);opacity:1}
+/* Fat macro bar: solid tone instead of cream at .55 (non-text contrast >=3:1 vs its track) */
+.hero .bar.f i{background:hsl(40 30% 78%);opacity:1}
 </style></head><body>
 <header><h1>Forma</h1><div class="hd"><button class="btn s lgb" data-lg="en" aria-label="English">EN</button><button class="btn s lgb" data-lg="es" aria-label="Español">ES</button><button class="btn s" id="th" aria-label="Toggle light or dark">🌗</button></div></header>
 <nav id="nav"></nav><main id="main"></main><div id="toast"></div><div class="mdl" id="mdl" hidden><div class="card"><div style="font-size:44px">📏</div><h3>Monthly measurements</h3><p class="mut" id="mdt2"></p><div class="row" style="flex-wrap:nowrap"><button class="btn p" data-a="mgo">Measure now</button><button class="btn t" data-a="mlater">Tomorrow</button></div></div></div>
