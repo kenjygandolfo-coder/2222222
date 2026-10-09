@@ -2,6 +2,16 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Forma — Gym Companion</title>
+<script>
+/* FOUC guard: runs before the stylesheet paints. data-theme is what the CSS keys
+   off; .dark-theme is a convenience hook. data-theme is left UNSET when the user
+   has never chosen, so the prefers-color-scheme block keeps following the OS live. */
+(function(){try{var s=JSON.parse(localStorage.getItem('forma1')||'{}'),r=document.documentElement;
+if(s.th)r.dataset.th=s.th;
+if(s.mode)r.dataset.theme=s.mode;
+var d=s.mode?s.mode=='dark':window.matchMedia('(prefers-color-scheme:dark)').matches;
+r.classList.toggle('dark-theme',d)}catch(e){}})();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--pri-l:#5C1A22;--pri-d:#A8404F;--acc-l:#4B4D2C;--acc-d:#8E9358;--bgd:#171813;--cardd:#20211A;--lined:#34362A;--onpd:#F3EAD9;--bg:#ECE5D6;--card:#F8F2E7;--ink:#2B2C1A;--mut:hsl(63 26% 26%);--pri:var(--pri-l);--onpri:#F8F2E7;--acc:var(--acc-l);--olv-t:#4B4D2C;--olv-s:#4B4D2C;--gold:#7C8048;--line:#D6CDB6;--sh:0 4px 14px rgba(42,42,28,.08);--shh:0 14px 32px rgba(42,42,28,.16);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -473,8 +483,12 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
 :is(.hero,.phero,.rt,.fo.on) :focus-visible{--focus:var(--onpri)}
 /* Muted text on dark surfaces: solid colour instead of opacity */
 .hero .mut,.phero span,.pbig small,.fo.on .mut,.rt .rtl span{color:var(--onpri-mut);opacity:1}
-/* Fat macro bar: solid tone instead of cream at .55 (non-text contrast >=3:1 vs its track) */
-.hero .bar.f i{background:hsl(40 30% 78%);opacity:1}
+/* the goal chip sits on a lightened tint of the hero, so the muted tone only
+   reached 4.29:1 there: full cream text on a darker chip instead */
+.phero .gt{background:rgba(243,234,217,.10);color:var(--onpri)}
+/* Fat macro bar: a light tinted olive via color-mix, not cream at .55 opacity.
+   Measured by pixel sampling against the composited track inside the hero. */
+.hero .bar.f i{background:color-mix(in srgb,var(--olv-t) 16%,var(--onpri));opacity:1}
 
 /* ===== v9: desaturated semantic states (sage / clay / ochre / slate) =====
    Two tiers on purpose: the pure tone is a SURFACE/HAIRLINE colour (it only reaches
@@ -552,6 +566,93 @@ body.sov-open{overflow:hidden}
 /* ===== v15: water card is the ring plus one pair of controls, nothing else ===== */
 .bt-wat .wrow{gap:32px;margin-top:-4px}
 
+/* ===== v16: language selector follows the gender-toggle pattern =====
+   Unselected: baseline capsule border on a recessed surface. Active: solid wine
+   with the light on-wine text tone. JS state logic is untouched; this is the
+   same .on hook applyLang() already sets. */
+.lgb{transition:background-color var(--t-micro) var(--ease),color var(--t-micro) var(--ease),border-color var(--t-micro) var(--ease)}
+/* unselected: transparent with the baseline capsule border, exactly like .seg .btn */
+.hd .btn.s.lgb,.obc .lgb{background:transparent;
+border:1.5px solid color-mix(in srgb,var(--olv-t) 30%,transparent);color:var(--olv-t)}
+.lgb.on,.hd .btn.s.lgb.on,.obc .lgb.on{background:var(--pri);border-color:transparent;color:var(--onpri)}
+.thb{background:color-mix(in srgb,var(--bg) 65%,var(--card));border:1.5px solid color-mix(in srgb,var(--olv-t) 30%,transparent)}
+
+/* ===== v17: selected option cards are solid wine, internals inverted ===== */
+.opt{transition:background-color var(--t-micro) var(--ease),color var(--t-micro) var(--ease),
+border-color var(--t-micro) var(--ease),box-shadow var(--t-micro) var(--ease),
+fill var(--t-micro) var(--ease),stroke var(--t-micro) var(--ease)}
+.opt.on{background:var(--pri);border-color:transparent;color:var(--onpri);box-shadow:var(--shv)}
+.opt.on b{color:var(--onpri)}
+.opt.on span,.opt.on .mut,.opt.on em,.opt.on small{color:var(--onpri-mut)}
+.opt.on svg{fill:var(--onpri);stroke:var(--onpri)}
+.opt.on .chip{background:rgba(243,234,217,.18);color:var(--onpri)}
+
+/* ===== v18: macro cards share one flex rhythm and one caption treatment ===== */
+.mac3>div{display:flex;flex-direction:column;gap:.5rem}
+.mac3 span,.mac3 b,.mac3 em{margin:0}
+.mac3 span{font-size:var(--fs-sm);line-height:1.3;color:var(--mut)}
+.mac3 em{font-family:Montserrat,system-ui,sans-serif;font-size:var(--fs-xs);line-height:1.4;
+color:var(--mut);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+
+/* ===== v19: caption tier + common-region date badge (8pt rhythm) ===== */
+.cap{font-size:clamp(.75rem,.72rem + .1vw,.875rem);line-height:1.5;color:var(--mut);margin:8px 0 0;max-width:60ch}
+.dbg{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+margin-bottom:24px;padding:16px 24px;border-radius:24px;
+background:color-mix(in srgb,var(--olv-t) 10%,var(--card));
+border:1.5px solid color-mix(in srgb,var(--olv-t) 28%,transparent)}
+.dbg h2{margin:0}.dbg h2::after{display:none}
+.dbg-k{display:inline-block;font:700 .6875rem/1 Montserrat,system-ui,sans-serif;letter-spacing:.14em;
+text-transform:uppercase;color:var(--olv-t);margin-bottom:8px}
+.dbg .cap{margin:8px 0 0}
+@media(max-width:560px){.dbg{padding:16px}}
+
+/* ===== v20: native CSS wheel picker (scroll-snap + IntersectionObserver) ===== */
+.whl-w{position:relative;border-radius:20px;overflow:hidden;
+background:color-mix(in srgb,var(--bg) 65%,var(--card));
+border:1.5px solid color-mix(in srgb,var(--olv-t) 45%,transparent);
+transition:border-color var(--t-micro) var(--ease)}
+.whl-w:focus-within{border-color:var(--olv-t);box-shadow:0 0 0 3px color-mix(in srgb,var(--olv-t) 22%,transparent)}
+/* centre selection slot, painted behind the scrolling list */
+.whl-w::before{content:"";position:absolute;left:8px;right:8px;top:50%;height:40px;transform:translateY(-50%);
+border-radius:12px;background:color-mix(in srgb,var(--olv-t) 12%,transparent);
+box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--olv-t) 32%,transparent);pointer-events:none;z-index:0}
+.whl{position:relative;z-index:1;height:200px;overflow-y:scroll;overflow-x:hidden;
+scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+scrollbar-width:none;-ms-overflow-style:none;background:transparent}
+.whl::-webkit-scrollbar{display:none}
+.whl:focus-visible{outline:none}
+.whl ul{list-style:none;margin:0;padding:80px 0}
+.whl li{height:40px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;
+font:500 1.0625rem/1 Montserrat,system-ui,sans-serif;color:var(--mut);cursor:pointer;
+transition:color var(--t-micro) var(--ease),font-size var(--t-micro) var(--ease)}
+.whl li.on{color:var(--pri);font:italic 600 1.75rem/1 'Cormorant Garamond',Georgia,serif}
+.whl-u{position:absolute;right:16px;top:50%;transform:translateY(-50%);z-index:2;
+font-size:var(--fs-sm);font-weight:600;color:var(--mut);pointer-events:none}
+@media(prefers-reduced-motion:reduce){.whl{scroll-behavior:auto}}
+
+/* ===== v21: sleep / naps modules + accent on the new inputs (60-30-10) ===== */
+.bt-pair{grid-template-columns:repeat(3,minmax(0,1fr))}
+.bt-slp,.bt-nap{display:flex;flex-direction:column}
+.bt-slp .fld,.bt-nap .fld{margin-top:auto}
+.fld{margin-top:16px}
+.fld .f{margin-bottom:8px}
+/* three modules share the left column, so the quick-add row gets tighter metrics */
+.bt-pair .hq{gap:4px}
+.bt-pair .hq .btn{padding-left:4px;padding-right:4px;font-size:var(--fs-xs)}
+input.acc{border-color:color-mix(in srgb,var(--olv-t) 45%,transparent)}
+input.acc:focus{border-color:var(--olv-t)}
+.bt-nap{--i:3}.bt-wat{--i:4}.bt-cre{--i:5}.bt-log{--i:6}.bt-lgd{--i:7}.bt-exe{--i:8}
+@media(max-width:1000px){.bt-pair{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){.bt-pair{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.bt-nap{order:8}.bt-cre{order:9}
+.bt-hero{--i:0}.bt-log{--i:1}.bt-lgd{--i:2}.bt-exe{--i:3}.bt-wat{--i:4}.bt-stp{--i:5}.bt-slp{--i:6}.bt-nap{--i:7}.bt-cre{--i:8}}
+
+/* ===== v22: theme swap is animated on the surfaces that change colour ===== */
+.card{transition:transform var(--t-micro) var(--ease),box-shadow var(--t-micro) var(--ease),
+background-color var(--t-panel) var(--ease),color var(--t-panel) var(--ease),border-color var(--t-panel) var(--ease)}
+.tile,.note,input,.ddb,.sov-p,.dbg,.whl-w,.hero,.phero,.mac3>div,.hst{
+transition:background-color var(--t-panel) var(--ease),color var(--t-panel) var(--ease),border-color var(--t-panel) var(--ease)}
+
 /* ===== v13: selected / active states are solid wine, not a wine-to-black gradient ===== */
 .tab.on,.tab.on:hover,.btn.p,.btn.p:hover,.seg .btn.on,.fab.on,.dpc.sel,.crd i.on,.ddo.on,.fo.on{background:var(--pri)}
 /* the gradient's dark end was doing contrast work for the label; dark mode --pri is a
@@ -569,7 +670,7 @@ transition-duration:1ms!important;transition-delay:0ms!important;scroll-behavior
 :is(.card,.tile,.btn,.tab,.fab,.sw,.ddb,.ftog,.chip,button.chip,.opt,.wkn,.fo,.ddo,.dpc,.hc,.crb,.dpn):is(:hover,:active,:focus-visible){transform:none!important}
 }
 </style></head><body>
-<header><h1>Forma</h1><div class="hd"><button class="btn s lgb" data-lg="en" aria-label="English">EN</button><button class="btn s lgb" data-lg="es" aria-label="Español">ES</button><button class="btn s" id="th" aria-label="Toggle light or dark">🌗</button></div></header>
+<header><h1>Forma</h1><div class="hd"><button class="btn s lgb" data-lg="en" aria-label="English">EN</button><button class="btn s lgb" data-lg="es" aria-label="Español">ES</button><button class="btn s thb" data-a="theme" aria-label="Toggle light or dark">🌗</button></div></header>
 <nav id="nav"></nav><main id="main"></main><div id="toast"></div><div class="mdl" id="mdl" hidden><div class="card"><div style="font-size:44px">📏</div><h3>Monthly measurements</h3><p class="mut" id="mdt2"></p><div class="row" style="flex-wrap:nowrap"><button class="btn p" data-a="mgo">Measure now</button><button class="btn t" data-a="mlater">Tomorrow</button></div></div></div>
 <div class="sov" id="sov"><button class="sov-b" data-a="sclose" aria-label="Close" tabindex="-1"></button><aside class="sov-p" role="dialog" aria-modal="true" aria-labelledby="sovt" tabindex="-1"><div class="sov-h"><h3 id="sovt">How your goal is calculated</h3><button class="btn s" data-a="sclose" aria-label="Close">✕</button></div><div id="sovc"></div></aside></div>
 <div class="ob" id="ob" hidden><div class="obc" id="obc"></div></div>
@@ -608,28 +709,36 @@ const dl=x=>DOW[(new Date(x+'T00:00').getDay()+6)%7];
 function hmini(d,get,max,cls){return`<div class="hb">${l7(d).map(x=>{const v=get(x)||0;return`<div class="${x==d?'cur':''}"><i class="${v?cls(v):''}" style="height:${v?Math.max(6,Math.min(100,v/max*100)):6}%"></i><span>${dl(x)}</span></div>`}).join('')}</div>`}
 const dtl=(k,l)=>`<button class="btn s ibtn dtl" data-a="sov" data-v="${k}" aria-haspopup="dialog" aria-label="${l}" title="${l}">\u22ef</button>`;
 function habd(d){
-const st=(S.stp||{})[d]||0,sl=(S.slp||{})[d]||0,sr=(S.str||{})[d]||0,cr=!!(S.cre||{})[d];
+const st=(S.stp||{})[d]||0,sl=(S.slp||{})[d]||0,sr=(S.str||{})[d]||0,cr=!!(S.cre||{})[d],np=(S.nap||{})[d]||0;
 const slCls=v=>v>=7&&v<=9?'ok':v>=6?'mid':'';
 const avg=m=>{const a=l7(d).map(x=>(S[m]||{})[x]||0).filter(Boolean);return a.length?a.reduce((p,q)=>p+q,0)/a.length:0};
-const sa=avg('stp'),la=avg('slp');
+const sa=avg('stp'),la=avg('slp'),na=avg('nap');
 let cs=0;{const x=new Date(d+'T00:00');if(!(S.cre||{})[fmt(x)])x.setDate(x.getDate()-1);while((S.cre||{})[fmt(x)]){cs++;x.setDate(x.getDate()-1)}}
 const stS=!st?['Not logged yet','']:st<STEP_MIN?['Keep walking','w']:st<=STEP_MAX?['In the target range \u2705','ok']:['Above target 🔥','ok'];
 const slS=!sl?['Not logged yet','']:sl<6?['Under-recovered \u26a0\ufe0f','w']:sl<7?['Almost there','w']:sl<=9?['In the zone \u2705','ok']:['Long sleep','w'];
-return{st,sl,sr,cr,slCls,sa,la,cs,stS,slS,low:(sl&&sl<6)||sr>=4}}
+const npS=!np?['No nap today','']:np<=.5?['Power nap ✅','ok']:np<=1.5?['Long nap','w']:['Very long nap','w'];
+return{st,sl,sr,cr,np,slCls,sa,la,na,cs,stS,slS,npS,low:(sl&&sl<6)||sr>=4}}
 function hab(d){const h=habd(d);
 return[`<div class="card bt-stp"><div class="hdr"><h3>👟 Steps</h3>${dtl('steps','Steps history and details')}</div>
-<div class="kpi"><span class="big">${n0(h.st)}</span><span class="mut">of 8,000\u201310,000</span></div>
+<div class="kpi"><span class="big">${n0(h.st)}</span><span class="mut">of 8,000–10,000</span></div>
 <div class="bar tg"><i style="width:${Math.min(100,h.st/STEP_MAX*100)}%"></i><b class="tk" style="left:${STEP_MIN/STEP_MAX*100}%"></b></div>
 <div><span class="hst ${h.stS[1]}">${h.stS[0]}</span></div>
 <div class="hq"><button class="btn" data-a="stadd" data-v="1000">+1,000</button><button class="btn" data-a="stadd" data-v="2000">+2,000</button><button class="btn" data-a="stadd" data-v="5000">+5,000</button></div></div>`,
-`<div class="card bt-slp"><div class="hdr"><h3>😴 Sleep &amp; recovery</h3>${dtl('sleep','Sleep history and details')}</div>
-<div class="kpi"><span class="big">${h.sl?r1(h.sl):'\u2013'}</span><span class="mut">of 7\u20139 h</span></div>
+`<div class="card bt-slp"><div class="hdr"><h3>😴 Night sleep</h3>${dtl('sleep','Sleep history and details')}</div>
+<div class="kpi"><span class="big">${h.sl?r1(h.sl):'–'}</span><span class="mut">of 7–9 h</span></div>
 <div class="bar tg"><i style="width:${Math.min(100,h.sl/9*100)}%"></i><b class="tk" style="left:${7/9*100}%"></b></div>
 <div><span class="hst ${h.slS[1]}">${h.slS[0]}</span></div>
-<div class="hq">${[6,7,8,9].map(x=>`<button class="btn" data-a="slq" data-v="${x}">${x}</button>`).join('')}</div>
-${h.low?`<div class="note warn" style="margin-top:16px"><b>Ease off today</b><div class="mut" style="margin-top:4px">Low sleep or high stress: consider trimming volume or intensity.</div></div>`:''}</div>`,
+${h.low?`<div class="note warn" style="margin-top:16px"><b>Ease off today</b><div class="mut" style="margin-top:4px">Low sleep or high stress: consider trimming volume or intensity.</div></div>`:''}
+<div class="fld"><label class="f" for="slv">Hours slept</label><div class="row" style="flex-wrap:nowrap;align-items:center"><input id="slv" class="acc" type="number" min="0" max="24" step="0.25" inputmode="decimal" value="${h.sl||''}" placeholder="e.g. 7.5"><button class="btn p" style="flex:none" data-a="slset">Save</button></div>
+<p class="cap">Sleep cycles run about 1 h 30 min, so totals like 6, 7.5 or 9 h usually feel better than waking mid-cycle.</p></div></div>`,
+`<div class="card bt-nap"><div class="hdr"><h3>🛌 Naps</h3>${dtl('naps','Nap history and details')}</div>
+<div class="kpi"><span class="big">${h.np?r1(h.np):'–'}</span><span class="mut">h today</span></div>
+<div class="bar tg"><i style="width:${Math.min(100,h.np/1.5*100)}%"></i><b class="tk" style="left:${.5/1.5*100}%"></b></div>
+<div><span class="hst ${h.npS[1]}">${h.npS[0]}</span></div>
+<div class="fld"><label class="f" for="npv">Nap hours</label><div class="row" style="flex-wrap:nowrap;align-items:center"><input id="npv" class="acc" type="number" min="0" max="6" step="0.25" inputmode="decimal" value="${h.np||''}" placeholder="e.g. 0.5"><button class="btn p" style="flex:none" data-a="npset">Save</button></div>
+<p class="cap">A 20–30 min nap restores alertness without grogginess. Past 1 h 30 min you complete a full cycle and it can eat into tonight's sleep.</p></div></div>`,
 `<div class="card bt-cre"><div class="hdr"><h3>💊 Creatine</h3>${dtl('creatine','Creatine history and details')}</div>
-<button class="btn crb ${h.cr?'':'p'}" data-a="crtog">${h.cr?'Taken today \u2705':'Mark as taken'}</button>
+<button class="btn crb ${h.cr?'':'p'}" data-a="crtog">${h.cr?'Taken today ✅':'Mark as taken'}</button>
 <div class="kpi" style="margin:16px 0 0"><span class="big">${h.cs}</span><span class="mut">day streak</span></div></div>`]}
 function stepsDetail(d){const h=habd(d);
 return`<div class="sov-s"><h4>Log today</h4><div class="row" style="flex-wrap:nowrap;align-items:flex-end"><label class="f" style="margin:0">Steps today<input id="stv" type="number" min="0" max="100000" step="1" inputmode="numeric" value="${h.st||''}" placeholder="Total steps"></label><button class="btn p" style="flex:none" data-a="stset">Save</button></div>
@@ -637,11 +746,12 @@ return`<div class="sov-s"><h4>Log today</h4><div class="row" style="flex-wrap:no
 <div class="sov-s"><h4>Last 7 days</h4>${hmini(d,x=>(S.stp||{})[x],STEP_MAX,v=>v>=STEP_MIN?'ok':'mid')}<div class="hav"><span class="mut">Avg</span><b>${h.sa?n0(h.sa):'\u2013'}</b></div></div>
 <div class="sov-s"><div class="note info"><b class="sxt">Why steps</b><div class="mut" style="margin-top:4px">Walking burns fat without taxing your muscle recovery or nervous system.</div></div></div>`}
 function sleepDetail(d){const h=habd(d);
-return`<div class="sov-s"><h4>Log today</h4><div class="row" style="flex-wrap:nowrap;align-items:flex-end"><label class="f" style="margin:0">Hours slept<input id="slv" type="number" min="0" max="24" step="0.25" inputmode="decimal" value="${h.sl||''}" placeholder="e.g. 7.5"></label><button class="btn p" style="flex:none" data-a="slset">Save</button></div>
-<div><span class="hst ${h.slS[1]}">${h.slS[0]}</span></div></div>
-<div class="sov-s"><h4>Stress today</h4><div class="seg" style="margin-bottom:4px">${[1,2,3,4,5].map(n=>`<button class="btn ${h.sr==n?'on':''}" data-a="slst" data-v="${n}">${n}</button>`).join('')}</div><div class="mut">1 = calm \u00b7 5 = very stressed</div></div>
+return`<div class="sov-s"><h4>Stress today</h4><div class="seg" style="margin-bottom:4px">${[1,2,3,4,5].map(n=>`<button class="btn ${h.sr==n?'on':''}" data-a="slst" data-v="${n}">${n}</button>`).join('')}</div><div class="mut">1 = calm \u00b7 5 = very stressed</div></div>
 <div class="sov-s"><h4>Last 7 days</h4>${hmini(d,x=>(S.slp||{})[x],9,h.slCls)}<div class="hav"><span class="mut">Avg</span><b>${h.la?r1(h.la):'\u2013'}</b></div></div>
 <div class="sov-s"><div class="note info"><b class="sxt">Why it matters</b><div class="mut" style="margin-top:4px">Sleep and stress set how much training volume you can tolerate and how well you build muscle.</div></div></div>`}
+function napDetail(d){const h=habd(d);
+return`<div class="sov-s"><h4>Last 7 days</h4>${hmini(d,x=>(S.nap||{})[x],2,v=>v<=.5?'ok':'mid')}<div class="hav"><span class="mut">Avg</span><b>${h.na?r1(h.na):'–'}</b></div></div>
+<div class="sov-s"><div class="note info"><b class="sxt">How naps fit in</b><div class="mut" style="margin-top:4px">Naps count towards recovery but not towards your 7–9 h night target. Keep them before mid-afternoon so they do not push back your bedtime.</div></div></div>`}
 function creDetail(d){const h=habd(d);
 return`<div class="sov-s"><h4>Last 7 days</h4><div class="crd" style="margin-top:0">${l7(d).map(x=>`<div class="${x==d?'cur':''}"><i class="${(S.cre||{})[x]?'on':''}"></i><span>${dl(x)}</span></div>`).join('')}</div></div>
 <div class="sov-s"><div class="tiles" style="grid-template-columns:repeat(2,1fr);margin:0"><div class="tile"><b style="font:600 26px 'Cormorant Garamond',Georgia,serif;display:block">${h.cs}</b><span class="mut">Day streak</span></div><div class="tile"><b style="font:600 26px 'Cormorant Garamond',Georgia,serif;display:block">${l7(d).filter(x=>(S.cre||{})[x]).length}/7</b><span class="mut">This week</span></div></div></div>
@@ -649,11 +759,11 @@ return`<div class="sov-s"><h4>Last 7 days</h4><div class="crd" style="margin-top
 
 const V={
 today(){const hb=hab(day),d=day,c=calc(),t=tot(d),ex=S.ex[d]||0,bud=c.target+ex,left=Math.round(bud-t.k),pr=Math.min(1,t.k/bud),over=left<0,goal={cut:'Losing fat',maint:'Maintaining',bulk:'Building muscle'}[S.p.goal],nb='style="min-width:48px;flex:none"';
-return`<div class="row" style="justify-content:space-between;margin-bottom:16px"><div><h2 style="margin:0">${d==today()?'Today':d}</h2><div class="mut" style="margin-top:8px">${new Date(d+'T00:00').toLocaleDateString(LOC,{weekday:'long',month:'long',day:'numeric'})}</div></div><div class="row" style="flex:none;gap:8.0px"><button class="btn s" ${nb} data-a="dback">‹</button><button class="btn s" ${nb} data-a="dnext">›</button></div></div>
+return`<div class="dbg"><div><span class="dbg-k">${d==today()?'Logging today':'Logging'}</span><h2 style="margin:0">${d==today()?'Today':d}</h2><div class="cap">${new Date(d+'T00:00').toLocaleDateString(LOC,{weekday:'long',month:'long',day:'numeric'})}</div></div><div class="row" style="flex:none;gap:8.0px"><button class="btn s" ${nb} data-a="dback" aria-label="Previous day">‹</button><button class="btn s" ${nb} data-a="dnext" aria-label="Next day">›</button></div></div>
 <div class="bt-alt">${galmini()}</div><div class="bento">
 <div class="bt-L"><div class="card hero split bt-hero"><div><div class="ring"><svg viewBox="0 0 120 120"><defs><linearGradient id="rgf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:#C9CC9A"/><stop offset="1" style="stop-color:color-mix(in srgb,#A8404F 78%,#F3EAD9)"/></linearGradient></defs><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(243,234,217,.3)" stroke-width="10"/><circle cx="60" cy="60" r="52" fill="none" stroke="${over?'var(--warn)':'url(#rgf)'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="${326.7*(1-pr)}" transform="rotate(-90 60 60)"/></svg><b>${Math.abs(left)}<span class="mut" style="font:13px Montserrat">${over?'kcal over':'kcal left'}</span></b></div><p class="mut" style="text-align:center;margin:8px 0 0">${goal}</p></div>
-<div><div class="stats"><div><span class="mut">Budget</span><b>${bud}</b></div><div><span class="mut">Eaten</span><b>${Math.round(t.k)}</b></div><div><span class="mut">Burned</span><b>${ex}</b></div></div><div class="hmac">${meter('Protein',t.p,c.P,'g','')}${meter('Carbs',t.c,c.C,'g','c')}${meter('Fat',t.f,c.F,'g','f')}</div></div></div><div class="bt-pair">${hb[0]}${hb[1]}</div></div>
-<div class="bt-R">${wcard(d)}${hb[2]}</div>
+<div><div class="stats"><div><span class="mut">Budget</span><b>${bud}</b></div><div><span class="mut">Eaten</span><b>${Math.round(t.k)}</b></div><div><span class="mut">Burned</span><b>${ex}</b></div></div><div class="hmac">${meter('Protein',t.p,c.P,'g','')}${meter('Carbs',t.c,c.C,'g','c')}${meter('Fat',t.f,c.F,'g','f')}</div></div></div><div class="bt-pair">${hb[0]}${hb[1]}${hb[2]}</div></div>
+<div class="bt-R">${wcard(d)}${hb[3]}</div>
 <div class="card bt-log"><h3>🍽️ Log a meal</h3><div class="seg">${[['pick','🔎 Pick'],['desc','🧮 Describe'],['new','✍️ Create']].map(([v,l])=>`<button class="btn ${lm==v?'on':''}" data-a="lm" data-v="${v}">${l}</button>`).join('')}</div>
 <div ${lm!='pick'?'hidden':''}><label class="f">Search foods<input id="fq" placeholder="Search by name"></label><button class="ftog" id="ft" data-a="ftog"></button><div class="fw" id="fw"><div><div class="chips" id="fc2"></div></div></div><div class="fl" id="fl"></div></div>
 <div ${lm=='pick'?'hidden':''}><div ${lm!='desc'?'hidden':''}><label class="f">What did you eat?<input id="dq" value="${esc(dqv)}" placeholder="e.g. 200 g chicken breast fried in vegetable oil"></label><button class="btn a" data-a="est" style="margin-bottom:16px">🧮 Estimate nutrition</button></div>
@@ -855,7 +965,7 @@ return`<div class="sov-s"><h4>Logged today</h4>${l.map((e,i)=>`<div class="li"><
 function winfo(d){const g=wgoal(d),gs=wgs(),c=calc();return`<div class="how"><div><div>Weight<small>${c.kg?r1(c.kg)+' kg × 32.5 ml'+(S.p.sex=='m'?', +10% for men':''):'Add your weight in Settings (using 2,000 ml)'}</small></div><b>${n0(g.base)}</b></div><div><div>Exercise<small>${g.mins} min logged, +425 ml per 30 min</small></div><b>+${n0(g.ex)}</b></div><div><div>Climate<small>Adds ${g.cl} ml</small></div><b>+${n0(g.cl)}</b></div><div><div>Total need<small>Drink about 80%, the other 20% comes from food</small></div><b>${n0(g.total)}</b></div><div><div>Your drinking goal<small>${r1(g.goal/gs)} glasses</small></div><b>${n0(g.goal)} ml</b></div></div>
 <label class="f" style="margin-top:16px">Climate<select id="wcl">${['Mild','Warm (+375 ml)','Hot or humid (+750 ml)'].map((x,i)=>`<option value="${i}" ${(S.wcl||0)==i?'selected':''}>${x}</option>`).join('')}</select></label><label class="gsz">Glass size<input id="gsz" type="number" min="50" max="2000" step="50" inputmode="numeric" value="${gs}" aria-label="Glass size in ml">ml</label>`}
 function wtick(){const w=S.wr;if(!w||!w.on||!w.wake)return;const n=new Date(),hm=n.getHours()*60+n.getMinutes(),k=today();if(!S.wn||S.wn.d!=k)S.wn={d:k,l:[]};wsched().forEach((m,i)=>{if(((m%1440)+1440)%1440==hm&&!S.wn.l.includes(i)){S.wn.l.push(i);const t='💧 Time for a glass of water';toast(t);try{if(Notification.permission=='granted')new Notification('Forma',{body:t})}catch(e){}}});save()}
-const SOVS={water:['💧 Water',waterDetail],steps:['👟 Steps',stepsDetail],sleep:['😴 Sleep & recovery',sleepDetail],creatine:['💊 Creatine',creDetail],exercise:['🔥 Exercise',exDetail]};
+const SOVS={water:['💧 Water',waterDetail],steps:['👟 Steps',stepsDetail],sleep:['😴 Night sleep',sleepDetail],naps:['🛌 Naps',napDetail],creatine:['💊 Creatine',creDetail],exercise:['🔥 Exercise',exDetail]};
 let sovO=null;
 function sovr(){const c=$('#sovc');if(!c)return;const s=SOVS[sovO];if(s){$('#sovt').textContent=s[0];c.innerHTML=s[1](day);dd()}$('#sov').classList.toggle('on',!!s);document.body.classList.toggle('sov-open',!!s)}
 function sov(v){if(v&&!SOVS[v])return;if(v){sovO=v;sovr();requestAnimationFrame(()=>{const f=$('#sov .sov-p');if(f&&sovO)f.focus()})}
@@ -920,21 +1030,51 @@ const MI=()=>`<button class="ftog ${mi?'open':''}" id="mib" data-a="minfo" style
 let oi=0;
 function unit(k,v){const p=S.p;if(k=='wu'&&p.wu&&v!=p.wu&&p.w!=='')p.w=r1(v=='lb'?p.w*2.20462:p.w/2.20462);if(k=='hu'&&p.hu&&v!=p.hu&&p.h!=='')p.h=r1(v=='in'?p.h/2.54:p.h*2.54);if(k=='wu'&&p.wu&&v!=p.wu)for(const d in S.wt)S.wt[d]=r1(v=='lb'?S.wt[d]*2.20462:S.wt[d]/2.20462);p[k]=v;save()}
 function chk(){const c=calc(),p=S.p,M='Pick an option to continue';if(oi==0&&!p.sex)return M;if(oi==2&&!p.hu)return'Choose centimeters or inches';if(oi==3&&!p.wu)return'Choose kilograms or pounds';if(oi==4&&!p.act)return M;if(oi==5&&!p.goal)return M;if(oi==1&&!(p.age>=12&&p.age<=100))return'Enter an age between 12 and 100';if(oi==2&&!(c.cm>=100&&c.cm<=250))return'Enter a realistic height';if(oi==3&&!(c.kg>=30&&c.kg<=300))return'Enter a realistic weight';return''}
+/* ---- Vertical wheel picker: scroll-snap list + IntersectionObserver ---- */
+const WHL={h:{cm:[120,230,1,170],in:[48,92,.5,67]},w:{kg:[35,200,.5,70],lb:[77,440,1,154]}};
+function whl(key,u,val){const r=WHL[key][u];if(!r)return'';const[a,b,st,def]=r;
+const n=Math.round((b-a)/st)+1,cur=(val===''||val==null||isNaN(+val))?def:Math.min(b,Math.max(a,+val));
+const items=[...Array(n)].map((_,i)=>{const v=r1(a+i*st);
+return`<li data-v="${v}" role="option" aria-selected="${Math.abs(v-cur)<st/2?'true':'false'}" class="${Math.abs(v-cur)<st/2?'on':''}">${v}</li>`}).join('');
+return`<div class="whl-w"><span class="whl-u">${u}</span><div class="whl" data-whl="${key}" role="listbox" tabindex="0" aria-label="${key=='h'?'Height':'Weight'} in ${u}"><ul>${items}</ul></div></div>`}
+function whlInit(){document.querySelectorAll('.whl').forEach(sc=>{
+if(sc.dataset.io)return;sc.dataset.io=1;
+const fld=sc.dataset.whl=='h'?'h':'w';
+const on=sc.querySelector('li.on')||sc.querySelector('li');
+if(on)sc.scrollTop=on.offsetTop-(sc.clientHeight-on.offsetHeight)/2;
+let t;
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(!e.isIntersecting)return;
+sc.querySelectorAll('li.on').forEach(x=>{x.classList.remove('on');x.setAttribute('aria-selected','false')});
+e.target.classList.add('on');e.target.setAttribute('aria-selected','true');
+const v=+e.target.dataset.v;
+clearTimeout(t);t=setTimeout(()=>{if(S.p[fld]!==v){S.p[fld]=v;save();res()}},90)})},
+{root:sc,rootMargin:'-48% 0px -48% 0px',threshold:0});
+sc.querySelectorAll('li').forEach(li=>io.observe(li));
+sc.addEventListener('click',e=>{const li=e.target.closest('li');if(li)li.scrollIntoView({block:'center',behavior:'smooth'})});
+sc.addEventListener('keydown',e=>{const d=e.key=='ArrowDown'?1:e.key=='ArrowUp'?-1:0;if(!d)return;e.preventDefault();
+const c=sc.querySelector('li.on')||sc.querySelector('li'),nx=d>0?c.nextElementSibling:c.previousElementSibling;
+if(nx)nx.scrollIntoView({block:'center',behavior:'smooth'})})})}
 function obr(){const p=S.p,seg=(a,k,o)=>`<div class="seg">${o.map(([v,l])=>`<button class="btn ${p[k]==v?'on':''}" data-a="${a}" data-v="${v}">${l}</button>`).join('')}</div>`;
 const T=['Sex assigned at birth','How old are you?','How tall are you?','What do you weigh?','How active are you?','What is your goal?','Your plan'];
 const B=[`<p class="mut">It sets the baseline in the Harris-Benedict formula that estimates your resting calories.</p>${seg('osx','sex',[['m','Male'],['f','Female']])}`,
 inp('Age in years','p.age','number',p.age,'min="12" max="100"'),
-seg('ohu','hu',[['cm','Centimeters'],['in','Inches']])+inp('Height'+(p.hu?' ('+p.hu+')':''),'p.h','number',p.h,'step="0.1"'),
-seg('owu','wu',[['kg','Kilograms'],['lb','Pounds']])+inp('Weight'+(p.wu?' ('+p.wu+')':''),'p.w','number',p.w,'step="0.1"'),
+seg('ohu','hu',[['cm','Centimeters'],['in','Inches']])+(p.hu?whl('h',p.hu,p.h)+'<p class="cap">Scroll the wheel or use the arrow keys. Tap a value to centre it.</p>':''),
+seg('owu','wu',[['kg','Kilograms'],['lb','Pounds']])+(p.wu?whl('w',p.wu,p.w)+'<p class="cap">Scroll the wheel or use the arrow keys. Tap a value to centre it.</p>':''),
 ACT.map(([v,n,d])=>`<button class="opt ${p.act==v?'on':''}" data-a="oact" data-v="${v}"><b>${n}</b><span>${d}</span></button>`).join(''),
 GL.map(([v,n,d,x])=>`<button class="opt ${p.goal==v?'on':''}" data-a="ogl" data-v="${v}" data-x="${x}"><b>${n}</b><span>${d}</span></button>${v=='maint'?MI():''}`).join(''),
 `<div class="card" style="margin-bottom:0"><div id="res"></div></div><p class="mut">You can change any of this later in Settings.</p>`];
-$('#obc').innerHTML=`<div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:16px"><button class="btn s lgb ${LANG=='en'?'on':''}" data-lg="en" style="flex:none">English</button><button class="btn s lgb ${LANG=='es'?'on':''}" data-lg="es" style="flex:none">Español</button></div><div class="pg"><i style="width:${(oi+1)/7*100}%"></i></div><h1>${T[oi]}</h1><div style="margin-top:16px">${B[oi]}</div><div class="row" style="margin-top:24px;flex-wrap:nowrap">${oi?'<button class="btn" data-a="obk">Back</button>':''}<button class="btn p" data-a="onx">${oi==6?'Start tracking':'Continue'}</button></div>`;if(oi==6)res()}
+$('#obc').innerHTML=`<div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:24px"><button class="btn s lgb ${LANG=='en'?'on':''}" data-lg="en" style="flex:none">English</button><button class="btn s lgb ${LANG=='es'?'on':''}" data-lg="es" style="flex:none">Español</button><button class="btn s thb" data-a="theme" style="flex:none" aria-label="Toggle light or dark">🌗</button></div><div class="pg"><i style="width:${(oi+1)/7*100}%"></i></div><h1>${T[oi]}</h1><div style="margin-top:16px">${B[oi]}</div><div class="row" style="margin-top:24px;flex-wrap:nowrap">${oi?'<button class="btn" data-a="obk">Back</button>':''}<button class="btn p" data-a="onx">${oi==6?'Start tracking':'Continue'}</button></div>`;if(oi==6)res();whlInit();thSync()}
 let tab='today';const TABS=[['today','🏠 Today'],['foods','🥑 Foods'],['weight','⚖️ Weight'],['body','📏 Body'],['gym','🏋️ Gym']];
 function go(t){tab=t;$('#nav').innerHTML=TABS.map(([k,l])=>`<button class="tab ${k==t?'on':''}" data-t="${k}">${l}</button>`).join('');const m=$('#main');m.innerHTML=V[t]();m.classList.toggle('wide',t=='week');m.style.animation='none';m.offsetHeight;m.style.animation='';if(t=='plan')res();if(t=='gym')gres();if(t=='today')flist();if(t=='stats')rs();document.querySelectorAll('.fab').forEach(x=>x.classList.toggle('on',x.dataset.t==t));dd();sovr()}
 document.addEventListener('input',e=>{const k=e.target.dataset.k;if(!k)return;if(k=='p.wu'||k=='p.hu'){const q=k=='p.wu'?'w':'h';unit(k.slice(2),e.target.value);const f=document.querySelector(`[data-k="p.${q}"]`);if(f)f.value=S.p[q];res();return}const[o,p]=k.split('.');let v=e.target.value;if(e.target.type=='number'||e.target.type=='range'||e.target.dataset.n)v=v===''?'':(parseFloat(v)||0);S[o][p]=v;save();if(o=='p')res();else gres()});
 document.addEventListener('change',e=>{if(e.target.id=='imp'){const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const o=JSON.parse(t);if(!o.p||!o.foods)throw 0;localStorage.setItem(K,t);location.reload()}catch(x){toast('That file is not a Forma backup')}});return}if(e.target.id=='wdt'){wdt=e.target.value||today();return go(tab)}if(e.target.id=='mdt'){mdt=e.target.value||today();return go(tab)}if(e.target.id=='wcl'){S.wcl=+e.target.value;save();return go(tab)}if(e.target.id=='gsz'){S.gs=Math.min(2000,Math.max(50,Math.round(parseFloat(e.target.value))||250));save();return go(tab)}if(e.target.id=='wgl'){S.wa[day]=Math.max(0,Math.floor(parseFloat(e.target.value))||0);save();return go(tab)}if(e.target.id=='fs'){const f=S.foods.find(x=>x.id==e.target.value);$('#ql').textContent=f.b=='g'?'Amount (grams)':'Amount (units)';$('#qty').value=f.b=='g'?100:1}});
-$('#th').onclick=()=>{const r=document.documentElement,d=r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches;S.mode=r.dataset.theme=d?'light':'dark';save()};
+function thDark(){const r=document.documentElement;return r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches}
+function thSync(){const d=thDark();document.documentElement.classList.toggle('dark-theme',d);
+document.querySelectorAll('.thb').forEach(b=>{b.textContent=d?'\u{1F319}':'\u2600\uFE0F';
+b.setAttribute('aria-label',d?'Dark theme on. Switch to light':'Light theme on. Switch to dark');
+b.setAttribute('aria-pressed',d?'true':'false')})}
+function thToggle(){const r=document.documentElement;S.mode=r.dataset.theme=thDark()?'light':'dark';save();thSync()}
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{if(!S.mode)thSync()});
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const a=b.dataset.a,d=today(),v=id=>$('#'+id).value;
 if(b.dataset.lg){setLang(b.dataset.lg);return}
 if(b.dataset.t){go(b.dataset.t);scrollTo(0,0);return}
@@ -942,6 +1082,7 @@ if(a=='rts'){const dy=glg!=null&&GR[gdn()][glg];if(!dy)return;const j=+b.dataset
 if(a=='rtq'){rtStart(b.dataset.v=='H'?'Heavy compound':'Isolation lift',b.dataset.v=='H');return}
 if(a=='rta'){rtAdj(+b.dataset.v);return}
 if(a=='rtx'){rtStop();return}
+if(a=='theme'){thToggle();return}
 if(a=='sov'){sov(b.dataset.v);return}
 if(a=='sclose'){sov(null);return}
 if(a=='gauto'){S.gym.auto=S.gym.auto===false;save();b.classList.toggle('on',S.gym.auto!==false);return}
@@ -1011,12 +1152,12 @@ else if(a=='gadis'){S.gym.adis=Object.keys(S.gym.wl||{}).sort().pop()||''}
 else if(a=='stset'){const raw=v('stv'),n=Math.round(+raw);if(raw===''||!(n>=0))return toast('Enter your steps');const s=(S.stp??={});if(n)s[day]=Math.min(n,100000);else delete s[day];toast('Steps saved')}
 else if(a=='stadd'){const s=(S.stp??={});s[day]=Math.min(100000,(s[day]||0)+(+b.dataset.v));toast('Steps added')}
 else if(a=='slset'){const raw=v('slv'),h=parseFloat(raw),s=(S.slp??={});if(raw===''){delete s[day];toast('Sleep cleared')}else{if(!(h>=0&&h<=24))return toast('Enter hours between 0 and 24');if(h)s[day]=Math.round(h*4)/4;else delete s[day];toast('Sleep saved')}}
-else if(a=='slq'){(S.slp??={})[day]=+b.dataset.v;toast('Sleep saved')}
+else if(a=='npset'){const raw=v('npv'),hh=parseFloat(raw),nn=(S.nap??={});if(raw===''){delete nn[day];toast('Nap cleared')}else{if(!(hh>=0&&hh<=6))return toast('Enter nap hours between 0 and 6');if(hh)nn[day]=Math.round(hh*4)/4;else delete nn[day];toast('Nap saved')}}
 else if(a=='slst'){const s=(S.str??={}),x=+b.dataset.v;if(s[day]==x)delete s[day];else s[day]=x}
 else if(a=='crtog'){const c=(S.cre??={});if(c[day])delete c[day];else c[day]=1;toast(c[day]?'Creatine logged':'Creatine unmarked')}
 else if(a=='wkp'||a=='wkx'){const x=new Date(wk0+'T00:00');x.setDate(x.getDate()+(a=='wkx'?7:-7));wk0=fmt(x)}
 else return;save();if(['gsw','gpick','gdays','ginc'].includes(a)&&$('#gout')){const y=scrollY;$('#gout').classList.add('q');gview();scrollTo(0,y);return}go(tab)});
-function ap(){const r=document.documentElement;r.dataset.th=S.th||'burgundy';if(S.mode)r.dataset.theme=S.mode;document.querySelectorAll('.sw').forEach(x=>x.classList.toggle('on',x.dataset.th==r.dataset.th))}ap();
+function ap(){const r=document.documentElement;r.dataset.th=S.th||'burgundy';if(S.mode)r.dataset.theme=S.mode;document.querySelectorAll('.sw').forEach(x=>x.classList.toggle('on',x.dataset.th==r.dataset.th))}ap();thSync();
 let LANG='en',LOC='en-US',DOW='MTWTFSS',DWK='MON TUE WED THU FRI SAT SUN';
 const D={
 "Close":"Cerrar","Failure. Every set of isolation and machine lifts":"Fallo. Todas las series de ejercicios aislados y de máquina","Top end of heavy compounds":"Extremo alto de los compuestos pesados","Stop timer":"Detener temporizador","Rest over, next set":"Descanso terminado, siguiente serie","Heavy compound · rest 3–4 min":"Compuesto pesado · descanso 3–4 min","Isolation lift · rest 2 min":"Ejercicio de aislamiento · descanso 2 min","Heavy compound":"Compuesto pesado","Isolation lift":"Ejercicio de aislamiento","RIR is required for every set.":"El RIR es obligatorio en cada serie.","⏱ Auto-start rest":"⏱ Descanso automático","⏱ Heavy 3:30":"⏱ Pesado 3:30","⏱ Isolation 2:00":"⏱ Aislamiento 2:00","Deload week: about half the sets, lighter weights, stop 3–4 reps short of failure.":"Semana de descarga: aproximadamente la mitad de las series, pesos más ligeros y detén cada serie 3–4 repeticiones antes del fallo.","Too close to failure for this target":"Demasiado cerca del fallo para este objetivo","Easier than planned":"Más fácil de lo planeado","Room to spare: add a rep or a little weight":"Te sobró margen: añade una repetición o un poco de peso","Push closer to failure on isolation lifts":"Acércate más al fallo en los ejercicios aislados","✅ On target":"✅ En el objetivo","Enter RIR (0–5) for every set":"Escribe el RIR (0–5) en cada serie","Workout saved · some sets were off the RIR target":"Entrenamiento guardado · algunas series se salieron del objetivo de RIR","📈 Strength progress":"📈 Progreso de fuerza","Squat":"Sentadilla","🏋️ Squat":"🏋️ Sentadilla","Deadlift":"Peso muerto","Estimated 1RM":"1RM estimado","No sessions logged yet. Log a workout with this lift to start your chart.":"Aún no hay sesiones. Registra un entrenamiento con este ejercicio para iniciar tu gráfico.","Log one more session to see the trend.":"Registra una sesión más para ver la tendencia.","Estimated 1RM per session from your best set, adjusted for the reps you had left (RIR). Deload sessions are left out.":"1RM estimado por sesión a partir de tu mejor serie, ajustado según las repeticiones que te quedaban (RIR). Las sesiones de descarga no se incluyen.","⚠️ Possible recovery issue":"⚠️ Posible problema de recuperación","👀 Strength is stalling":"👀 La fuerza se está estancando","Your numbers are trending down. Plan a deload week: about half the sets, weights around 10% lighter, and every set 3–4 reps from failure. If that feels like too much, drop 1 set from every exercise for the next two weeks.":"Tus números van a la baja. Planifica una semana de descarga: aproximadamente la mitad de las series, pesos alrededor de un 10 % más ligeros y cada serie a 3–4 repeticiones del fallo. Si es demasiado, quita 1 serie de cada ejercicio durante las próximas dos semanas.","Try cutting 1–2 sets from the stalled lifts next session, hit your RIR targets and protect your sleep. If it continues, take a deload.":"Prueba a quitar 1–2 series de los ejercicios estancados en la próxima sesión, cumple tus objetivos de RIR y cuida tu sueño. Si continúa, haz una descarga.","Your heavy lifts are being taken to failure, which adds fatigue.":"Estás llevando los ejercicios pesados al fallo, lo que añade fatiga.","Start deload week":"Iniciar semana de descarga","Dismiss":"Descartar","End deload":"Terminar descarga","🔄 Deload week":"🔄 Semana de descarga","Until":"Hasta","Half the sets, weights about 10% lighter, every set stopped 3–4 reps short of failure.":"La mitad de las series, pesos un 10 % más ligeros y cada serie detenida 3–4 repeticiones antes del fallo.","Open the Gym tab to see what to do.":"Abre la pestaña Gimnasio para ver qué hacer.","View":"Ver","Deload week started":"Semana de descarga iniciada","Deload ended":"Descarga terminada",
@@ -1133,6 +1274,6 @@ function applyLang(){LOC=LANG=='es'?'es':'en-US';MN=MNS[LANG];DOW=LANG=='es'?'LM
 function setLang(v){LANG=v;S.lang=v;save();applyLang();if(!$('#ob').hidden)obr();else go(tab);tr(document.body)}
 LANG=S.lang||((navigator.language||'').toLowerCase().startsWith('es')?'es':'en');applyLang();
 new MutationObserver(rs=>{for(const r of rs){if(r.type=='characterData')tr(r.target);r.addedNodes.forEach(tr)}}).observe(document.body,{childList:true,subtree:true,characterData:true});tr(document.body);
-document.addEventListener('keydown',e=>{if(e.key!='Enter')return;const m={stv:'stset',slv:'slset'}[e.target.id];if(m){e.preventDefault();const b=document.querySelector('[data-a="'+m+'"]');if(b)b.click()}});
+document.addEventListener('keydown',e=>{if(e.key!='Enter')return;const m={stv:'stset',slv:'slset',npv:'npset'}[e.target.id];if(m){e.preventDefault();const b=document.querySelector('[data-a="'+m+'"]');if(b)b.click()}});
 setInterval(wtick,20000);go('today');if(!S.done){$('#ob').hidden=false;obr()}else mprompt()
 </script></body></html>
