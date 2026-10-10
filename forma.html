@@ -368,7 +368,7 @@ grid-template-areas:
 .bt-L,.bt-R,.bt-log,.bt-S{grid-column:1/-1}.bt-R,.bt-S{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.bt-R .bt-cre,.bt-S .bt-lgd{flex:none}}
 @media(max-width:640px){.bento{grid-template-columns:minmax(0,1fr);gap:16px;grid-template-areas:none}
 .bt-L,.bt-R,.bt-S,.bt-pair{display:contents}.bt-log{grid-column:auto}
-.bt-hero{order:1}.bt-log{order:2}.bt-lgd{order:3}.bt-wat{order:5}.bt-stp{order:6}.bt-slp{order:7}.bt-cre{order:8}
+.bt-hero{order:1}.bt-wk{order:2}.bt-log{order:3}.bt-lgd{order:4}.bt-wat{order:5}.bt-stp{order:6}.bt-slp{order:7}.bt-cre{order:8}
 .bt-hero{padding:24px}.bt-hero .ring{width:128px}.bt-hero .ring b{font-size:32px}}
 
 /* ===== Typography: leading + fluid modular scale (clamp) ===== */
@@ -786,13 +786,35 @@ return`<div class="sov-s"><h4>Last 7 days</h4><div class="crd" style="margin-top
 <div class="sov-s"><div class="tiles" style="grid-template-columns:repeat(2,1fr);margin:0"><div class="tile"><b style="font:600 26px 'Cormorant Garamond',Georgia,serif;display:block">${h.cs}</b><span class="mut">Day streak</span></div><div class="tile"><b style="font:600 26px 'Cormorant Garamond',Georgia,serif;display:block">${l7(d).filter(x=>(S.cre||{})[x]).length}/7</b><span class="mut">This week</span></div></div></div>
 <div class="sov-s"><div class="note info"><b class="sxt">How to take it</b><div class="mut" style="margin-top:4px">Creatine monohydrate, 3\u20135 g daily. Consistency matters more than timing.</div></div></div>`}
 
+/* ---- Weekly plan card: the on-demand "recalculate my week" control ----
+   Shows the estimate first and only writes it to state when the user presses
+   the button, so the targets never move under their feet. */
+function wkcard(d){const e=wkEst(d),w=wplan(d),auto=!!S.auto,
+dn=x=>new Date(x+'T00:00').toLocaleDateString(LOC,{weekday:'short',month:'short',day:'numeric'}),
+mac=q=>`<div class="how" style="margin-top:8px"><div><div>Protein</div><b>${q.p} g</b></div><div><div>Carbs</div><b>${q.c} g</b></div><div><div>Fat</div><b>${q.f} g</b></div></div>`,
+days=n=>n>1?'days left':'day left';
+if(e.first)return`<div class="card bt-wk"><div class="hdr"><h3>\u{1F9ED} Weekly plan</h3></div>
+<div class="kpi"><span class="big">${n0(e.base.k)}</span><span class="mut">kcal \u00b7 <span>base target</span></span></div>${mac(e.base)}
+<p class="cap" style="margin:8px 0 0">Monday opens the week, so there is nothing to catch up yet. Recalculating becomes available from Tuesday.</p></div>`;
+const shown=auto?e:(w||e.base),fresh=w&&w.k==e.k&&w.p==e.p&&w.c==e.c&&w.f==e.f;
+return`<div class="card bt-wk"><div class="hdr"><h3>\u{1F9ED} Weekly plan</h3>${auto?'<span class="hst">Automatic</span>':w?'<span class="hst">Applied</span>':''}</div>
+<div class="kpi"><span class="big">${n0(shown.k)}</span><span class="mut">kcal \u00b7 ${e.rem} <span>${days(e.rem)}</span></span></div>${mac(shown)}
+${auto?`<p class="cap" style="margin:8px 0 0">Weekly auto-adjust is on, so this is applied for you and refreshes every time you log a meal.</p>
+<button class="btn s" style="margin-top:8px" data-a="wauto" data-v="0">Switch to on-demand</button>`
+:w?`<p class="cap" style="margin:8px 0 0"><span>Applied</span> ${dn(w.d)} \u00b7 <span>locked in until you recalculate</span></p>
+${fresh?'':`<p class="cap" style="margin:4px 0 0"><span>New estimate</span>: <b>${n0(e.k)}</b> kcal \u00b7 P ${e.p} \u00b7 C ${e.c} \u00b7 F ${e.f}</p>`}
+<div class="row" style="margin-top:8px"><button class="btn ${fresh?'s':'p'}" data-a="wkapply" data-d="${d}">${fresh?'Recalculate':'Update the plan'}</button><button class="btn s t" style="flex:none" data-a="wkclear">Clear</button></div>`
+:`<p class="cap" style="margin:8px 0 0">Spreads whatever is left of the weekly pot across the days that remain, today included. Nothing changes until you press it.</p>
+<button class="btn p crb" style="margin-top:8px" data-a="wkapply" data-d="${d}">Recalculate the rest of the week</button>`}
+${e.cap?`<p class="cap" style="margin:8px 0 0"><span>A safety limit applies, so part of the gap carries into next week. Allowed range</span>: <b>${n0(e.lo)}</b> \u2013 <b>${n0(e.hi)}</b> kcal.</p>`:''}</div>`}
+
 const V={
 today(){const hb=hab(day),d=day,c=calc(),dg=dayGoal(d),t=tot(d),bud=dg.k,left=Math.round(bud-t.k),pr=bud?Math.min(1,t.k/bud):(t.k?1:0),over=left<0,goal={cut:'Losing fat',maint:'Maintaining',bulk:'Building muscle'}[S.p.goal],nb='style="min-width:48px;flex:none"';
 return`<div class="dbg"><div><span class="dbg-k">${d==today()?'Logging today':'Logging'}</span><h2 style="margin:0">${d==today()?'Today':d}</h2><div class="cap">${new Date(d+'T00:00').toLocaleDateString(LOC,{weekday:'long',month:'long',day:'numeric'})}</div></div><div class="row" style="flex:none;gap:8.0px"><button class="btn s" ${nb} data-a="dback" aria-label="Previous day">‹</button><button class="btn s" ${nb} data-a="dnext" aria-label="Next day">›</button></div></div>
 <div class="bt-alt">${galmini()}</div><div class="bento">
 <div class="bt-L"><div class="card hero split bt-hero"><div><div class="ring"><svg viewBox="0 0 120 120"><defs><linearGradient id="rgf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:#C9CC9A"/><stop offset="1" style="stop-color:color-mix(in srgb,#A8404F 78%,#F3EAD9)"/></linearGradient></defs><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(243,234,217,.3)" stroke-width="10"/><circle cx="60" cy="60" r="52" fill="none" stroke="${over?'var(--warn)':'url(#rgf)'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="${326.7*(1-pr)}" transform="rotate(-90 60 60)"/></svg><b>${Math.abs(left)}<span class="mut" style="font:13px Montserrat">${over?'kcal over':'kcal left'}</span></b></div><p class="mut" style="text-align:center;margin:8px 0 0">${goal}</p>${dg.on&&dg.past?`<p class="mut cap" style="text-align:center;margin:8px 0 0">${dg.adj>0?'+':dg.adj<0?'\u2212':''}${n0(Math.abs(dg.adj))} <span>kcal vs base</span> \u00b7 ${dg.rem} <span>${dg.rem>1?'days left':'day left'}</span>${dg.cap?' \u00b7 <span>safety limit applied</span>':''}</p>`:''}</div>
 <div><div class="stats"><div><span class="mut">Budget</span><b>${bud}</b></div><div><span class="mut">Eaten</span><b>${Math.round(t.k)}</b></div><div><span class="mut">Left</span><b>${left}</b></div></div><div class="hmac">${meter('Protein',t.p,dg.p,'g','')}${meter('Carbs',t.c,dg.c,'g','c')}${meter('Fat',t.f,dg.f,'g','f')}</div></div></div><div class="bt-pair">${hb[0]}${hb[1]}${hb[2]}</div></div>
-<div class="bt-R">${wcard(d)}${hb[3]}</div>
+<div class="bt-R">${wkcard(d)}${wcard(d)}${hb[3]}</div>
 <div class="card bt-log"><h3>🍽️ Log a meal</h3><div class="seg">${[['pick','🔎 Pick'],['desc','🧮 Describe'],['new','✍️ Create']].map(([v,l])=>`<button class="btn ${lm==v?'on':''}" data-a="lm" data-v="${v}">${l}</button>`).join('')}</div>
 <div ${lm!='pick'?'hidden':''}><label class="f">Search foods<input id="fq" placeholder="Search by name"></label><button class="ftog" id="ft" data-a="ftog"></button><div class="fw" id="fw"><div><div class="chips" id="fc2"></div></div></div><div class="fl" id="fl"></div></div>
 <div ${lm=='pick'?'hidden':''}><div ${lm!='desc'?'hidden':''}><label class="f">What did you eat?<input id="dq" value="${esc(dqv)}" placeholder="e.g. 200 g chicken breast fried in vegetable oil"></label><button class="btn a" data-a="est" style="margin-bottom:16px">🧮 Estimate nutrition</button></div>
@@ -807,8 +829,9 @@ return`<h2>Plan settings</h2><div class="g"><div class="card"><h3>🧬 Your data
 ${inp('Age','p.age','number',p.age)}${inp('Body fat % (optional)','p.bf','number',p.bf||'','min="0" max="60" step="0.5"')}<p class="mut" style="margin:-8px 0 16px">At 22%+ body fat the plan uses your height in cm minus 100 as the calculation weight, so excess fat does not inflate calories and protein.</p><label class="f">Activity level${sel('act',[[1.2,'Sedentary (×1.2)'],[1.375,'Lightly active (×1.375)'],[1.55,'Moderately active (×1.55)'],[1.725,'Very active (×1.725)'],[1.9,'Extra active (×1.9)']])}</label></div>
 <div class="card"><h3>🎯 Goal</h3><div class="seg">${[['cut','Lose fat',-10],['maint','Maintain',0],['bulk','Build muscle',10]].map(([v,l,x])=>`<button class="btn ${p.goal==v?'on':''}" data-a="goal" data-v="${v}" data-x="${x}">${l}</button>`).join('')}</div>
 <p class="mut" style="margin:0 0 16px">${{cut:'Fat loss: body weight × 24 kcal, protein 2 g/kg. Aim to lose 0.5–1% of body weight per week.',maint:'Maintenance: your daily energy expenditure, protein 1.6 g/kg.',bulk:'Clean bulk: maintenance + 300 kcal, protein 1.6 g/kg. Gain at most 1% of body weight per month.'}[p.goal]||''} Fat is always 1 g/kg (never below 50 g) and carbs fill the rest. Calories and macros stay the same on rest days.</p>
-<div class="fld" style="margin-top:0"><label class="f">Weekly auto-adjust</label><div class="seg" style="margin-bottom:8px">${[['1','On'],['0','Off']].map(([v,l])=>`<button class="btn ${(S.auto?'1':'0')==v?'on':''}" data-a="wauto" data-v="${v}">${l}</button>`).join('')}</div>
+<div class="fld" style="margin-top:0"><label class="f">Weekly adjustment</label><div class="seg" style="margin-bottom:8px">${[['1','Automatic'],['0','On demand']].map(([v,l])=>`<button class="btn ${(S.auto?'1':'0')==v?'on':''}" data-a="wauto" data-v="${v}">${l}</button>`).join('')}</div>
 <p class="cap">Keeps the weekly total fixed instead of the daily one. Whatever you leave over or overspend earlier in the week is spread across the days that remain, today included. Mondays always use the base target, and a past day you never logged counts as if you hit the base exactly.</p>
+<p class="cap">With it off you stay in control: the Weekly plan card on Today shows the same estimate and only applies it when you press Recalculate, and the target then stays put until you press it again.</p>
 <p class="cap">Safety limits keep a badly skewed week from leaving you on a dangerous number: the adjusted target never goes above 25% over your base, and never below 25% under it or the hard floor, whichever is higher. Anything beyond that carries into next week.</p>
 ${S.p.goal?`<p class="cap"><span>For your current base that means staying between</span> <b>${n0(kBand(calc().target)[0])}</b> \u2013 <b>${n0(kBand(calc().target)[1])}</b> kcal.</p>`:''}</div>
 <div id="res"></div></div></div><p style="margin-top:8.0px;display:flex;gap:8.0px;flex-wrap:wrap"><button class="btn s" data-a="exp">⬇️ Export backup</button><label class="btn s" style="margin:0">⬆️ Import backup<input type="file" id="imp" accept="application/json" hidden></label><button class="btn s t" data-a="reset">Reset all data</button></p><p class="mut">Your data lives in this browser only. Export a backup now and then.</p>`},
@@ -837,8 +860,9 @@ else if(!sm.length)cu='<p class="mut" style="margin:0">Log at least one full day
 else{const behind=g=='cut'?diff>50:g=='bulk'?diff<-50:Math.abs(diff)>100;
 if(!behind)cu=`<p style="margin:0">✅ You are on track. ${diff==0?'Right on budget':n0(Math.abs(diff))+' kcal '+(diff>0?'over':'under')+' so far, which fits your goal'}. Keep your usual ${n0(c.target)} kcal a day.</p>`;
 else{const[flo,fhi]=kBand(c.target),raw=c.target-diff/rem,nk=clampG(raw,flo,fhi),cap=Math.abs(raw-nk)>5,C2=Math.max(0,Math.round((nk-c.P*4-c.F*9)/4));
-cu=`<p style="margin:0 0 8px">You are <b>${n0(Math.abs(diff))} kcal ${diff>0?'over':'under'}</b> your budget for the days logged so far. To still hit the week, spread it over the remaining <b>${rem} day${rem>1?'s':''}</b> (today included):</p><div class="how"><div><div>New daily target<small>instead of ${n0(c.target)} kcal</small></div><b>${n0(nk)}</b></div><div><div>Macros<small>protein kept, carbs absorb the change</small></div><b style="font-size:17px">P ${c.P} · C ${C2} · F ${c.F}</b></div></div>${cap?'<p class="mut" style="margin:8px 0 0">Capped at 25% from your normal target (and a safe minimum), so the rest carries into next week.</p>':''}`}}
+cu=`<p style="margin:0 0 8px">You are <b>${n0(Math.abs(diff))} kcal ${diff>0?'over':'under'}</b> your budget for the days logged so far. To still hit the week, spread it over the remaining <b>${rem} day${rem>1?'s':''}</b> (today included):</p><div class="how"><div><div>New daily target<small>instead of ${n0(c.target)} kcal</small></div><b>${n0(nk)}</b></div><div><div>Macros<small>protein kept, carbs absorb the change</small></div><b style="font-size:17px">P ${c.P} · C ${C2} · F ${c.F}</b></div></div>${cap?'<p class="mut" style="margin:8px 0 0">Capped at 25% from your normal target (and a safe minimum), so the rest carries into next week.</p>':''}${S.auto?'':`<div class="row" style="margin-top:16px"><button class="btn p" data-a="wkapply" data-d="${td}">${wplan(td)?'Update the plan':'Apply to the rest of the week'}</button>${wplan(td)?'<button class="btn s t" style="flex:none" data-a="wkclear">Clear</button>':''}</div>`}`}}
 if(S.auto&&w.cur&&cu)cu=`<div class="note info" style="margin:0 0 16px"><b class="sxt">Applied automatically</b><div class="mut" style="margin-top:4px">Weekly auto-adjust is on, so the Today card is already using the adjusted target of ${n0(dayGoal(td).k)} kcal.</div></div>`+cu;
+else if(w.cur&&cu&&wplan(td))cu=`<div class="note info" style="margin:0 0 16px"><b class="sxt">Plan applied</b><div class="mut" style="margin-top:4px">The Today card is using the target you applied, ${n0(dayGoal(td).k)} kcal, and keeps it until you recalculate.</div></div>`+cu;
 if(w.cur&&n>1&&A.p<c.P*.9)cu+=`<p class="mut" style="margin:16px 0 0">🥚 Protein is averaging ${n0(A.p)} g against a ${c.P} g target. Aim for about ${n0(c.P-A.p)} g extra per day.</p>`;
 const K=[['cal','Calories within 10% of the weekly budget'],['dir',g=='cut'?'In a calorie deficit':g=='bulk'?'In a calorie surplus':'Close to maintenance'],['pro','Protein at 90% or more of target'],['mac','Carbs and fat within 25% of target']];
 return`<h2>Weekly diary</h2><div class="row" style="flex-wrap:nowrap;margin-bottom:16px"><button class="btn s" style="flex:none" data-a="wkp" aria-label="Previous week">‹</button><h3 style="margin:0;text-align:center">${dn(ws)} – ${dn(w.dys[6])}</h3><button class="btn s" style="flex:none" data-a="wkx" aria-label="Next week">›</button></div>
@@ -1030,21 +1054,35 @@ const wkDays=ws=>[...Array(7)].map((_,i)=>{const x=new Date(ws+'T00:00');x.setDa
 const KFLOOR=()=>S.p.sex=='m'?1500:1200;
 const kBand=base=>[Math.min(base,Math.max(base*.75,KFLOOR())),base*1.25];
 const clampG=(raw,lo,hi)=>Math.max(0,Math.round(Math.min(hi,Math.max(lo,raw))));
-function dayGoal(d){const c=calc(),base={k:c.target,p:c.P,c:c.C,f:c.F},
-flat=on=>({...base,base,on,adj:0,rem:7,past:0,assumed:0,cap:false});
-if(!S.auto)return flat(false);
-const days=wkDays(wkStart(d)),i=days.indexOf(d);
-if(i<=0)return flat(true);
+/* The estimate on its own: what the remaining days need to look like for the
+   week to land on base x 7. Pure maths over the log, with no opinion on how it
+   gets applied, so the toggle and the manual button share one source. */
+function wkEst(d){const c=calc(),base={k:c.target,p:c.P,c:c.C,f:c.F},
+days=wkDays(wkStart(d)),i=days.indexOf(d),[lo,hi]=kBand(base.k),
+flat={...base,base,adj:0,rem:7,past:0,assumed:0,cap:false,first:true,lo:Math.round(lo),hi:Math.round(hi),used:{k:0,p:0,c:0,f:0}};
+if(i<=0)return flat;
 const u={k:0,p:0,c:0,f:0};let assumed=0;
 for(let j=0;j<i;j++){const x=days[j];
 if((S.log[x]||[]).length){const t=tot(x);u.k+=t.k;u.p+=t.p;u.c+=t.c;u.f+=t.f}
 else{assumed++;u.k+=base.k;u.p+=base.p;u.c+=base.c;u.f+=base.f}}
-const rem=7-i,raw=(b,used)=>(b*7-used)/rem,[lo,hi]=kBand(base.k),
+const rem=7-i,raw=(b,used)=>(b*7-used)/rem,
 rk=raw(base.k,u.k),k=clampG(rk,lo,hi),
 p=clampG(raw(base.p,u.p),base.p*.75,base.p*1.25),
 f=clampG(raw(base.f,u.f),base.f*.75,base.f*1.25),
 cb=Math.max(0,Math.round((k-p*4-f*9)/4));
-return{on:true,rem,past:i,assumed,used:u,base,adj:k-base.k,cap:Math.abs(rk-k)>5,lo:Math.round(lo),hi:Math.round(hi),k,p,c:cb,f}}
+return{rem,past:i,assumed,used:u,base,adj:k-base.k,cap:Math.abs(rk-k)>5,lo:Math.round(lo),hi:Math.round(hi),k,p,c:cb,f,first:false}}
+/* A plan the user applied with the Recalculate button. Frozen on purpose: it
+   covers the day it was created through Sunday and does not drift as more
+   meals get logged, so the number you were given in the morning is the number
+   you still have at night. Press the button again to refresh it. */
+const wplan=d=>{const w=S.wplan;return w&&w.ws==wkStart(d)&&d>=w.d?w:null};
+/* Precedence: the toggle wins when on, then a manually applied plan, then the
+   plain base target. */
+function dayGoal(d){const e=wkEst(d);
+if(S.auto)return{...e,on:true,src:'auto'};
+const w=wplan(d);
+if(w)return{...e,k:w.k,p:w.p,c:w.c,f:w.f,adj:w.k-e.base.k,cap:!!w.cap,on:true,src:'man',from:w.d};
+return{...e,...e.base,adj:0,cap:false,on:false,src:'off'}}
 function wkd(ws){const c=calc(),dys=[];for(let i=0;i<7;i++){const x=new Date(ws+'T00:00');x.setDate(x.getDate()+i);dys.push(fmt(x))}
 const D=dys.map(d=>({d,l:(S.log[d]||[]).length>0,t:tot(d),bud:c.target,td:c.tdee})),L=D.filter(x=>x.l),n=L.length||1,sum=k=>L.reduce((a,x)=>a+x.t[k],0),T={k:sum('k'),p:sum('p'),c:sum('c'),f:sum('f')},A={k:T.k/n,p:T.p/n,c:T.c/n,f:T.f/n},B=L.reduce((a,x)=>a+x.bud,0),TD=L.reduce((a,x)=>a+x.td,0),net=T.k-TD,g=S.p.goal;
 const ch={cal:L.length>0&&Math.abs(T.k-B)/B<=.1,dir:g=='cut'?net<0:g=='bulk'?net>0:Math.abs(net)<=TD*.05,pro:A.p>=c.P*.9,mac:Math.abs(A.c-c.C)<=c.C*.25&&Math.abs(A.f-c.F)<=c.F*.25};
@@ -1176,7 +1214,12 @@ if(a=='sp'||a=='sn'){const k=a=='sn'?1:-1;if(sv.m=='year')sv.y+=k;else{sv.mo+=k;
 if(a=='gd'){day=b.dataset.d;return go('today')}
 if(a=='sex'){S.p.sex=b.dataset.v}
 else if(a=='goal'){S.p.goal=b.dataset.v;S.p.pct=+b.dataset.x;S.p.kcal=+b.dataset.x*30}
-else if(a=='wauto'){S.auto=b.dataset.v=='1';toast(S.auto?'Weekly auto-adjust on':'Weekly auto-adjust off')}
+else if(a=='wauto'){S.auto=b.dataset.v=='1';toast(S.auto?'Weekly auto-adjust on':'Switched to on-demand recalculation')}
+else if(a=='wkapply'){const ad=b.dataset.d||day,e=wkEst(ad);
+if(e.first)return toast('Monday opens the week, there is nothing to catch up yet');
+S.wplan={ws:wkStart(ad),d:ad,k:e.k,p:e.p,c:e.c,f:e.f,cap:e.cap};
+toast(e.cap?'Plan applied, trimmed to the safety limit':'Plan applied to the rest of the week')}
+else if(a=='wkclear'){delete S.wplan;toast('Back to your base target')}
 else if(a=='pm'){S.p.mode=b.dataset.v}
 else if(a=='add'){const q=parseFloat($('#qty').value);if(!fsel)return toast('Pick a food first');if(!q)return toast('Enter an amount greater than 0');(S.log[day]??=[]).push({i:fsel,q,m:v('ml')});S.rec=[fsel,...S.rec.filter(x=>x!=fsel)].slice(0,8);toast('Meal added')}
 else if(a=='dback'||a=='dnext'){const x=new Date(day+'T00:00');x.setDate(x.getDate()+(a=='dnext'?1:-1));day=fmt(x)}
@@ -1271,7 +1314,7 @@ const D={
 "Thickest part of the calf, standing with weight even.":"Parte más gruesa de la pantorrilla, de pie con el peso repartido.",
 "Save measurements":"Guardar medidas","History":"Historial","Area":"Zona","Change":"Cambio","Nothing saved yet.":"Aún no hay nada guardado.","📈 Progress":"📈 Progreso","Add at least two entries with this area to see a chart.":"Añade al menos dos entradas de esta zona para ver el gráfico.","🗂️ Entries":"🗂️ Entradas",
 "Pick a date up to today":"Elige una fecha hasta hoy","Enter at least one measurement":"Escribe al menos una medida","Measurements saved":"Medidas guardadas","How to measure":"Cómo medir",
-"kcal vs base":"kcal frente a la base","day left":"día restante","days left":"días restantes","safety limit applied":"límite de seguridad aplicado","Weekly auto-adjust":"Ajuste automático semanal","On":"Activado","Off":"Desactivado","Weekly auto-adjust on":"Ajuste automático semanal activado","Weekly auto-adjust off":"Ajuste automático semanal desactivado","Keeps the weekly total fixed instead of the daily one. Whatever you leave over or overspend earlier in the week is spread across the days that remain, today included. Mondays always use the base target, and a past day you never logged counts as if you hit the base exactly.":"Mantiene fijo el total semanal en lugar del diario. Lo que te sobre o te pases en los días anteriores de la semana se reparte entre los días que quedan, hoy incluido. Los lunes siempre usan la meta base, y un día pasado que nunca registraste cuenta como si hubieras cumplido la base exactamente.","Safety limits keep a badly skewed week from leaving you on a dangerous number: the adjusted target never goes above 25% over your base, and never below 25% under it or the hard floor, whichever is higher. Anything beyond that carries into next week.":"Los límites de seguridad evitan que una semana muy desviada te deje en una cifra peligrosa: la meta ajustada nunca sube más de un 25 % sobre tu base, ni baja más de un 25 % por debajo de ella o del piso absoluto, el que sea mayor. Lo que exceda ese rango pasa a la semana siguiente.","For your current base that means staying between":"Con tu base actual eso significa mantenerte entre","Applied automatically":"Aplicado automáticamente","Weekly diary":"Diario semanal","My weekly diary":"Mi diario semanal","Previous week":"Semana anterior","Next week":"Semana siguiente","Nothing logged":"Sin registros","Open this day":"Abrir este día",
+"kcal vs base":"kcal frente a la base","day left":"día restante","days left":"días restantes","safety limit applied":"límite de seguridad aplicado","Weekly auto-adjust":"Ajuste automático semanal","Weekly adjustment":"Ajuste semanal","Automatic":"Automático","On demand":"Cuando yo lo pida","Weekly auto-adjust on":"Ajuste automático semanal activado","Switched to on-demand recalculation":"Cambiado a recálculo manual","🧭 Weekly plan":"🧭 Plan semanal","base target":"meta base","Applied":"Aplicado","Plan applied":"Plan aplicado","locked in until you recalculate":"fijo hasta que vuelvas a recalcular","New estimate":"Nueva estimación","Recalculate":"Recalcular","Update the plan":"Actualizar el plan","Clear":"Quitar","Recalculate the rest of the week":"Recalcular el resto de la semana","Apply to the rest of the week":"Aplicar al resto de la semana","Switch to on-demand":"Cambiar a manual","Spreads whatever is left of the weekly pot across the days that remain, today included. Nothing changes until you press it.":"Reparte lo que queda de la bolsa semanal entre los días restantes, hoy incluido. Nada cambia hasta que lo pulses.","Monday opens the week, so there is nothing to catch up yet. Recalculating becomes available from Tuesday.":"El lunes abre la semana, así que todavía no hay nada que compensar. El recálculo se activa a partir del martes.","Weekly auto-adjust is on, so this is applied for you and refreshes every time you log a meal.":"El ajuste automático semanal está activo, así que esto se aplica solo y se actualiza cada vez que registras una comida.","A safety limit applies, so part of the gap carries into next week. Allowed range":"Se aplica un límite de seguridad, así que parte de la diferencia pasa a la semana siguiente. Rango permitido","Plan applied to the rest of the week":"Plan aplicado al resto de la semana","Plan applied, trimmed to the safety limit":"Plan aplicado, recortado al límite de seguridad","Monday opens the week, there is nothing to catch up yet":"El lunes abre la semana, todavía no hay nada que compensar","Back to your base target":"De vuelta a tu meta base","With it off you stay in control: the Weekly plan card on Today shows the same estimate and only applies it when you press Recalculate, and the target then stays put until you press it again.":"Con el modo manual mandas tú: la tarjeta Plan semanal en Hoy muestra la misma estimación y solo la aplica cuando pulsas Recalcular, y la meta se queda fija hasta que lo vuelvas a pulsar.","Weekly auto-adjust off":"Ajuste automático semanal desactivado","Keeps the weekly total fixed instead of the daily one. Whatever you leave over or overspend earlier in the week is spread across the days that remain, today included. Mondays always use the base target, and a past day you never logged counts as if you hit the base exactly.":"Mantiene fijo el total semanal en lugar del diario. Lo que te sobre o te pases en los días anteriores de la semana se reparte entre los días que quedan, hoy incluido. Los lunes siempre usan la meta base, y un día pasado que nunca registraste cuenta como si hubieras cumplido la base exactamente.","Safety limits keep a badly skewed week from leaving you on a dangerous number: the adjusted target never goes above 25% over your base, and never below 25% under it or the hard floor, whichever is higher. Anything beyond that carries into next week.":"Los límites de seguridad evitan que una semana muy desviada te deje en una cifra peligrosa: la meta ajustada nunca sube más de un 25 % sobre tu base, ni baja más de un 25 % por debajo de ella o del piso absoluto, el que sea mayor. Lo que exceda ese rango pasa a la semana siguiente.","For your current base that means staying between":"Con tu base actual eso significa mantenerte entre","Applied automatically":"Aplicado automáticamente","Weekly diary":"Diario semanal","My weekly diary":"Mi diario semanal","Previous week":"Semana anterior","Next week":"Semana siguiente","Nothing logged":"Sin registros","Open this day":"Abrir este día",
 "🍽️ Totals and averages":"🍽️ Totales y promedios","Avg per day":"Promedio por día","Days logged":"Días registrados","🎯 Weekly goal reached?":"🎯 ¿Meta semanal cumplida?","Yes 🎉":"Sí 🎉","So far this week":"Hasta ahora esta semana","For the week":"En la semana","No meals logged this week yet":"Aún no hay comidas registradas esta semana",
 "Calories within 10% of the weekly budget":"Calorías dentro del 10 % del presupuesto semanal","In a calorie deficit":"En déficit calórico","In a calorie surplus":"En superávit calórico","Close to maintenance":"Cerca del mantenimiento","Protein at 90% or more of target":"Proteína al 90 % o más de la meta","Carbs and fat within 25% of target":"Carbos y grasa dentro del 25 % de la meta",
 "📊 Calories per day":"📊 Calorías por día","Dashed line = that day's budget":"Línea punteada = presupuesto de ese día","🍩 Macro split":"🍩 Distribución de macros","Log meals to see your macro split.":"Registra comidas para ver tu distribución de macros.","PROTEIN":"PROTEÍNA",
@@ -1321,6 +1364,8 @@ const R=[[/^Target RIR (.+)$/,'RIR objetivo $1'],[/^dropping across (\d+) sessio
 [/^(Height|Weight) \((\w+)\)$/,(m,a,b)=>(a=='Height'?'Estatura':'Peso')+' ('+b+')'],[/^Week of (.+)$/,'Semana del $1'],[/^Latest: (.+)$/,'Último: $1'],[/^(\d+) areas$/,'$1 zonas'],[/^How to measure (.+)$/,(m,a)=>'Cómo medir '+ts(a)],
 [/^avg (.+)$/,'prom. $1'],[/based on (\d+) logged days?/,(m,a)=>'según '+a+(a==1?' día registrado':' días registrados')],[/kcal over so far, which fits your goal/,'kcal de más hasta ahora, lo que encaja con tu objetivo'],[/kcal under so far, which fits your goal/,'kcal de menos hasta ahora, lo que encaja con tu objetivo'],
 [/^(\d[\d,]*) kcal over$/,'$1 kcal de más'],[/^(\d[\d,]*) kcal under$/,'$1 kcal de menos'],[/^(\d+) days?$/,(m,a)=>a+(a==1?' día':' días')],[/^instead of (.+)$/,'en lugar de $1'],
+[/^Weekly auto-adjust is on, so the Today card is already using the adjusted target of ([\d,]+) kcal\.$/,(m,a)=>'El ajuste automático semanal está activo, así que la tarjeta de Hoy ya usa la meta ajustada de '+a.replace(/,/g,'.')+' kcal.'],
+[/^The Today card is using the target you applied, ([\d,]+) kcal, and keeps it until you recalculate\.$/,(m,a)=>'La tarjeta de Hoy usa la meta que aplicaste, '+a.replace(/,/g,'.')+' kcal, y la mantiene hasta que vuelvas a recalcular.'],
 [/Protein is averaging (\d+) g against a (\d+) g target\. Aim for about (\d+) g extra per day\./,'Tu proteína promedia $1 g frente a una meta de $2 g. Intenta sumar unos $3 g extra por día.'],[/^on target on (\d+) of (\d+) logged days$/,'en objetivo $1 de $2 días registrados'],[/^weight change \((.+)\)$/,'cambio de peso ($1)'],
 [/^📝 Log workout: (.+)$/,(m,a)=>'📝 Registrar entrenamiento: '+ts(a)],[/^About (\d+) min$/,'Unos $1 min'],[/^last (.*) · next$/,'última vez $1 · siguiente'],[/^pick a load you can lift for (.+) reps$/,'elige una carga con la que puedas hacer $1 repeticiones'],
 [/^Saved: (.+)$/,(m,a)=>'Guardado: '+ts(a)],[/^(\d+) exercises · volume (.+) kg$/,'$1 ejercicios · volumen $2 kg'],[/· rest$/,'· descanso'],[/\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/g,m=>DY[m]]];
