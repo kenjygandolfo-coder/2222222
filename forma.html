@@ -653,6 +653,29 @@ background-color var(--t-panel) var(--ease),color var(--t-panel) var(--ease),bor
 .tile,.note,input,.ddb,.sov-p,.dbg,.whl-w,.hero,.phero,.mac3>div,.hst{
 transition:background-color var(--t-panel) var(--ease),color var(--t-panel) var(--ease),border-color var(--t-panel) var(--ease)}
 
+/* ===== v23: three separable macro fills + a delineated stacked bar =====
+   --gold and --acc both resolve to #8E9358 in dark mode, so the carbs and fat
+   segments were literally the same hex (1.00:1) and merged into one block.
+   Fat gets its own token, pushed away from carbs in each scheme. Three fills
+   from one earth family cannot all be separated by luminance alone, so the bar
+   also gets a capsule frame (showing where 100% ends) and wider gaps. */
+:root{--mfat:#30321B}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--mfat:#DCD5B8}}
+:root[data-theme="dark"]{--mfat:#DCD5B8}
+.pbar{gap:6px;height:14px;padding:2px;border-radius:999px;
+border:1px solid color-mix(in srgb,var(--olv-t) 32%,transparent)}
+.pbar i{border-radius:999px;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--card) 55%,transparent)}
+.pbar i.f{background:var(--mfat)}
+.mac3 .f span::before{background:var(--mfat)}
+.bar.f i{background:var(--mfat)}
+
+/* The fat column carries class "f", which also matches the global .f form-label
+   class (uppercase + 600 + letter-spacing + --mut + margin-bottom). That made it
+   render differently from Protein and Carbs. Neutralised inside .mac3 so all
+   three columns are structurally identical; .mac3 em re-applies the caption case. */
+.mac3>div{text-transform:none;letter-spacing:normal;font-weight:400;
+color:var(--ink);margin-bottom:0;font-size:var(--fs-body)}
+
 /* ===== v13: selected / active states are solid wine, not a wine-to-black gradient ===== */
 .tab.on,.tab.on:hover,.btn.p,.btn.p:hover,.seg .btn.on,.fab.on,.dpc.sel,.crd i.on,.ddo.on,.fo.on{background:var(--pri)}
 /* the gradient's dark end was doing contrast work for the label; dark mode --pri is a
