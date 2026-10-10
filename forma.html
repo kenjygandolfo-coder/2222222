@@ -310,7 +310,7 @@ grid-template-areas:
 "log log log log log log log lgd lgd lgd lgd lgd"
 "log log log log log log log exe exe exe exe exe"}
 .bento>*{min-width:0;margin:0!important}
-.bt-hero{grid-area:hero}.bt-wat{grid-area:wat}.bt-stp{grid-area:stp}.bt-slp{grid-area:slp}.bt-cre{grid-area:cre}.bt-log{grid-area:log}.bt-lgd{grid-area:lgd}.bt-exe{grid-area:exe}
+.bt-hero{grid-area:hero}.bt-wat{grid-area:wat}.bt-stp{grid-area:stp}.bt-slp{grid-area:slp}.bt-cre{grid-area:cre}.bt-log{grid-area:log}.bt-lgd{grid-area:lgd}
 .bt-hero{align-content:center}
 .bt-cre{display:flex;flex-direction:column;justify-content:space-between;gap:16px}.bt-cre>*{margin-top:0!important;margin-bottom:0!important}
 .bt-cre>h3{margin-bottom:-8px!important}
@@ -344,7 +344,7 @@ grid-template-areas:
 
 /* ===== v4: compact hero, independent columns, slide-over ===== */
 .bento{grid-template-areas:none;grid-template-columns:repeat(12,minmax(0,1fr));align-items:stretch}
-.bt-hero,.bt-wat,.bt-stp,.bt-slp,.bt-cre,.bt-log,.bt-lgd,.bt-exe{grid-area:auto}
+.bt-hero,.bt-wat,.bt-stp,.bt-slp,.bt-cre,.bt-log,.bt-lgd{grid-area:auto}
 .bt-L{grid-column:1/9}.bt-R{grid-column:9/13}.bt-log{grid-column:1/8}.bt-S{grid-column:8/13}
 .bt-L,.bt-R,.bt-S{display:flex;flex-direction:column;gap:24px;min-width:0}
 .bt-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;flex:1}
@@ -368,7 +368,7 @@ grid-template-areas:
 .bt-L,.bt-R,.bt-log,.bt-S{grid-column:1/-1}.bt-R,.bt-S{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.bt-R .bt-cre,.bt-S .bt-lgd{flex:none}}
 @media(max-width:640px){.bento{grid-template-columns:minmax(0,1fr);gap:16px;grid-template-areas:none}
 .bt-L,.bt-R,.bt-S,.bt-pair{display:contents}.bt-log{grid-column:auto}
-.bt-hero{order:1}.bt-log{order:2}.bt-lgd{order:3}.bt-exe{order:4}.bt-wat{order:5}.bt-stp{order:6}.bt-slp{order:7}.bt-cre{order:8}
+.bt-hero{order:1}.bt-log{order:2}.bt-lgd{order:3}.bt-wat{order:5}.bt-stp{order:6}.bt-slp{order:7}.bt-cre{order:8}
 .bt-hero{padding:24px}.bt-hero .ring{width:128px}.bt-hero .ring b{font-size:32px}}
 
 /* ===== Typography: leading + fluid modular scale (clamp) ===== */
@@ -540,8 +540,8 @@ main{animation:in var(--t-panel) var(--ease)}
 /* staggered entry: --i lives on the card classes (not inline) so the mobile
    reorder below can override it without an !important fight */
 .bento :is(.card,.tile,.note){animation-delay:calc(var(--i,0) * var(--stagger))}
-.bt-hero{--i:0}.bt-stp{--i:1}.bt-slp{--i:2}.bt-wat{--i:3}.bt-cre{--i:4}.bt-log{--i:5}.bt-lgd{--i:6}.bt-exe{--i:7}
-@media(max-width:640px){.bt-hero{--i:0}.bt-log{--i:1}.bt-lgd{--i:2}.bt-exe{--i:3}.bt-wat{--i:4}.bt-stp{--i:5}.bt-slp{--i:6}.bt-cre{--i:7}}
+.bt-hero{--i:0}.bt-stp{--i:1}.bt-slp{--i:2}.bt-wat{--i:3}.bt-cre{--i:4}.bt-log{--i:5}.bt-lgd{--i:6}
+@media(max-width:640px){.bt-hero{--i:0}.bt-log{--i:1}.bt-lgd{--i:2}.bt-wat{--i:4}.bt-stp{--i:5}.bt-slp{--i:6}.bt-cre{--i:7}}
 
 /* ===== v11: progressive disclosure - core KPI on the surface, detail in the panel ===== */
 .card>.hdr:first-child{margin-bottom:8px}
@@ -643,11 +643,11 @@ font-size:var(--fs-sm);font-weight:600;color:var(--mut);pointer-events:none}
 .bt-pair .hq .btn{padding-left:4px;padding-right:4px;font-size:var(--fs-xs)}
 input.acc{border-color:color-mix(in srgb,var(--olv-t) 45%,transparent)}
 input.acc:focus{border-color:var(--olv-t)}
-.bt-nap{--i:3}.bt-wat{--i:4}.bt-cre{--i:5}.bt-log{--i:6}.bt-lgd{--i:7}.bt-exe{--i:8}
+.bt-nap{--i:3}.bt-wat{--i:4}.bt-cre{--i:5}.bt-log{--i:6}.bt-lgd{--i:7}
 @media(max-width:1000px){.bt-pair{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:760px){.bt-pair{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){.bt-nap{order:8}.bt-cre{order:9}
-.bt-hero{--i:0}.bt-log{--i:1}.bt-lgd{--i:2}.bt-exe{--i:3}.bt-wat{--i:4}.bt-stp{--i:5}.bt-slp{--i:6}.bt-nap{--i:7}.bt-cre{--i:8}}
+.bt-hero{--i:0}.bt-log{--i:1}.bt-lgd{--i:2}.bt-wat{--i:3}.bt-stp{--i:4}.bt-slp{--i:5}.bt-nap{--i:6}.bt-cre{--i:7}}
 
 /* ===== v22: theme swap is animated on the surfaces that change colour ===== */
 .card{transition:transform var(--t-micro) var(--ease),box-shadow var(--t-micro) var(--ease),
@@ -706,10 +706,14 @@ const K='forma1',$=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]
 const fmt=x=>`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`,today=()=>fmt(new Date());
 let S={p:{sex:'',w:'',wu:'',h:'',hu:'',age:'',act:0,goal:'',pct:0,kcal:0,mode:'pct'},
 foods:[{id:1,name:'Chicken breast (raw)',cat:'Protein',b:'g',k:120,p:23,c:0,f:2.6},{id:2,name:'White rice (cooked)',cat:'Carbs',b:'g',k:130,p:2.7,c:28,f:.3},{id:3,name:'Whole egg',cat:'Protein',b:'u',k:72,p:6.3,c:.4,f:4.8},{id:4,name:'Oats (dry)',cat:'Carbs',b:'g',k:389,p:16.9,c:66,f:6.9}],
-log:{},wa:{},rec:[],cats:['Protein','Carbs','Fats','Dairy','Fruit & Veg','Snacks','Drinks'],wt:{},ms:{},ex:{},gym:{yrs:.5,days:4,hrs:1},nid:10};
+log:{},wa:{},rec:[],cats:['Protein','Carbs','Fats','Dairy','Fruit & Veg','Snacks','Drinks'],wt:{},ms:{},gym:{yrs:.5,days:4,hrs:1},nid:10};
 try{const x=localStorage.getItem(K);if(x)S=Object.assign(S,JSON.parse(x))}catch(e){}
 if(!S.done)S.p={sex:'',w:'',wu:'',h:'',hu:'',age:'',act:0,goal:'',pct:0,kcal:0,mode:'pct'};
 const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+/* Migration: exercise logging is gone. Base calories already account for the
+   activity level (TDEE), so burned calories no longer top up the day or the
+   weekly pot. Drop the old keys from saved state. */
+if(S.ex!==undefined||S.exl!==undefined){delete S.ex;delete S.exl;save()}
 const toast=m=>{const t=$('#toast');t.textContent=m;t.className='on';clearTimeout(toast.t);toast.t=setTimeout(()=>t.className='',2600)};
 const r1=n=>Math.round(n*10)/10;
 
@@ -783,19 +787,18 @@ return`<div class="sov-s"><h4>Last 7 days</h4><div class="crd" style="margin-top
 <div class="sov-s"><div class="note info"><b class="sxt">How to take it</b><div class="mut" style="margin-top:4px">Creatine monohydrate, 3\u20135 g daily. Consistency matters more than timing.</div></div></div>`}
 
 const V={
-today(){const hb=hab(day),d=day,c=calc(),dg=dayGoal(d),t=tot(d),ex=S.ex[d]||0,bud=dg.k+ex,left=Math.round(bud-t.k),pr=bud?Math.min(1,t.k/bud):(t.k?1:0),over=left<0,goal={cut:'Losing fat',maint:'Maintaining',bulk:'Building muscle'}[S.p.goal],nb='style="min-width:48px;flex:none"';
+today(){const hb=hab(day),d=day,c=calc(),dg=dayGoal(d),t=tot(d),bud=dg.k,left=Math.round(bud-t.k),pr=bud?Math.min(1,t.k/bud):(t.k?1:0),over=left<0,goal={cut:'Losing fat',maint:'Maintaining',bulk:'Building muscle'}[S.p.goal],nb='style="min-width:48px;flex:none"';
 return`<div class="dbg"><div><span class="dbg-k">${d==today()?'Logging today':'Logging'}</span><h2 style="margin:0">${d==today()?'Today':d}</h2><div class="cap">${new Date(d+'T00:00').toLocaleDateString(LOC,{weekday:'long',month:'long',day:'numeric'})}</div></div><div class="row" style="flex:none;gap:8.0px"><button class="btn s" ${nb} data-a="dback" aria-label="Previous day">‹</button><button class="btn s" ${nb} data-a="dnext" aria-label="Next day">›</button></div></div>
 <div class="bt-alt">${galmini()}</div><div class="bento">
-<div class="bt-L"><div class="card hero split bt-hero"><div><div class="ring"><svg viewBox="0 0 120 120"><defs><linearGradient id="rgf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:#C9CC9A"/><stop offset="1" style="stop-color:color-mix(in srgb,#A8404F 78%,#F3EAD9)"/></linearGradient></defs><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(243,234,217,.3)" stroke-width="10"/><circle cx="60" cy="60" r="52" fill="none" stroke="${over?'var(--warn)':'url(#rgf)'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="${326.7*(1-pr)}" transform="rotate(-90 60 60)"/></svg><b>${Math.abs(left)}<span class="mut" style="font:13px Montserrat">${over?'kcal over':'kcal left'}</span></b></div><p class="mut" style="text-align:center;margin:8px 0 0">${goal}</p>${dg.on&&dg.past?`<p class="mut cap" style="text-align:center;margin:8px 0 0">${dg.adj>0?'+':dg.adj<0?'\u2212':''}${n0(Math.abs(dg.adj))} kcal vs base \u00b7 ${dg.rem} day${dg.rem>1?'s':''} left</p>`:''}</div>
-<div><div class="stats"><div><span class="mut">Budget</span><b>${bud}</b></div><div><span class="mut">Eaten</span><b>${Math.round(t.k)}</b></div><div><span class="mut">Burned</span><b>${ex}</b></div></div><div class="hmac">${meter('Protein',t.p,dg.p,'g','')}${meter('Carbs',t.c,dg.c,'g','c')}${meter('Fat',t.f,dg.f,'g','f')}</div></div></div><div class="bt-pair">${hb[0]}${hb[1]}${hb[2]}</div></div>
+<div class="bt-L"><div class="card hero split bt-hero"><div><div class="ring"><svg viewBox="0 0 120 120"><defs><linearGradient id="rgf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:#C9CC9A"/><stop offset="1" style="stop-color:color-mix(in srgb,#A8404F 78%,#F3EAD9)"/></linearGradient></defs><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(243,234,217,.3)" stroke-width="10"/><circle cx="60" cy="60" r="52" fill="none" stroke="${over?'var(--warn)':'url(#rgf)'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="${326.7*(1-pr)}" transform="rotate(-90 60 60)"/></svg><b>${Math.abs(left)}<span class="mut" style="font:13px Montserrat">${over?'kcal over':'kcal left'}</span></b></div><p class="mut" style="text-align:center;margin:8px 0 0">${goal}</p>${dg.on&&dg.past?`<p class="mut cap" style="text-align:center;margin:8px 0 0">${dg.adj>0?'+':dg.adj<0?'\u2212':''}${n0(Math.abs(dg.adj))} <span>kcal vs base</span> \u00b7 ${dg.rem} <span>${dg.rem>1?'days left':'day left'}</span>${dg.cap?' \u00b7 <span>safety limit applied</span>':''}</p>`:''}</div>
+<div><div class="stats"><div><span class="mut">Budget</span><b>${bud}</b></div><div><span class="mut">Eaten</span><b>${Math.round(t.k)}</b></div><div><span class="mut">Left</span><b>${left}</b></div></div><div class="hmac">${meter('Protein',t.p,dg.p,'g','')}${meter('Carbs',t.c,dg.c,'g','c')}${meter('Fat',t.f,dg.f,'g','f')}</div></div></div><div class="bt-pair">${hb[0]}${hb[1]}${hb[2]}</div></div>
 <div class="bt-R">${wcard(d)}${hb[3]}</div>
 <div class="card bt-log"><h3>🍽️ Log a meal</h3><div class="seg">${[['pick','🔎 Pick'],['desc','🧮 Describe'],['new','✍️ Create']].map(([v,l])=>`<button class="btn ${lm==v?'on':''}" data-a="lm" data-v="${v}">${l}</button>`).join('')}</div>
 <div ${lm!='pick'?'hidden':''}><label class="f">Search foods<input id="fq" placeholder="Search by name"></label><button class="ftog" id="ft" data-a="ftog"></button><div class="fw" id="fw"><div><div class="chips" id="fc2"></div></div></div><div class="fl" id="fl"></div></div>
 <div ${lm=='pick'?'hidden':''}><div ${lm!='desc'?'hidden':''}><label class="f">What did you eat?<input id="dq" value="${esc(dqv)}" placeholder="e.g. 200 g chicken breast fried in vegetable oil"></label><button class="btn a" data-a="est" style="margin-bottom:16px">🧮 Estimate nutrition</button></div>
 <div ${lm=='new'||nf.est?'':'hidden'}>${nf.note?`<p class="note">${esc(nf.note)}</p>`:''}${ffm(nf,'l')}<button class="btn p" data-a="lsave" style="margin-bottom:16px">Save food &amp; use it</button></div></div>
 <div class="row"><label class="f"><span id="ql">Amount</span><input id="qty" type="number" min="0" value="100"></label><label class="f">Meal<select id="ml">${MEALS.map(m=>`<option>${m}</option>`).join('')}</select></label></div><button class="btn p" data-a="add">Add to day</button></div>
-<div class="bt-S"><div class="card bt-lgd"><div class="hdr"><h3>🧾 Logged meals</h3></div><div class="kpi"><span class="big">${(S.log[d]||[]).length}</span><span class="mut">items · ${n0(t.k)} kcal</span></div><div class="scr">${MEALS.map(M=>{const it=(S.log[d]||[]).map((e,i)=>({e,i})).filter(x=>(x.e.m||'Snack')==M);return it.length?`<div class="mt">${M}</div>`+it.map(({e,i})=>{const f=S.foods.find(x=>x.id==e.i);if(!f)return'';const m=f.b=='g'?e.q/100:e.q;return`<div class="li"><div>${esc(f.name)}<div class="mut">${e.q}${f.b=='g'?' g':' units'} · ${Math.round(f.k*m)} kcal · P${r1(f.p*m)} C${r1(f.c*m)} F${r1(f.f*m)}</div></div><button class="btn s t" data-a="del" data-i="${i}">Remove</button></div>`}).join(''):''}).join('')||'<p class="mut">Nothing logged yet. Add your first meal on the left.</p>'}</div></div>
-<div class="card bt-exe"><div class="hdr"><h3>🔥 Exercise</h3>${dtl('exercise','Exercise log and details')}</div><div class="kpi"><span class="big">${n0(ex)}</span><span class="mut">kcal burned${((S.exl||{})[d]||[]).length?` · ${((S.exl||{})[d]||[]).length} logged`:''}</span></div><label class="f">Activity<select id="exa">${ACTV.map((a,i)=>`<option value="${i}">${a[0]} (MET ${a[1]})</option>`).join('')}</select></label><div class="row" style="flex-wrap:nowrap;align-items:flex-end"><label class="f" style="margin:0">Minutes<input id="exm" type="number" min="1" value="45"></label><button class="btn p" style="flex:none" data-a="exadd">Add</button></div></div></div></div>`},
+<div class="bt-S"><div class="card bt-lgd"><div class="hdr"><h3>🧾 Logged meals</h3></div><div class="kpi"><span class="big">${(S.log[d]||[]).length}</span><span class="mut">items · ${n0(t.k)} kcal</span></div><div class="scr">${MEALS.map(M=>{const it=(S.log[d]||[]).map((e,i)=>({e,i})).filter(x=>(x.e.m||'Snack')==M);return it.length?`<div class="mt">${M}</div>`+it.map(({e,i})=>{const f=S.foods.find(x=>x.id==e.i);if(!f)return'';const m=f.b=='g'?e.q/100:e.q;return`<div class="li"><div>${esc(f.name)}<div class="mut">${e.q}${f.b=='g'?' g':' units'} · ${Math.round(f.k*m)} kcal · P${r1(f.p*m)} C${r1(f.c*m)} F${r1(f.f*m)}</div></div><button class="btn s t" data-a="del" data-i="${i}">Remove</button></div>`}).join(''):''}).join('')||'<p class="mut">Nothing logged yet. Add your first meal on the left.</p>'}</div></div></div></div>`},
 
 plan(){const p=S.p,sel=(k,o)=>`<select data-k="p.${k}" data-n="1">${o.map(([v,l])=>`<option value="${v}" ${p[k]==v?'selected':''}>${l}</option>`).join('')}</select>`;
 return`<h2>Plan settings</h2><div class="g"><div class="card"><h3>🧬 Your data</h3><div class="seg">${[['m','Male'],['f','Female']].map(([v,l])=>`<button class="btn ${p.sex==v?'on':''}" data-a="sex" data-v="${v}">${l}</button>`).join('')}</div>
@@ -805,7 +808,9 @@ ${inp('Age','p.age','number',p.age)}${inp('Body fat % (optional)','p.bf','number
 <div class="card"><h3>🎯 Goal</h3><div class="seg">${[['cut','Lose fat',-10],['maint','Maintain',0],['bulk','Build muscle',10]].map(([v,l,x])=>`<button class="btn ${p.goal==v?'on':''}" data-a="goal" data-v="${v}" data-x="${x}">${l}</button>`).join('')}</div>
 <p class="mut" style="margin:0 0 16px">${{cut:'Fat loss: body weight × 24 kcal, protein 2 g/kg. Aim to lose 0.5–1% of body weight per week.',maint:'Maintenance: your daily energy expenditure, protein 1.6 g/kg.',bulk:'Clean bulk: maintenance + 300 kcal, protein 1.6 g/kg. Gain at most 1% of body weight per month.'}[p.goal]||''} Fat is always 1 g/kg (never below 50 g) and carbs fill the rest. Calories and macros stay the same on rest days.</p>
 <div class="fld" style="margin-top:0"><label class="f">Weekly auto-adjust</label><div class="seg" style="margin-bottom:8px">${[['1','On'],['0','Off']].map(([v,l])=>`<button class="btn ${(S.auto?'1':'0')==v?'on':''}" data-a="wauto" data-v="${v}">${l}</button>`).join('')}</div>
-<p class="cap">Keeps the weekly total fixed instead of the daily one. Whatever you leave over or overspend earlier in the week is spread across the days that remain, today included. Mondays always use the base target, and a past day you never logged counts as if you hit the base exactly.</p></div>
+<p class="cap">Keeps the weekly total fixed instead of the daily one. Whatever you leave over or overspend earlier in the week is spread across the days that remain, today included. Mondays always use the base target, and a past day you never logged counts as if you hit the base exactly.</p>
+<p class="cap">Safety limits keep a badly skewed week from leaving you on a dangerous number: the adjusted target never goes above 25% over your base, and never below 25% under it or the hard floor, whichever is higher. Anything beyond that carries into next week.</p>
+${S.p.goal?`<p class="cap"><span>For your current base that means staying between</span> <b>${n0(kBand(calc().target)[0])}</b> \u2013 <b>${n0(kBand(calc().target)[1])}</b> kcal.</p>`:''}</div>
 <div id="res"></div></div></div><p style="margin-top:8.0px;display:flex;gap:8.0px;flex-wrap:wrap"><button class="btn s" data-a="exp">⬇️ Export backup</button><label class="btn s" style="margin:0">⬆️ Import backup<input type="file" id="imp" accept="application/json" hidden></label><button class="btn s t" data-a="reset">Reset all data</button></p><p class="mut">Your data lives in this browser only. Export a backup now and then.</p>`},
 
 foods(){const e=ef&&S.foods.find(x=>x.id==ef);return`<h2>Foods</h2><div class="g"><div class="card"><h3>${e?'✏️ Edit food':'🥑 New food'}</h3>${ffm(e||{},'f')}<div class="row"><button class="btn p" data-a="food">${e?'Save changes':'Save food'}</button>${e?'<button class="btn t" data-a="fcancel">Cancel</button>':''}</div></div>
@@ -824,15 +829,15 @@ return`<h2>Monthly measurements</h2>${due?`<div class="note">${l?'It has been a 
 <div class="card"><h3>🗂️ Entries</h3>${ks.slice().reverse().map(d=>`<div class="li"><div>${d}<div class="mut">${Object.keys(S.ms[d]).length} areas</div></div><span style="display:flex;gap:8px"><button class="btn s" data-a="med" data-d="${d}">Edit</button><button class="btn s t" data-a="mdel" data-d="${d}">Delete</button></span></div>`).join('')||'<p class="mut">No entries yet.</p>'}</div></div>`},
 
 week(){const ws=wk0,w=wkd(ws),c=w.c,T=w.T,A=w.A,n=w.L.length,g=S.p.goal,dn=x=>new Date(x+'T00:00').toLocaleDateString(LOC,{month:'short',day:'numeric'}),IC={Breakfast:'🌅',Lunch:'🍱',Dinner:'🌙',Snack:'🍎'},td=today();
-const col=(x,i)=>{const lg=S.log[x.d]||[],ex=(S.exl||{})[x.d]||[],tt=x.t.p*4+x.t.c*4+x.t.f*9||1,pc=v=>Math.round(v/tt*100);
-return`<div class="wkc"><div class="wkh">${DWK.split(' ')[i]}</div><div class="wkd ${x.d==td?'today':''}"><button class="wkn" data-a="gd" data-d="${x.d}" title="Open this day">${+x.d.slice(8)}</button>${x.l?`<div><b>${n0(x.t.k)}</b> <span class="mut">kcal</span></div><div class="pbar" style="height:6px;margin:0 0"><i style="width:${pc(x.t.p*4)}%"></i><i class="c" style="width:${pc(x.t.c*4)}%"></i><i class="f" style="width:${pc(x.t.f*9)}%"></i></div>`:'<div class="mut">Nothing logged</div>'}${MEALS.map(M=>{const it=lg.filter(e=>(e.m||'Snack')==M);return it.length?`<div class="m">${IC[M]} ${M}</div>`+it.map(e=>{const f=S.foods.find(y=>y.id==e.i);if(!f)return'';const m=f.b=='g'?e.q/100:e.q;return`<div class="e"><span>${esc(f.name)}</span><span>${Math.round(f.k*m)}</span></div>`}).join(''):''}).join('')}${ex.length?`<div class="m">🔥 Exercise</div>`+ex.map(e=>`<div class="e"><span>${esc(e.t)} ${e.m}m</span><span>${e.k}</span></div>`).join(''):''}${S.wa[x.d]?`<div class="m">💧 ${S.wa[x.d]} glasses</div>`:''}</div></div>`};
+const col=(x,i)=>{const lg=S.log[x.d]||[],tt=x.t.p*4+x.t.c*4+x.t.f*9||1,pc=v=>Math.round(v/tt*100);
+return`<div class="wkc"><div class="wkh">${DWK.split(' ')[i]}</div><div class="wkd ${x.d==td?'today':''}"><button class="wkn" data-a="gd" data-d="${x.d}" title="Open this day">${+x.d.slice(8)}</button>${x.l?`<div><b>${n0(x.t.k)}</b> <span class="mut">kcal</span></div><div class="pbar" style="height:6px;margin:0 0"><i style="width:${pc(x.t.p*4)}%"></i><i class="c" style="width:${pc(x.t.c*4)}%"></i><i class="f" style="width:${pc(x.t.f*9)}%"></i></div>`:'<div class="mut">Nothing logged</div>'}${MEALS.map(M=>{const it=lg.filter(e=>(e.m||'Snack')==M);return it.length?`<div class="m">${IC[M]} ${M}</div>`+it.map(e=>{const f=S.foods.find(y=>y.id==e.i);if(!f)return'';const m=f.b=='g'?e.q/100:e.q;return`<div class="e"><span>${esc(f.name)}</span><span>${Math.round(f.k*m)}</span></div>`}).join(''):''}).join('')}${S.wa[x.d]?`<div class="m">💧 ${S.wa[x.d]} glasses</div>`:''}</div></div>`};
 const sm=w.D.filter(x=>x.d<td&&x.l),rem=w.cur?w.D.filter(x=>x.d>=td).length:0,diff=sm.reduce((a,x)=>a+x.t.k-x.bud,0);let cu='';
 if(!w.cur)cu=w.L.length?'<p class="mut" style="margin:0">This week is over, so there is nothing left to adjust. Check the current week for a catch-up plan.</p>':'';
 else if(!sm.length)cu='<p class="mut" style="margin:0">Log at least one full day and this card will show how to adjust the rest of the week if you drift off plan.</p>';
 else{const behind=g=='cut'?diff>50:g=='bulk'?diff<-50:Math.abs(diff)>100;
 if(!behind)cu=`<p style="margin:0">✅ You are on track. ${diff==0?'Right on budget':n0(Math.abs(diff))+' kcal '+(diff>0?'over':'under')+' so far, which fits your goal'}. Keep your usual ${n0(c.target)} kcal a day.</p>`;
-else{const fl=S.p.sex=='m'?1500:1200,raw=c.target-diff/rem,nk=Math.round(Math.min(c.target*1.25,Math.max(c.target*.75,fl,raw))),cap=Math.abs(raw-nk)>5,C2=Math.max(0,Math.round((nk-c.P*4-c.F*9)/4)),mn=Math.round(Math.abs(diff)/rem/(5*c.kg/60));
-cu=`<p style="margin:0 0 8px">You are <b>${n0(Math.abs(diff))} kcal ${diff>0?'over':'under'}</b> your budget for the days logged so far. To still hit the week, spread it over the remaining <b>${rem} day${rem>1?'s':''}</b> (today included):</p><div class="how"><div><div>New daily target<small>instead of ${n0(c.target)} kcal</small></div><b>${n0(nk)}</b></div><div><div>Macros<small>protein kept, carbs absorb the change</small></div><b style="font-size:17px">P ${c.P} · C ${C2} · F ${c.F}</b></div>${c.kg&&diff>0?`<div><div>Or add exercise<small>keep eating ${n0(c.target)}, burn it off</small></div><b>~${mn} min/day</b></div>`:''}</div>${cap?'<p class="mut" style="margin:8px 0 0">Capped at 25% from your normal target (and a safe minimum), so the rest carries into next week.</p>':''}`}}
+else{const[flo,fhi]=kBand(c.target),raw=c.target-diff/rem,nk=clampG(raw,flo,fhi),cap=Math.abs(raw-nk)>5,C2=Math.max(0,Math.round((nk-c.P*4-c.F*9)/4));
+cu=`<p style="margin:0 0 8px">You are <b>${n0(Math.abs(diff))} kcal ${diff>0?'over':'under'}</b> your budget for the days logged so far. To still hit the week, spread it over the remaining <b>${rem} day${rem>1?'s':''}</b> (today included):</p><div class="how"><div><div>New daily target<small>instead of ${n0(c.target)} kcal</small></div><b>${n0(nk)}</b></div><div><div>Macros<small>protein kept, carbs absorb the change</small></div><b style="font-size:17px">P ${c.P} · C ${C2} · F ${c.F}</b></div></div>${cap?'<p class="mut" style="margin:8px 0 0">Capped at 25% from your normal target (and a safe minimum), so the rest carries into next week.</p>':''}`}}
 if(S.auto&&w.cur&&cu)cu=`<div class="note info" style="margin:0 0 16px"><b class="sxt">Applied automatically</b><div class="mut" style="margin-top:4px">Weekly auto-adjust is on, so the Today card is already using the adjusted target of ${n0(dayGoal(td).k)} kcal.</div></div>`+cu;
 if(w.cur&&n>1&&A.p<c.P*.9)cu+=`<p class="mut" style="margin:16px 0 0">🥚 Protein is averaging ${n0(A.p)} g against a ${c.P} g target. Aim for about ${n0(c.P-A.p)} g extra per day.</p>`;
 const K=[['cal','Calories within 10% of the weekly budget'],['dir',g=='cut'?'In a calorie deficit':g=='bulk'?'In a calorie surplus':'Close to maintenance'],['pro','Protein at 90% or more of target'],['mac','Carbs and fat within 25% of target']];
@@ -959,7 +964,6 @@ w.innerHTML=`<button type="button" class="ddb"><span>${esc(o[s.selectedIndex].te
 const b=w.firstChild,l=w.lastChild;b.onclick=e=>{e.stopPropagation();const op=!w.classList.contains('open');closeDD();w.classList.toggle('open',op)};
 l.onclick=e=>{const t=e.target.closest('.ddo');if(!t)return;e.stopPropagation();s.selectedIndex=+t.dataset.i;b.firstChild.textContent=t.textContent;l.querySelectorAll('.ddo').forEach(x=>x.classList.toggle('on',x==t));w.classList.remove('open');s.dispatchEvent(new Event('input',{bubbles:true}));s.dispatchEvent(new Event('change',{bubbles:true}))}})}
 document.addEventListener('click',closeDD);document.addEventListener('keydown',e=>{if(e.key=='Escape')closeDD()});
-const ACTV=[['Weight training',5],['Walking',3.5],['Running',9.8],['Cycling',7.5],['Swimming',6],['HIIT',8],['Rowing',7],['Elliptical',5],['Yoga',2.5],['Sports (general)',7]],exs=d=>S.ex[d]=S.exl[d].reduce((a,e)=>a+e.k,0);
 let ef=null,lm='pick',nf={},dqv='';
 const ffm=(v,x)=>`<label class="f">Name<input id="${x}n" value="${esc(v.name||'')}" placeholder="e.g. Greek yogurt"></label><label class="f">Values are per<select id="${x}b"><option value="g" ${v.b!='u'?'selected':''}>100 g</option><option value="u" ${v.b=='u'?'selected':''}>1 unit</option></select></label><div class="row"><label class="f">Category<select id="${x}c">${S.cats.map(c=>`<option ${c==v.cat?'selected':''}>${esc(c)}</option>`).join('')}</select></label><label class="f">Or new category<input id="${x}nc" placeholder="e.g. Supplements"></label></div><div class="row"><label class="f">Kcal<input id="${x}k" type="number" value="${v.k??''}"></label><label class="f">Protein g<input id="${x}p" type="number" value="${v.p??''}"></label></div><div class="row"><label class="f">Carbs g<input id="${x}ch" type="number" value="${v.c??''}"></label><label class="f">Fat g<input id="${x}f" type="number" value="${v.f??''}"></label></div>`;
 const rff=x=>{const g=i=>$('#'+x+i).value;return{name:g('n').trim(),b:g('b'),cat:g('nc').trim()||g('c'),kk:g('k'),k:+g('k')||0,p:+g('p')||0,c:+g('ch')||0,f:+g('f')||0}};
@@ -973,7 +977,7 @@ let m=s.match(/(\d+(?:\.\d+)?)\s*(?:g|gr|grs|grams?|gramos?)\b/),q=m?+m[1]:(B[3]
 const nm=t.trim().replace(/^(i\s+)?(ate|had|eat|me\s+com[ií]|com[ií]|desayun[eé]|almorc[eé]|cen[eé])\s+/i,'').replace(/^(about\s+)?\d+(\.\d+)?\s*(g|gr|grs|grams?|gramos?)\s+(of\s+|de\s+)?/i,'').replace(/^(a|an|some|the|un|una|unos|unas)\s+/i,'');
 return{name:nm.charAt(0).toUpperCase()+nm.slice(1),b:B[3],cat:B[2],k:Math.round(B[4]+g*o[2]),p:r(B[5]+g*o[3]),c:r(B[6]),f:r(B[7]+g*o[4]),q,note:`Estimated from ${B[1]} (${B[3]=='g'?(B[1].includes('dry')?'per 100 g':'cooked, per 100 g'):'per unit'})${g?` plus about ${g} g of ${o[1]} absorbed${deep?' while deep frying':''}`:''}. It is a rough guide, so adjust the numbers if you know better.`}}
 const n0=v=>Math.round(v).toLocaleString('en-US'),wgs=()=>S.gs||250,fT=m=>{m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')},pT=t=>{const[a,b]=t.split(':');return +a*60+ +b};
-function wgoal(d){const c=calc(),mins=((S.exl||{})[d]||[]).reduce((a,e)=>a+e.m,0),base=c.kg?c.kg*32.5*(S.p.sex=='m'?1.1:1):2000,ex=mins/30*425,cl=[0,375,750][S.wcl||0],total=base+ex+cl;return{base,mins,ex,cl,total,goal:Math.max(500,Math.round(total*.8/50)*50)}}
+function wgoal(d){const c=calc(),base=c.kg?c.kg*32.5*(S.p.sex=='m'?1.1:1):2000,cl=[0,375,750][S.wcl||0],total=base+cl;return{base,cl,total,goal:Math.max(500,Math.round(total*.8/50)*50)}}
 function wsched(){const w=S.wr;if(!w||!w.on||!w.wake||!w.bed)return[];const a=pT(w.wake),bd=pT(w.bed),st=a+15;let en=(bd<=a?bd+1440:bd)-60;const n=Math.max(1,Math.ceil(wgoal(today()).goal/wgs()));if(en<=st)en=st+60;return n==1?[st]:Array.from({length:n},(_,i)=>Math.round((st+i*(en-st)/(n-1))/5)*5)}
 function wnext(d){const g=wgoal(d),gs=wgs(),w=S.wa[d]||0,left=Math.ceil((g.goal-w*gs)/gs);let t=left>0?`${left} glass${left>1?'es':''} to go`:'Goal reached 🎉';const sc=wsched();if(d==today()&&sc.length&&w<sc.length)t+=` · next at ${fT(sc[w])}`;return t}
 function wgauge(d){const g=wgoal(d),gs=wgs(),w=S.wa[d]||0,gg=g.goal/gs,mx=Math.max(4,Math.ceil(gg*1.5)),t=Math.min(1,w/mx),A='M20 120A100 100 0 0 1 220 120';
@@ -987,14 +991,11 @@ return!r?`<div class="note info"><b class="sxt">🔔 Want water reminders?</b><d
 :`<button class="btn s" data-a="wry">🔔 Turn on reminders</button>`}
 function waterDetail(d){const g=wgoal(d),gs=wgs(),w=S.wa[d]||0;
 return`<div class="sov-s"><h4>Log water</h4><div class="row" style="flex-wrap:nowrap;align-items:flex-end"><label class="f" style="margin:0">Glasses today<input id="wgl" type="number" min="0" max="60" step="1" inputmode="numeric" value="${w}"></label><span class="mut" style="flex:none">= ${n0(w*gs)} ml</span></div><p class="mut" style="margin:8px 0 0">${wnext(d)}</p></div><div class="sov-s"><h4>How your goal is calculated</h4>${winfo(d)}</div><div class="sov-s"><h4>Reminders</h4>${wremind(d)}</div>`}
-function exDetail(d){const l=(S.exl||{})[d]||[];
-return`<div class="sov-s"><h4>Logged today</h4>${l.map((e,i)=>`<div class="li"><div>${esc(e.t)}<div class="mut">${e.m} min \u00b7 ${e.k} kcal</div></div><button class="btn s t" data-a="exdel" data-i="${i}">Remove</button></div>`).join('')||'<p class="mut">Nothing logged yet.</p>'}</div>
-<div class="sov-s"><div class="note info"><b class="sxt">How it is counted</b><div class="mut" style="margin-top:4px">kcal = MET \u00d7 weight (kg) \u00d7 hours. Added to your daily calorie budget.</div></div></div>`}
 
-function winfo(d){const g=wgoal(d),gs=wgs(),c=calc();return`<div class="how"><div><div>Weight<small>${c.kg?r1(c.kg)+' kg × 32.5 ml'+(S.p.sex=='m'?', +10% for men':''):'Add your weight in Settings (using 2,000 ml)'}</small></div><b>${n0(g.base)}</b></div><div><div>Exercise<small>${g.mins} min logged, +425 ml per 30 min</small></div><b>+${n0(g.ex)}</b></div><div><div>Climate<small>Adds ${g.cl} ml</small></div><b>+${n0(g.cl)}</b></div><div><div>Total need<small>Drink about 80%, the other 20% comes from food</small></div><b>${n0(g.total)}</b></div><div><div>Your drinking goal<small>${r1(g.goal/gs)} glasses</small></div><b>${n0(g.goal)} ml</b></div></div>
+function winfo(d){const g=wgoal(d),gs=wgs(),c=calc();return`<div class="how"><div><div>Weight<small>${c.kg?r1(c.kg)+' kg × 32.5 ml'+(S.p.sex=='m'?', +10% for men':''):'Add your weight in Settings (using 2,000 ml)'}</small></div><b>${n0(g.base)}</b></div><div><div>Climate<small>Adds ${g.cl} ml</small></div><b>+${n0(g.cl)}</b></div><div><div>Total need<small>Drink about 80%, the other 20% comes from food</small></div><b>${n0(g.total)}</b></div><div><div>Your drinking goal<small>${r1(g.goal/gs)} glasses</small></div><b>${n0(g.goal)} ml</b></div></div>
 <label class="f" style="margin-top:16px">Climate<select id="wcl">${['Mild','Warm (+375 ml)','Hot or humid (+750 ml)'].map((x,i)=>`<option value="${i}" ${(S.wcl||0)==i?'selected':''}>${x}</option>`).join('')}</select></label><label class="gsz">Glass size<input id="gsz" type="number" min="50" max="2000" step="50" inputmode="numeric" value="${gs}" aria-label="Glass size in ml">ml</label>`}
 function wtick(){const w=S.wr;if(!w||!w.on||!w.wake)return;const n=new Date(),hm=n.getHours()*60+n.getMinutes(),k=today();if(!S.wn||S.wn.d!=k)S.wn={d:k,l:[]};wsched().forEach((m,i)=>{if(((m%1440)+1440)%1440==hm&&!S.wn.l.includes(i)){S.wn.l.push(i);const t='💧 Time for a glass of water';toast(t);try{if(Notification.permission=='granted')new Notification('Forma',{body:t})}catch(e){}}});save()}
-const SOVS={water:['💧 Water',waterDetail],steps:['👟 Steps',stepsDetail],sleep:['😴 Night sleep',sleepDetail],naps:['🛌 Naps',napDetail],creatine:['💊 Creatine',creDetail],exercise:['🔥 Exercise',exDetail]};
+const SOVS={water:['💧 Water',waterDetail],steps:['👟 Steps',stepsDetail],sleep:['😴 Night sleep',sleepDetail],naps:['🛌 Naps',napDetail],creatine:['💊 Creatine',creDetail]};
 let sovO=null;
 function sovr(){const c=$('#sovc');if(!c)return;const s=SOVS[sovO];if(s){$('#sovt').textContent=s[0];c.innerHTML=s[1](day);dd()}$('#sov').classList.toggle('on',!!s);document.body.classList.toggle('sov-open',!!s)}
 function sov(v){if(v&&!SOVS[v])return;if(v){sovO=v;sovr();requestAnimationFrame(()=>{const f=$('#sov .sov-p');if(f&&sovO)f.focus()})}
@@ -1018,19 +1019,34 @@ const wkDays=ws=>[...Array(7)].map((_,i)=>{const x=new Date(ws+'T00:00');x.setDa
    week left over or overspent is spread across the days that remain, today
    included. A past day with no log at all counts as if the base was hit
    exactly, so an untracked day does not blow up the remaining budget.
-   Monday (or a disabled toggle) returns the base untouched.               */
-function dayGoal(d){const c=calc(),base={k:c.target,p:c.P,c:c.C,f:c.F};
-if(!S.auto)return{...base,base,on:false,adj:0,rem:7,past:0,assumed:0};
+   Monday (or a disabled toggle) returns the base untouched.
+   Safety limits are the same ones the manual catch-up card uses: never more
+   than +25% of base, never less than the greater of -25% of base and the
+   absolute floor (1,500 kcal for men, 1,200 for women). The floor is itself
+   capped at base, so a plan that already sits under it is never pushed up.
+   Protein and fat stay inside the same +-25% band and carbs are then
+   re-derived from the clamped calories, so the macro bars always add up to
+   the budget on show.                                                      */
+const KFLOOR=()=>S.p.sex=='m'?1500:1200;
+const kBand=base=>[Math.min(base,Math.max(base*.75,KFLOOR())),base*1.25];
+const clampG=(raw,lo,hi)=>Math.max(0,Math.round(Math.min(hi,Math.max(lo,raw))));
+function dayGoal(d){const c=calc(),base={k:c.target,p:c.P,c:c.C,f:c.F},
+flat=on=>({...base,base,on,adj:0,rem:7,past:0,assumed:0,cap:false});
+if(!S.auto)return flat(false);
 const days=wkDays(wkStart(d)),i=days.indexOf(d);
-if(i<=0)return{...base,base,on:true,adj:0,rem:7,past:0,assumed:0};
+if(i<=0)return flat(true);
 const u={k:0,p:0,c:0,f:0};let assumed=0;
 for(let j=0;j<i;j++){const x=days[j];
 if((S.log[x]||[]).length){const t=tot(x);u.k+=t.k;u.p+=t.p;u.c+=t.c;u.f+=t.f}
 else{assumed++;u.k+=base.k;u.p+=base.p;u.c+=base.c;u.f+=base.f}}
-const rem=7-i,g=(b,used)=>Math.max(0,Math.round((b*7-used)/rem)),k=g(base.k,u.k);
-return{on:true,rem,past:i,assumed,used:u,base,adj:k-base.k,k,p:g(base.p,u.p),c:g(base.c,u.c),f:g(base.f,u.f)}}
+const rem=7-i,raw=(b,used)=>(b*7-used)/rem,[lo,hi]=kBand(base.k),
+rk=raw(base.k,u.k),k=clampG(rk,lo,hi),
+p=clampG(raw(base.p,u.p),base.p*.75,base.p*1.25),
+f=clampG(raw(base.f,u.f),base.f*.75,base.f*1.25),
+cb=Math.max(0,Math.round((k-p*4-f*9)/4));
+return{on:true,rem,past:i,assumed,used:u,base,adj:k-base.k,cap:Math.abs(rk-k)>5,lo:Math.round(lo),hi:Math.round(hi),k,p,c:cb,f}}
 function wkd(ws){const c=calc(),dys=[];for(let i=0;i<7;i++){const x=new Date(ws+'T00:00');x.setDate(x.getDate()+i);dys.push(fmt(x))}
-const D=dys.map(d=>{const ex=S.ex[d]||0;return{d,l:(S.log[d]||[]).length>0,t:tot(d),ex,bud:c.target+ex,td:c.tdee+ex}}),L=D.filter(x=>x.l),n=L.length||1,sum=k=>L.reduce((a,x)=>a+x.t[k],0),T={k:sum('k'),p:sum('p'),c:sum('c'),f:sum('f')},A={k:T.k/n,p:T.p/n,c:T.c/n,f:T.f/n},B=L.reduce((a,x)=>a+x.bud,0),TD=L.reduce((a,x)=>a+x.td,0),net=T.k-TD,g=S.p.goal;
+const D=dys.map(d=>({d,l:(S.log[d]||[]).length>0,t:tot(d),bud:c.target,td:c.tdee})),L=D.filter(x=>x.l),n=L.length||1,sum=k=>L.reduce((a,x)=>a+x.t[k],0),T={k:sum('k'),p:sum('p'),c:sum('c'),f:sum('f')},A={k:T.k/n,p:T.p/n,c:T.c/n,f:T.f/n},B=L.reduce((a,x)=>a+x.bud,0),TD=L.reduce((a,x)=>a+x.td,0),net=T.k-TD,g=S.p.goal;
 const ch={cal:L.length>0&&Math.abs(T.k-B)/B<=.1,dir:g=='cut'?net<0:g=='bulk'?net>0:Math.abs(net)<=TD*.05,pro:A.p>=c.P*.9,mac:Math.abs(A.c-c.C)<=c.C*.25&&Math.abs(A.f-c.F)<=c.F*.25};
 return{c,D,L,T,A,ch,ok:L.length>0&&ch.cal&&ch.dir&&ch.pro&&ch.mac,cur:dys.includes(today()),dys}}
 function wbars(w){const mx=Math.max(1,...w.D.map(x=>Math.max(x.t.k,x.bud)))*1.12,H=100,Y=v=>118-v/mx*H;return`<svg viewBox="0 0 320 150" style="width:100%"><defs><linearGradient id="wbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--gold)"/><stop offset="1" style="stop-color:var(--olv-t)"/></linearGradient></defs>${w.D.map((x,i)=>{const X=14+i*44,h=x.l?Math.max(4,x.t.k/mx*H):4;return`<rect x="${X}" y="${118-h}" width="30" height="${h}" rx="10" fill="${x.l?'url(#wbg)':'var(--line)'}"/>${x.l?`<text x="${X+15}" y="${112-h}" text-anchor="middle" style="font:600 8px Montserrat,sans-serif;fill:var(--ink)">${Math.round(x.t.k)}</text>`:''}<line x1="${X-4}" x2="${X+34}" y1="${Y(x.bud)}" y2="${Y(x.bud)}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="3 3" opacity=".55"/><text x="${X+15}" y="136" text-anchor="middle" style="font:600 8px Montserrat,sans-serif;fill:var(--mut)">${DOW[i]}</text>`}).join('')}</svg>`}
@@ -1050,7 +1066,7 @@ if(fcat=='Recent')fs.sort((a,b)=>S.rec.indexOf(a.id)-S.rec.indexOf(b.id));
 l.innerHTML=fs.map(f=>`<button class="fo ${f.id==fsel?'on':''}" data-a="pick" data-i="${f.id}"><span>${esc(f.name)}</span><span class="mut">${f.k} kcal/${f.b=='g'?'100g':'unit'}</span></button>`).join('')||'<p class="mut" style="margin:8.0px">No foods match. Use Describe or Create above.</p>'}
 document.addEventListener('input',e=>{if(e.target.id=='fq')flist();if(e.target.id=='wnt'){(S.wkn??={})[wk0]=e.target.value;save()}});
 let MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
-const st=d=>{const l=S.log[d];if(!l||!l.length)return null;const c=calc(),t=tot(d),ex=S.ex[d]||0,b=c.target+ex,net=t.k-(c.tdee+ex),g=S.p.goal,miss=[];
+const st=d=>{const l=S.log[d];if(!l||!l.length)return null;const c=calc(),t=tot(d),b=c.target,net=t.k-c.tdee,g=S.p.goal,miss=[];
 const cal=Math.abs(t.k-b)/b<=.1,dir=g=='cut'?net<0:g=='bulk'?net>0:Math.abs(net)<=c.tdee*.05,pro=t.p>=c.P*.9,mac=Math.abs(t.c-c.C)<=c.C*.25&&Math.abs(t.f-c.F)<=c.F*.25;
 if(!cal)miss.push('calories off budget');if(!dir)miss.push(g=='cut'?'not in a deficit':g=='bulk'?'not in a surplus':'not at maintenance');if(!pro)miss.push('protein low');if(!mac)miss.push('carbs/fat off');
 const ok=!miss.length;return{k:t.k,p:t.p,lv:ok?3:cal&&dir?2:1,ok,miss}};
@@ -1171,8 +1187,6 @@ else if(a=='wrs'){const wk=v('wwk'),bd=v('wbd');if(!wk||!bd)return toast('Set bo
 else if(a=='wp'||a=='wm')S.wa[day]=Math.max(0,(S.wa[day]||0)+(a=='wp'?1:-1));
 else if(a=='reset'){if(!arm){arm=1;setTimeout(()=>arm=0,4000);return toast('Tap again to erase all data')}try{localStorage.removeItem(K)}catch(e){}location.reload();return}
 else if(a=='del')S.log[day].splice(+b.dataset.i,1);
-else if(a=='exadd'){const m=parseFloat(v('exm')),A=ACTV[+v('exa')],kg=calc().kg;if(!m||m<=0)return toast('Enter the minutes');if(!kg)return toast('Add your weight in Settings first');const k=Math.round(A[1]*kg*m/60);((S.exl??={})[day]??=[]).push({t:A[0],m,k});exs(day);toast('+'+k+' kcal burned')}
-else if(a=='exdel'){S.exl[day].splice(+b.dataset.i,1);exs(day)}
 else if(a=='food'){const o=rff('f');if(!o.name||o.kk==='')return toast('Add a name and calories');sf(o,ef);toast(ef?'Food updated':'Food saved');ef=null}
 else if(a=='fedit'){ef=+b.dataset.i;scrollTo(0,0)}
 else if(a=='fcancel')ef=null;
@@ -1213,7 +1227,7 @@ const D={
 "🏠 Today":"🏠 Hoy","🥑 Foods":"🥑 Alimentos","⚖️ Weight":"⚖️ Peso","📏 Body":"📏 Cuerpo","🏋️ Gym":"🏋️ Gimnasio","Week":"Semana","Stats":"Estadísticas","Settings":"Ajustes",
 "Monthly measurements":"Medidas mensuales","Measure now":"Medir ahora","Tomorrow":"Mañana",
 "It has been a month since your last measurements. Ready to log new ones?":"Ha pasado un mes desde tus últimas medidas. ¿Listo para registrar nuevas?","Add your first set of body measurements so we can track your progress.":"Añade tu primer juego de medidas corporales para seguir tu progreso.",
-"Today":"Hoy","Losing fat":"Perdiendo grasa","Maintaining":"Manteniendo","Building muscle":"Ganando músculo","kcal over":"kcal de más","kcal left":"kcal restantes","Budget":"Presupuesto","Eaten":"Comido","Burned":"Quemado",
+"Today":"Hoy","Losing fat":"Perdiendo grasa","Maintaining":"Manteniendo","Building muscle":"Ganando músculo","kcal over":"kcal de más","kcal left":"kcal restantes","Budget":"Presupuesto","Eaten":"Comido","Left":"Restante",
 "Protein":"Proteína","Carbs":"Carbos","Fat":"Grasa","Fats":"Grasas","Dairy":"Lácteos","Fruit & Veg":"Frutas y verduras","Drinks":"Bebidas","Other":"Otros",
 "Chicken breast (raw)":"Pechuga de pollo (cruda)","White rice (cooked)":"Arroz blanco (cocido)","Whole egg":"Huevo entero","Oats (dry)":"Avena (seca)",
 "🍽️ Log a meal":"🍽️ Registrar comida","🔎 Pick":"🔎 Elegir","🧮 Describe":"🧮 Describir","✍️ Create":"✍️ Crear","Search foods":"Buscar alimentos","Search by name":"Buscar por nombre","Filters":"Filtros","All":"Todos","Recent":"Recientes",
@@ -1221,11 +1235,9 @@ const D={
 "Amount":"Cantidad","Amount (grams)":"Cantidad (gramos)","Amount (units)":"Cantidad (unidades)","Meal":"Comida","Breakfast":"Desayuno","Lunch":"Almuerzo","Dinner":"Cena","Snack":"Merienda","Add to day":"Añadir al día",
 "🧾 Logged meals":"🧾 Comidas registradas","Remove":"Quitar","Nothing logged yet. Add your first meal on the left.":"Aún no has registrado nada. Añade tu primera comida a la izquierda.","No foods match. Use Describe or Create above.":"Ningún alimento coincide. Usa Describir o Crear arriba.",
 "Name":"Nombre","e.g. Greek yogurt":"p. ej. Yogur griego","Values are per":"Los valores son por","1 unit":"1 unidad","Category":"Categoría","Or new category":"O nueva categoría","e.g. Supplements":"p. ej. Suplementos","Protein g":"Proteína g","Carbs g":"Carbos g","Fat g":"Grasa g",
-"🔥 Exercise":"🔥 Ejercicio","Activity":"Actividad","Weight training":"Pesas","Walking":"Caminar","Running":"Correr","Cycling":"Ciclismo","Swimming":"Natación","Elliptical":"Elíptica","Sports (general)":"Deportes (general)","Minutes":"Minutos","Add":"Añadir",
-"kcal = MET × weight (kg) × hours. Added to your daily budget.":"kcal = MET × peso (kg) × horas. Se suma a tu presupuesto diario.","Enter the minutes":"Escribe los minutos","Add your weight in Settings first":"Primero añade tu peso en Ajustes",
 "💧 Water":"💧 Agua","glasses":"vasos","🔔 Want water reminders?":"🔔 ¿Quieres recordatorios de agua?","We can spread your glasses across your day.":"Podemos repartir tus vasos a lo largo del día.","Yes, remind me":"Sí, recuérdame","Not now":"Ahora no",
 "🌙 When do you usually sleep?":"🌙 ¿A qué hora sueles dormir?","Wake up":"Despertar","Bed time":"Hora de dormir","Save schedule":"Guardar horario","Change times":"Cambiar horas","Turn off":"Desactivar","🔔 Turn on reminders":"🔔 Activar recordatorios",
-"Goal reached 🎉":"Meta alcanzada 🎉","How your goal is calculated":"Cómo se calcula tu meta","Exercise":"Ejercicio","Climate":"Clima","Total need":"Necesidad total","Your drinking goal":"Tu meta de agua",
+"Goal reached 🎉":"Meta alcanzada 🎉","How your goal is calculated":"Cómo se calcula tu meta","Climate":"Clima","Total need":"Necesidad total","Your drinking goal":"Tu meta de agua",
 "Add your weight in Settings (using 2,000 ml)":"Añade tu peso en Ajustes (se usan 2.000 ml)","Drink about 80%, the other 20% comes from food":"Bebe cerca del 80 %; el otro 20 % viene de la comida",
 "Mild":"Templado","Warm (+375 ml)":"Cálido (+375 ml)","Hot or humid (+750 ml)":"Caluroso o húmedo (+750 ml)","Glass size":"Tamaño del vaso","Remove a glass":"Quitar un vaso","Add a glass":"Añadir un vaso","Glasses of water":"Vasos de agua","Daily goal":"Meta diaria",
 "💧 Time for a glass of water":"💧 Hora de un vaso de agua","Set both times":"Define ambas horas","Reminders set":"Recordatorios guardados",
@@ -1259,7 +1271,7 @@ const D={
 "Thickest part of the calf, standing with weight even.":"Parte más gruesa de la pantorrilla, de pie con el peso repartido.",
 "Save measurements":"Guardar medidas","History":"Historial","Area":"Zona","Change":"Cambio","Nothing saved yet.":"Aún no hay nada guardado.","📈 Progress":"📈 Progreso","Add at least two entries with this area to see a chart.":"Añade al menos dos entradas de esta zona para ver el gráfico.","🗂️ Entries":"🗂️ Entradas",
 "Pick a date up to today":"Elige una fecha hasta hoy","Enter at least one measurement":"Escribe al menos una medida","Measurements saved":"Medidas guardadas","How to measure":"Cómo medir",
-"Weekly diary":"Diario semanal","My weekly diary":"Mi diario semanal","Previous week":"Semana anterior","Next week":"Semana siguiente","Nothing logged":"Sin registros","Open this day":"Abrir este día",
+"kcal vs base":"kcal frente a la base","day left":"día restante","days left":"días restantes","safety limit applied":"límite de seguridad aplicado","Weekly auto-adjust":"Ajuste automático semanal","On":"Activado","Off":"Desactivado","Weekly auto-adjust on":"Ajuste automático semanal activado","Weekly auto-adjust off":"Ajuste automático semanal desactivado","Keeps the weekly total fixed instead of the daily one. Whatever you leave over or overspend earlier in the week is spread across the days that remain, today included. Mondays always use the base target, and a past day you never logged counts as if you hit the base exactly.":"Mantiene fijo el total semanal en lugar del diario. Lo que te sobre o te pases en los días anteriores de la semana se reparte entre los días que quedan, hoy incluido. Los lunes siempre usan la meta base, y un día pasado que nunca registraste cuenta como si hubieras cumplido la base exactamente.","Safety limits keep a badly skewed week from leaving you on a dangerous number: the adjusted target never goes above 25% over your base, and never below 25% under it or the hard floor, whichever is higher. Anything beyond that carries into next week.":"Los límites de seguridad evitan que una semana muy desviada te deje en una cifra peligrosa: la meta ajustada nunca sube más de un 25 % sobre tu base, ni baja más de un 25 % por debajo de ella o del piso absoluto, el que sea mayor. Lo que exceda ese rango pasa a la semana siguiente.","For your current base that means staying between":"Con tu base actual eso significa mantenerte entre","Applied automatically":"Aplicado automáticamente","Weekly diary":"Diario semanal","My weekly diary":"Mi diario semanal","Previous week":"Semana anterior","Next week":"Semana siguiente","Nothing logged":"Sin registros","Open this day":"Abrir este día",
 "🍽️ Totals and averages":"🍽️ Totales y promedios","Avg per day":"Promedio por día","Days logged":"Días registrados","🎯 Weekly goal reached?":"🎯 ¿Meta semanal cumplida?","Yes 🎉":"Sí 🎉","So far this week":"Hasta ahora esta semana","For the week":"En la semana","No meals logged this week yet":"Aún no hay comidas registradas esta semana",
 "Calories within 10% of the weekly budget":"Calorías dentro del 10 % del presupuesto semanal","In a calorie deficit":"En déficit calórico","In a calorie surplus":"En superávit calórico","Close to maintenance":"Cerca del mantenimiento","Protein at 90% or more of target":"Proteína al 90 % o más de la meta","Carbs and fat within 25% of target":"Carbos y grasa dentro del 25 % de la meta",
 "📊 Calories per day":"📊 Calorías por día","Dashed line = that day's budget":"Línea punteada = presupuesto de ese día","🍩 Macro split":"🍩 Distribución de macros","Log meals to see your macro split.":"Registra comidas para ver tu distribución de macros.","PROTEIN":"PROTEÍNA",
@@ -1268,7 +1280,7 @@ const D={
 "Log at least one full day and this card will show how to adjust the rest of the week if you drift off plan.":"Registra al menos un día completo y esta tarjeta te mostrará cómo ajustar el resto de la semana si te sales del plan.",
 "✅ You are on track.":"✅ Vas bien.","Right on budget":"Justo en el presupuesto","Keep your usual":"Mantén tus","kcal a day.":"kcal al día.",
 "You are":"Estás"," your budget for the days logged so far. To still hit the week, spread it over the remaining ":" respecto a tu presupuesto de los días registrados. Para cumplir la semana, repártelo entre los días que quedan: "," (today included):":" (hoy incluido):",
-"New daily target":"Nueva meta diaria","Macros":"Macros","protein kept, carbs absorb the change":"se mantiene la proteína, los carbos absorben el cambio","Or add exercise":"O añade ejercicio","Capped at 25% from your normal target (and a safe minimum), so the rest carries into next week.":"Limitado al 25 % sobre tu meta normal (y a un mínimo seguro); el resto pasa a la próxima semana.",
+"New daily target":"Nueva meta diaria","Macros":"Macros","protein kept, carbs absorb the change":"se mantiene la proteína, los carbos absorben el cambio","Capped at 25% from your normal target (and a safe minimum), so the rest carries into next week.":"Limitado al 25 % sobre tu meta normal (y a un mínimo seguro); el resto pasa a la próxima semana.",
 "Your progress":"Tu progreso","Monthly":"Mensual","Yearly":"Anual","No meals logged in this period yet":"Aún no hay comidas registradas en este periodo","🔥 Daily goal heatmap":"🔥 Mapa de cumplimiento diario","No log":"Sin registro","Missed":"Fallado","Calories ok":"Calorías ok","On target":"En objetivo","on target":"en objetivo",
 "On target means calories within 10% of budget, the right side of maintenance for your goal (deficit, balance or surplus), protein at 90%+ of target, and carbs and fat within 25%. Hover or tap a day for what was missed.":"En objetivo significa calorías dentro del 10 % del presupuesto, el lado correcto del mantenimiento según tu meta (déficit, equilibrio o superávit), proteína al 90 % o más de la meta, y carbos y grasa dentro del 25 %. Pasa el cursor o toca un día para ver qué falló.",
 "days logged":"días registrados","avg kcal / day":"kcal prom. / día","avg protein":"proteína prom.","best streak (days)":"mejor racha (días)","current streak":"racha actual","glasses of water":"vasos de agua","Days on target by month":"Días en objetivo por mes",
@@ -1303,12 +1315,12 @@ const D={
 "Machine lateral raise":"Elevación lateral en máquina","Leaning cable lateral raise":"Elevación lateral en polea inclinado","Wide-grip pulldown":"Jalón con agarre ancho","Pull-ups":"Dominadas","Chin-ups":"Dominadas supinas","Machine pullover":"Pullover en máquina","Dumbbell pullover":"Pullover con mancuerna","Machine row":"Remo en máquina","One-arm cable row":"Remo unilateral en polea","Incline barbell press":"Press inclinado con barra","Smith bench press":"Press banca en Smith","Barbell back squat":"Sentadilla con barra","Seated calf raise":"Gemelos sentado","Leg press calf raise":"Gemelos en prensa","Machine crunch":"Crunch en máquina","Hanging knee raise":"Elevación de rodillas colgado"};
 const DK=Object.keys(D).filter(k=>k.length>=7).sort((a,b)=>b.length-a.length),DY={Mon:'Lun',Tue:'Mar',Wed:'Mié',Thu:'Jue',Fri:'Vie',Sat:'Sáb',Sun:'Dom'};
 const R=[[/^Target RIR (.+)$/,'RIR objetivo $1'],[/^dropping across (\d+) sessions$/,'bajando en $1 sesiones'],[/^no new best in (\d+) sessions$/,'sin nuevo récord en $1 sesiones'],[/^(\d+) sessions$/,'$1 sesiones'],[/^1 session$/,'1 sesión'],[/^Your sleep averaged ([\d.]+) h this week, below the 7–9 h target\.$/,'Tu sueño promedió $1 h esta semana, por debajo de la meta de 7–9 h.'],[/^Your stress averaged ([\d.]+) out of 5 this week\.$/,'Tu estrés promedió $1 de 5 esta semana.'],[/^(\d[\d,]*) steps to reach 8,000$/,(m,a)=>a.replace(',','.')+' pasos para llegar a 8.000'],[/(\d+) glass(?:es)? to go/,(m,a)=>a+(a==1?' vaso':' vasos')+' por beber'],[/· next at/,'· próximo a las'],[/^🔔 Your (\d+) glasses of (\d+) ml, (\S+) to (\S+)$/,'🔔 Tus $1 vasos de $2 ml, de $3 a $4'],
-[/^([\d.]+) kg × 32\.5 ml(, \+10% for men)?$/,(m,a,b)=>a+' kg × 32,5 ml'+(b?', +10 % hombres':'')],[/^(\d+) min logged, \+425 ml per 30 min$/,'$1 min registrados, +425 ml por cada 30 min'],[/^Adds (\d+) ml$/,'Suma $1 ml'],[/^\+(\d+) kcal burned$/,'+$1 kcal quemadas'],
-[/(\d+) units\b/,'$1 unidades'],[/Rowing/,'Remo'],[/^× Activity (.+)$/,'× Actividad $1'],[/Calculation weight (\d+) kg \(height − 100\)\./,'Peso de cálculo $1 kg (estatura − 100).'],
+[/^([\d.]+) kg × 32\.5 ml(, \+10% for men)?$/,(m,a,b)=>a+' kg × 32,5 ml'+(b?', +10 % hombres':'')],[/^Adds (\d+) ml$/,'Suma $1 ml'],
+[/(\d+) units\b/,'$1 unidades'],[/^× Activity (.+)$/,'× Actividad $1'],[/Calculation weight (\d+) kg \(height − 100\)\./,'Peso de cálculo $1 kg (estatura − 100).'],
 [/Expected loss: ([\d.]+) to ([\d.]+) kg per week\./,'Pérdida esperada: $1 a $2 kg por semana.'],[/Expected gain: up to ([\d.]+) kg per month\./,'Ganancia esperada: hasta $1 kg por mes.'],[/(\d+) g of /,'$1 g de '],
 [/^(Height|Weight) \((\w+)\)$/,(m,a,b)=>(a=='Height'?'Estatura':'Peso')+' ('+b+')'],[/^Week of (.+)$/,'Semana del $1'],[/^Latest: (.+)$/,'Último: $1'],[/^(\d+) areas$/,'$1 zonas'],[/^How to measure (.+)$/,(m,a)=>'Cómo medir '+ts(a)],
 [/^avg (.+)$/,'prom. $1'],[/based on (\d+) logged days?/,(m,a)=>'según '+a+(a==1?' día registrado':' días registrados')],[/kcal over so far, which fits your goal/,'kcal de más hasta ahora, lo que encaja con tu objetivo'],[/kcal under so far, which fits your goal/,'kcal de menos hasta ahora, lo que encaja con tu objetivo'],
-[/^(\d[\d,]*) kcal over$/,'$1 kcal de más'],[/^(\d[\d,]*) kcal under$/,'$1 kcal de menos'],[/^(\d+) days?$/,(m,a)=>a+(a==1?' día':' días')],[/^instead of (.+)$/,'en lugar de $1'],[/^keep eating (.+), burn it off$/,'sigue comiendo $1 y quémalo con ejercicio'],[/min\/day/,'min/día'],
+[/^(\d[\d,]*) kcal over$/,'$1 kcal de más'],[/^(\d[\d,]*) kcal under$/,'$1 kcal de menos'],[/^(\d+) days?$/,(m,a)=>a+(a==1?' día':' días')],[/^instead of (.+)$/,'en lugar de $1'],
 [/Protein is averaging (\d+) g against a (\d+) g target\. Aim for about (\d+) g extra per day\./,'Tu proteína promedia $1 g frente a una meta de $2 g. Intenta sumar unos $3 g extra por día.'],[/^on target on (\d+) of (\d+) logged days$/,'en objetivo $1 de $2 días registrados'],[/^weight change \((.+)\)$/,'cambio de peso ($1)'],
 [/^📝 Log workout: (.+)$/,(m,a)=>'📝 Registrar entrenamiento: '+ts(a)],[/^About (\d+) min$/,'Unos $1 min'],[/^last (.*) · next$/,'última vez $1 · siguiente'],[/^pick a load you can lift for (.+) reps$/,'elige una carga con la que puedas hacer $1 repeticiones'],
 [/^Saved: (.+)$/,(m,a)=>'Guardado: '+ts(a)],[/^(\d+) exercises · volume (.+) kg$/,'$1 ejercicios · volumen $2 kg'],[/· rest$/,'· descanso'],[/\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/g,m=>DY[m]]];
