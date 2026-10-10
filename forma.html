@@ -799,13 +799,18 @@ fin=finOn(d),w=wplan(d),
 dn=x=>new Date(x+'T00:00').toLocaleDateString(LOC,{weekday:'short',month:'short',day:'numeric'}),
 mac=q=>`<div class="how" style="margin-top:8px"><div><div>Protein</div><b>${q.p} g</b></div><div><div>Carbs</div><b>${q.c} g</b></div><div><div>Fat</div><b>${q.f} g</b></div></div>`,
 dys=n=>n>1?'days left':'day left',
-/* Whatever the limits could not absorb, offered as a roll-over or a walk. */
-spill=q=>{if(!q.left||Math.abs(q.left)<25)return'';const up=q.left>0,m=burnMin(q.left);
+/* Whatever the limits could not absorb, offered as a roll-over, a walk, or an
+   explicit override. The override states the resulting target up front, so the
+   risk is quantified before it is taken rather than after. */
+spill=q=>{if(!q.left||Math.abs(q.left)<25)return'';const up=q.left>0,m=burnMin(q.left),
+F=wkClose(d,1),able=F.rem>0&&Math.abs(F.k-c.k)>5;
 return`<div class="note ${up?'info':'warn'}" style="margin:16px 0 0"><b class="sxt">${up?'Could not fit this week':'Over what the week can absorb'}</b>
 <div class="mut" style="margin-top:4px">${up
 ?`<span>Even eating the maximum safe amount every remaining day you would finish</span> <b>${n0(q.left)} kcal</b> <span>under plan.</span>`
 :`<span>Even at the safe minimum you would finish</span> <b>${n0(Math.abs(q.left))} kcal</b> <span>over plan.</span>${m?` <span>Walking it off would take about</span> <b>${n0(m)} min</b><span>.</span>`:''}`}</div>
-<button class="btn s" style="margin-top:8px" data-a="wkcarry" data-v="${q.left}" data-w="${q.ws}" data-d="${d}">${up?'Add it to next week':'Subtract it from next week'}</button></div>`};
+<button class="btn s" style="margin-top:8px" data-a="wkcarry" data-v="${q.left}" data-w="${q.ws}" data-d="${d}">${up?'Add it to next week':'Subtract it from next week'}</button>
+${able?`<p class="cap" style="margin:16px 0 0"><span>Or force it into this week instead. Each of the</span> ${F.rem} <span>${F.rem>1?'remaining days':'remaining day'}</span> <span>would land on</span> <b>${n0(F.k)}</b> <span>kcal</span>, <span>outside the</span> ${n0(c.lo)}\u2013${n0(c.hi)} <span>safe range</span><span>.</span></p>
+<button class="btn s t" style="margin-top:8px" data-a="wkforce" data-d="${d}">At your own risk: fit it into this week</button>`:''}</div>`};
 if(auto)return`<div class="card bt-wk"><div class="hdr"><h3>\u{1F9ED} Weekly plan</h3><span class="hst">Automatic</span></div>
 <div class="kpi"><span class="big">${n0(e.k)}</span><span class="mut">kcal \u00b7 ${e.rem} <span>${dys(e.rem)}</span></span></div>${mac(e)}
 <p class="cap" style="margin:8px 0 0">Weekly auto-adjust is on, so this is applied for you and refreshes every time you log a meal.</p>
@@ -823,6 +828,9 @@ ${fin?`<p class="cap" style="margin:8px 0 0"><span>Closed</span> ${dn(d)}${fin.r
 :`<p class="cap" style="margin:8px 0 0"><span>Logged so far</span>: <b>${n0(eaten)}</b> <span>of</span> <b>${n0(c.base.k)}</b> kcal. <span>Closing the day settles it and spreads the balance over the next</span> ${c.rem} <span>${c.rem>1?'days':'day'}</span><span>, landing each one on</span> <b>${n0(c.k)}</b> <span>kcal</span><span>.</span></p>
 <div class="row" style="margin-top:8px">${finish}</div>`}
 ${c.cap&&!c.none&&!fin?`<p class="cap" style="margin:8px 0 0"><span>A safety limit applies. Allowed range</span>: <b>${n0(c.lo)}</b> \u2013 <b>${n0(c.hi)}</b> kcal.</p>`:''}
+${fin&&fin.force?`<div class="note warn" style="margin:16px 0 0"><b class="sxt">Forced into this week</b>
+<div class="mut" style="margin-top:4px"><span>You chose to balance the week outside the</span> ${n0(c.lo)}\u2013${n0(c.hi)} <span>safe range. The 1,200 kcal floor still applies.</span></div>
+<button class="btn s" style="margin-top:8px" data-a="wksafe" data-d="${d}">Go back to the safe plan</button></div>`:''}
 ${spill(fin?{left:fin.left,ws:c.ws}:c)}</div>`}
 
 const V={
@@ -1083,6 +1091,10 @@ const wkDays=ws=>[...Array(7)].map((_,i)=>{const x=new Date(ws+'T00:00');x.setDa
    attributed, and wkMac() for the order the reconciliation follows.       */
 const KFLOOR=()=>S.p.sex=='m'?1500:1200;
 const kBand=base=>[Math.min(base,Math.max(base*.75,KFLOOR())),base*1.25];
+/* The one line the at-your-own-risk override still will not cross. The +-25%
+   band is a planning heuristic and the override may relax it; 1,200 kcal is a
+   health floor and it may not. */
+const KHARD=1200;
 const clampG=(raw,lo,hi)=>Math.max(0,Math.round(Math.min(hi,Math.max(lo,raw))));
 const dNext=d=>{const x=new Date(d+'T00:00');x.setDate(x.getDate()+1);return fmt(x)};
 const wkNext=ws=>{const x=new Date(ws+'T00:00');x.setDate(x.getDate()+7);return fmt(x)};
@@ -1105,9 +1117,12 @@ u.p+=gap*(base.p*4/base.k)/4;u.c+=gap*(base.c*4/base.k)/4;u.f+=gap*(base.f*9/bas
    then protein. Those three only get wider hard bounds at that stage, which is
    what lets a blown carb pot settle below the soft band while protein and fat
    stay physiologically sane. */
-function wkMac(base,u,rem,k){
-const soft={p:[base.p*.75,base.p*1.25],c:[base.c*.75,base.c*1.25],f:[base.f*.75,base.f*1.25]},
-hard={c:[0,base.c*1.6],f:[base.f*.6,base.f*1.5],p:[base.p*.7,base.p*1.5]},
+function wkMac(base,u,rem,k,force){
+const B=(n,a,b)=>[base[n]*a,base[n]*b],
+soft=force?{p:B('p',.5,3),c:B('c',0,4),f:B('f',.5,3)}
+          :{p:B('p',.75,1.25),c:B('c',.75,1.25),f:B('f',.75,1.25)},
+hard=force?{c:B('c',0,6),f:B('f',.4,4),p:B('p',.4,4)}
+          :{c:B('c',0,1.6),f:B('f',.6,1.5),p:B('p',.7,1.5)},
 kpg={p:4,c:4,f:9},m={};
 for(const n of['p','c','f'])m[n]=Math.min(soft[n][1],Math.max(soft[n][0],Math.max(0,(base[n]*7-u[n])/rem)));
 for(const n of['c','f','p']){const gap=k-(m.p*4+m.c*4+m.f*9);
@@ -1118,7 +1133,7 @@ m[n]=Math.min(hard[n][1],Math.max(hard[n][0],m[n]+gap/kpg[n]))}
 const p=Math.round(m.p),f=Math.round(m.f),c=Math.round(m.c);
 return{p,f,c:Math.max(0,Math.min(Math.round(hard.c[1]),c+Math.round((k-(p*4+c*4+f*9))/4)))}}
 /* One engine for both. `inc` decides whether d counts as settled. */
-function wkSpread(d,inc){const c=calc(),base={k:c.target,p:c.P,c:c.C,f:c.F},
+function wkSpread(d,inc,force){const c=calc(),base={k:c.target,p:c.P,c:c.C,f:c.F},
 ws=wkStart(d),days=wkDays(ws),i=days.indexOf(d),[lo,hi]=kBand(base.k),
 carry=carryFor(ws),n=inc?i+1:i,rem=7-n;
 const u={k:0,p:0,c:0,f:0};let assumed=0;
@@ -1128,11 +1143,11 @@ else{assumed++;u.k+=base.k;u.p+=base.p;u.c+=base.c;u.f+=base.f}}
 const pot=base.k*7+carry,diff=pot-u.k,
 o={base,ws,rem,past:n,first:n==0,assumed,used:u,carry,diff,lo:Math.round(lo),hi:Math.round(hi)};
 /* Nothing left to spread over: the week is done, the balance can only roll on. */
-if(rem<=0)return{...o,...base,adj:0,cap:false,left:Math.round(diff),none:true};
-const rk=(pot-u.k)/rem,k=clampG(rk,lo,hi);
-return{...o,k,...wkMac(base,u,rem,k),adj:k-base.k,cap:Math.abs(rk-k)>5,left:Math.round(diff-k*rem),none:false}}
+if(rem<=0)return{...o,...base,adj:0,cap:false,left:Math.round(diff),none:true,force:!!force};
+const rk=(pot-u.k)/rem,k=force?Math.max(KHARD,Math.round(rk)):clampG(rk,lo,hi);
+return{...o,k,...wkMac(base,u,rem,k,force),adj:k-base.k,cap:Math.abs(rk-k)>5,left:Math.round(diff-k*rem),none:false,force:!!force}}
 const wkEst=d=>wkSpread(d,false);
-const wkClose=d=>wkSpread(d,true);
+const wkClose=(d,force)=>wkSpread(d,true,force);
 /* Roughly how long a brisk walk would have to be to burn an excess. Advice
    only: it never touches the budget, because the base already prices in the
    activity level through TDEE. */
@@ -1287,11 +1302,13 @@ if(a=='gd'){day=b.dataset.d;return go('today')}
 if(a=='sex'){S.p.sex=b.dataset.v}
 else if(a=='goal'){S.p.goal=b.dataset.v;S.p.pct=+b.dataset.x;S.p.kcal=+b.dataset.x*30}
 else if(a=='wauto'){S.auto=b.dataset.v=='1';toast(S.auto?'Weekly auto-adjust on':'Switched to Finish day')}
-else if(a=='wkfin'){const ad=b.dataset.d||day;
-if(finOn(ad))return toast('That day is already closed');
-const e=wkClose(ad);
-(S.wfin??={})[ad]={ws:e.ws,k:e.k,p:e.p,c:e.c,f:e.f,cap:e.cap,left:e.left,rem:e.rem};
-toast(e.none?'Week closed':e.cap?'Day closed, the rest was trimmed to the safety limit':'Day closed, the rest of the week is updated')}
+else if(a=='wkfin'||a=='wkforce'||a=='wksafe'){const ad=b.dataset.d||day,force=a=='wkforce';
+if(a=='wkfin'&&finOn(ad))return toast('That day is already closed');
+const e=wkClose(ad,force);
+(S.wfin??={})[ad]={ws:e.ws,k:e.k,p:e.p,c:e.c,f:e.f,cap:e.cap,left:e.left,rem:e.rem,force:force?1:0};
+toast(force?'Forced into this week, outside the safe range'
+:a=='wksafe'?'Back to the safe plan'
+:e.none?'Week closed':e.cap?'Day closed, the rest was trimmed to the safety limit':'Day closed, the rest of the week is updated')}
 else if(a=='wkopen'){const ad=b.dataset.d||day;if(S.wfin)delete S.wfin[ad];toast('Day reopened')}
 else if(a=='wkcarry'){const k=+b.dataset.v,ws=b.dataset.w,ad=b.dataset.d;if(!k)return;
 S.carry={ws:wkNext(ws),k};
@@ -1391,7 +1408,7 @@ const D={
 "Thickest part of the calf, standing with weight even.":"Parte más gruesa de la pantorrilla, de pie con el peso repartido.",
 "Save measurements":"Guardar medidas","History":"Historial","Area":"Zona","Change":"Cambio","Nothing saved yet.":"Aún no hay nada guardado.","📈 Progress":"📈 Progreso","Add at least two entries with this area to see a chart.":"Añade al menos dos entradas de esta zona para ver el gráfico.","🗂️ Entries":"🗂️ Entradas",
 "Pick a date up to today":"Elige una fecha hasta hoy","Enter at least one measurement":"Escribe al menos una medida","Measurements saved":"Medidas guardadas","How to measure":"Cómo medir",
-"kcal vs base":"kcal frente a la base","day left":"día restante","days left":"días restantes","safety limit applied":"límite de seguridad aplicado","Weekly auto-adjust":"Ajuste automático semanal","Weekly adjustment":"Ajuste semanal","Automatic":"Automático","Finish day":"Terminar el día","Weekly auto-adjust on":"Ajuste automático semanal activado","🧭 Weekly plan":"🧭 Plan semanal","base target":"meta base","Applied":"Aplicado","Plan applied":"Plan aplicado","locked in until you recalculate":"fijo hasta que vuelvas a recalcular","New estimate":"Nueva estimación","Reopen":"Reabrir","Day reopened":"Día reabierto","That day is already closed":"Ese día ya está cerrado","Day closed":"Día cerrado","Closed":"Cerrado","week closed":"semana cerrada","Today is already closed.":"Hoy ya está cerrado.","the week is over, any balance can only roll into next week":"la semana terminó, cualquier saldo solo puede pasar a la semana siguiente","balance moved to the days after it":"saldo repartido en los días siguientes","Switch to Finish day":"Cambiar a Terminar el día","Logged so far":"Registrado hasta ahora","of":"de","Closing the day settles it and spreads the balance over the next":"Cerrar el día lo liquida y reparte el saldo en los próximos","days":"días","day":"día",", landing each one on":", dejando cada uno en","Sunday closes the week, so there are no days left to spread a balance over. Anything outstanding can only roll into next week.":"El domingo cierra la semana, así que no quedan días donde repartir el saldo. Lo que falte solo puede pasar a la semana siguiente.","Carried from last week":"Arrastrado de la semana pasada","kcal carried from last week":"kcal arrastradas de la semana pasada","Could not fit this week":"No alcanzó a entrar esta semana","Over what the week can absorb":"Más de lo que la semana puede absorber","Even eating the maximum safe amount every remaining day you would finish":"Incluso comiendo el máximo seguro todos los días restantes terminarías","under plan.":"por debajo del plan.","over plan.":"por encima del plan.","Even at the safe minimum you would finish":"Incluso en el mínimo seguro terminarías","Walking it off would take about":"Caminar para quemarlo tomaría unos","Add it to next week":"Sumarlo a la semana siguiente","Subtract it from next week":"Restarlo de la semana siguiente","kcal could not fit this week":"kcal no alcanzaron a entrar esta semana","kcal over what the week can absorb":"kcal de más sobre lo que la semana absorbe","Week closed":"Semana cerrada","Day closed, the rest of the week is updated":"Día cerrado, el resto de la semana se actualizó","Day closed, the rest was trimmed to the safety limit":"Día cerrado, el resto se recortó al límite de seguridad","Switched to Finish day":"Cambiado a Terminar el día","Added to next week":"Sumado a la semana siguiente","Subtracted from next week":"Restado de la semana siguiente","Weekly auto-adjust is on, so this is applied for you and refreshes every time you log a meal.":"El ajuste automático semanal está activo, así que esto se aplica solo y se actualiza cada vez que registras una comida.","A safety limit applies, so part of the gap carries into next week. Allowed range":"Se aplica un límite de seguridad, así que parte de la diferencia pasa a la semana siguiente. Rango permitido","On Finish day you stay in control: when you are done eating, press Finish day on the Weekly plan card. That settles the day with whatever you logged and spreads the balance over the days still to come, and the new target holds until you close the next day.":"Con Terminar el día mandas tú: cuando acabes de comer, pulsa Terminar el día en la tarjeta Plan semanal. Eso liquida la jornada con lo que registraste y reparte el saldo entre los días que faltan, y la nueva meta se mantiene hasta que cierres el siguiente día.","Weekly auto-adjust off":"Ajuste automático semanal desactivado","Keeps the weekly total fixed instead of the daily one. Whatever you leave over or overspend earlier in the week is spread across the days that remain, today included. Mondays always use the base target, and a past day you never logged counts as if you hit the base exactly.":"Mantiene fijo el total semanal en lugar del diario. Lo que te sobre o te pases en los días anteriores de la semana se reparte entre los días que quedan, hoy incluido. Los lunes siempre usan la meta base, y un día pasado que nunca registraste cuenta como si hubieras cumplido la base exactamente.","Safety limits keep a badly skewed week from leaving you on a dangerous number: the adjusted target never goes above 25% over your base, and never below 25% under it or the hard floor, whichever is higher. Anything beyond that carries into next week.":"Los límites de seguridad evitan que una semana muy desviada te deje en una cifra peligrosa: la meta ajustada nunca sube más de un 25 % sobre tu base, ni baja más de un 25 % por debajo de ella o del piso absoluto, el que sea mayor. Lo que exceda ese rango pasa a la semana siguiente.","For your current base that means staying between":"Con tu base actual eso significa mantenerte entre","Applied automatically":"Aplicado automáticamente","Weekly diary":"Diario semanal","My weekly diary":"Mi diario semanal","Previous week":"Semana anterior","Next week":"Semana siguiente","Nothing logged":"Sin registros","Open this day":"Abrir este día",
+"kcal vs base":"kcal frente a la base","day left":"día restante","days left":"días restantes","safety limit applied":"límite de seguridad aplicado","Weekly auto-adjust":"Ajuste automático semanal","Weekly adjustment":"Ajuste semanal","Automatic":"Automático","Finish day":"Terminar el día","Weekly auto-adjust on":"Ajuste automático semanal activado","🧭 Weekly plan":"🧭 Plan semanal","base target":"meta base","Applied":"Aplicado","Plan applied":"Plan aplicado","locked in until you recalculate":"fijo hasta que vuelvas a recalcular","New estimate":"Nueva estimación","Reopen":"Reabrir","At your own risk: fit it into this week":"Bajo tu propio riesgo: calcular para esta misma semana","Or force it into this week instead. Each of the":"O fórzalo dentro de esta semana. Cada uno de los","remaining days":"días restantes","remaining day":"día restante","would land on":"quedaría en","outside the":"fuera del","safe range":"rango seguro","Forced into this week":"Forzado dentro de esta semana","You chose to balance the week outside the":"Elegiste equilibrar la semana fuera del","safe range. The 1,200 kcal floor still applies.":"rango seguro. El piso de 1.200 kcal sigue vigente.","Go back to the safe plan":"Volver al plan seguro","Forced into this week, outside the safe range":"Forzado dentro de esta semana, fuera del rango seguro","Back to the safe plan":"De vuelta al plan seguro","Day reopened":"Día reabierto","That day is already closed":"Ese día ya está cerrado","Day closed":"Día cerrado","Closed":"Cerrado","week closed":"semana cerrada","Today is already closed.":"Hoy ya está cerrado.","the week is over, any balance can only roll into next week":"la semana terminó, cualquier saldo solo puede pasar a la semana siguiente","balance moved to the days after it":"saldo repartido en los días siguientes","Switch to Finish day":"Cambiar a Terminar el día","Logged so far":"Registrado hasta ahora","of":"de","Closing the day settles it and spreads the balance over the next":"Cerrar el día lo liquida y reparte el saldo en los próximos","days":"días","day":"día",", landing each one on":", dejando cada uno en","Sunday closes the week, so there are no days left to spread a balance over. Anything outstanding can only roll into next week.":"El domingo cierra la semana, así que no quedan días donde repartir el saldo. Lo que falte solo puede pasar a la semana siguiente.","Carried from last week":"Arrastrado de la semana pasada","kcal carried from last week":"kcal arrastradas de la semana pasada","Could not fit this week":"No alcanzó a entrar esta semana","Over what the week can absorb":"Más de lo que la semana puede absorber","Even eating the maximum safe amount every remaining day you would finish":"Incluso comiendo el máximo seguro todos los días restantes terminarías","under plan.":"por debajo del plan.","over plan.":"por encima del plan.","Even at the safe minimum you would finish":"Incluso en el mínimo seguro terminarías","Walking it off would take about":"Caminar para quemarlo tomaría unos","Add it to next week":"Sumarlo a la semana siguiente","Subtract it from next week":"Restarlo de la semana siguiente","kcal could not fit this week":"kcal no alcanzaron a entrar esta semana","kcal over what the week can absorb":"kcal de más sobre lo que la semana absorbe","Week closed":"Semana cerrada","Day closed, the rest of the week is updated":"Día cerrado, el resto de la semana se actualizó","Day closed, the rest was trimmed to the safety limit":"Día cerrado, el resto se recortó al límite de seguridad","Switched to Finish day":"Cambiado a Terminar el día","Added to next week":"Sumado a la semana siguiente","Subtracted from next week":"Restado de la semana siguiente","Weekly auto-adjust is on, so this is applied for you and refreshes every time you log a meal.":"El ajuste automático semanal está activo, así que esto se aplica solo y se actualiza cada vez que registras una comida.","A safety limit applies, so part of the gap carries into next week. Allowed range":"Se aplica un límite de seguridad, así que parte de la diferencia pasa a la semana siguiente. Rango permitido","On Finish day you stay in control: when you are done eating, press Finish day on the Weekly plan card. That settles the day with whatever you logged and spreads the balance over the days still to come, and the new target holds until you close the next day.":"Con Terminar el día mandas tú: cuando acabes de comer, pulsa Terminar el día en la tarjeta Plan semanal. Eso liquida la jornada con lo que registraste y reparte el saldo entre los días que faltan, y la nueva meta se mantiene hasta que cierres el siguiente día.","Weekly auto-adjust off":"Ajuste automático semanal desactivado","Keeps the weekly total fixed instead of the daily one. Whatever you leave over or overspend earlier in the week is spread across the days that remain, today included. Mondays always use the base target, and a past day you never logged counts as if you hit the base exactly.":"Mantiene fijo el total semanal en lugar del diario. Lo que te sobre o te pases en los días anteriores de la semana se reparte entre los días que quedan, hoy incluido. Los lunes siempre usan la meta base, y un día pasado que nunca registraste cuenta como si hubieras cumplido la base exactamente.","Safety limits keep a badly skewed week from leaving you on a dangerous number: the adjusted target never goes above 25% over your base, and never below 25% under it or the hard floor, whichever is higher. Anything beyond that carries into next week.":"Los límites de seguridad evitan que una semana muy desviada te deje en una cifra peligrosa: la meta ajustada nunca sube más de un 25 % sobre tu base, ni baja más de un 25 % por debajo de ella o del piso absoluto, el que sea mayor. Lo que exceda ese rango pasa a la semana siguiente.","For your current base that means staying between":"Con tu base actual eso significa mantenerte entre","Applied automatically":"Aplicado automáticamente","Weekly diary":"Diario semanal","My weekly diary":"Mi diario semanal","Previous week":"Semana anterior","Next week":"Semana siguiente","Nothing logged":"Sin registros","Open this day":"Abrir este día",
 "🍽️ Totals and averages":"🍽️ Totales y promedios","Avg per day":"Promedio por día","Days logged":"Días registrados","🎯 Weekly goal reached?":"🎯 ¿Meta semanal cumplida?","Yes 🎉":"Sí 🎉","So far this week":"Hasta ahora esta semana","For the week":"En la semana","No meals logged this week yet":"Aún no hay comidas registradas esta semana",
 "Calories within 10% of the weekly budget":"Calorías dentro del 10 % del presupuesto semanal","In a calorie deficit":"En déficit calórico","In a calorie surplus":"En superávit calórico","Close to maintenance":"Cerca del mantenimiento","Protein at 90% or more of target":"Proteína al 90 % o más de la meta","Carbs and fat within 25% of target":"Carbos y grasa dentro del 25 % de la meta",
 "📊 Calories per day":"📊 Calorías por día","Dashed line = that day's budget":"Línea punteada = presupuesto de ese día","🍩 Macro split":"🍩 Distribución de macros","Log meals to see your macro split.":"Registra comidas para ver tu distribución de macros.","PROTEIN":"PROTEÍNA",
