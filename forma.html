@@ -1072,31 +1072,62 @@ const wkDays=ws=>[...Array(7)].map((_,i)=>{const x=new Date(ws+'T00:00');x.setDa
    pushed up. Protein and fat stay in the same +-25% band and carbs are
    re-derived from the clamped calories, so the macro bars always add up to the
    budget on show. Whatever the limits refuse to absorb is reported as `left`,
-   which the UI offers to push into next week (or to walk off).            */
+   which the UI offers to push into next week (or to walk off).
+
+   Macros get the same catch-up as the calories, one pot each, and are then
+   reconciled against the calorie budget so the three bars always add up to it.
+   See addDay() for why energy a day's macros do not account for has to be
+   attributed, and wkMac() for the order the reconciliation follows.       */
 const KFLOOR=()=>S.p.sex=='m'?1500:1200;
 const kBand=base=>[Math.min(base,Math.max(base*.75,KFLOOR())),base*1.25];
 const clampG=(raw,lo,hi)=>Math.max(0,Math.round(Math.min(hi,Math.max(lo,raw))));
 const dNext=d=>{const x=new Date(d+'T00:00');x.setDate(x.getDate()+1);return fmt(x)};
 const wkNext=ws=>{const x=new Date(ws+'T00:00');x.setDate(x.getDate()+7);return fmt(x)};
 const carryFor=ws=>{const c=S.carry;return c&&c.ws==ws?c.k:0};
+/* Add a settled day to the running totals. Energy the day's macros do not
+   account for gets attributed across the three pots in the plan's own energy
+   split, because logged calories rarely equal 4/4/9 of the logged macros:
+   fibre and rounding cause a few percent, and a meal logged as calories only
+   causes all of it. Without this, logging "1,400 kcal" with no macro detail
+   reads as if no protein, carbs or fat had been eaten, and the macro catch-up
+   pushes them up while the calorie budget is coming down. */
+function addDay(u,t,base){u.k+=t.k;u.p+=t.p;u.c+=t.c;u.f+=t.f;
+const gap=t.k-(t.p*4+t.c*4+t.f*9);
+if(gap<=0||base.k<=0)return;
+u.p+=gap*(base.p*4/base.k)/4;u.c+=gap*(base.c*4/base.k)/4;u.f+=gap*(base.f*9/base.k)/9}
+/* Each macro catches up on its own pot, exactly like the calories do, inside
+   the same +-25% safety band. Clamping three numbers independently can leave
+   the plate off the calorie budget, so the residual is then absorbed in order:
+   carbs first, because carbs are this plan's flexible energy lever, then fat,
+   then protein. Those three only get wider hard bounds at that stage, which is
+   what lets a blown carb pot settle below the soft band while protein and fat
+   stay physiologically sane. */
+function wkMac(base,u,rem,k){
+const soft={p:[base.p*.75,base.p*1.25],c:[base.c*.75,base.c*1.25],f:[base.f*.75,base.f*1.25]},
+hard={c:[0,base.c*1.6],f:[base.f*.6,base.f*1.5],p:[base.p*.7,base.p*1.5]},
+kpg={p:4,c:4,f:9},m={};
+for(const n of['p','c','f'])m[n]=Math.min(soft[n][1],Math.max(soft[n][0],Math.max(0,(base[n]*7-u[n])/rem)));
+for(const n of['c','f','p']){const gap=k-(m.p*4+m.c*4+m.f*9);
+if(Math.abs(gap)<2)break;
+m[n]=Math.min(hard[n][1],Math.max(hard[n][0],m[n]+gap/kpg[n]))}
+/* Rounding three grams to integers can drift the plate by a few kcal on its
+   own (half a gram of fat is already 4.5), so carbs take that last bite too. */
+const p=Math.round(m.p),f=Math.round(m.f),c=Math.round(m.c);
+return{p,f,c:Math.max(0,Math.min(Math.round(hard.c[1]),c+Math.round((k-(p*4+c*4+f*9))/4)))}}
 /* One engine for both. `inc` decides whether d counts as settled. */
 function wkSpread(d,inc){const c=calc(),base={k:c.target,p:c.P,c:c.C,f:c.F},
 ws=wkStart(d),days=wkDays(ws),i=days.indexOf(d),[lo,hi]=kBand(base.k),
 carry=carryFor(ws),n=inc?i+1:i,rem=7-n;
 const u={k:0,p:0,c:0,f:0};let assumed=0;
 for(let j=0;j<n;j++){const x=days[j];
-if((S.log[x]||[]).length){const t=tot(x);u.k+=t.k;u.p+=t.p;u.c+=t.c;u.f+=t.f}
+if((S.log[x]||[]).length)addDay(u,tot(x),base);
 else{assumed++;u.k+=base.k;u.p+=base.p;u.c+=base.c;u.f+=base.f}}
 const pot=base.k*7+carry,diff=pot-u.k,
 o={base,ws,rem,past:n,first:n==0,assumed,used:u,carry,diff,lo:Math.round(lo),hi:Math.round(hi)};
 /* Nothing left to spread over: the week is done, the balance can only roll on. */
 if(rem<=0)return{...o,...base,adj:0,cap:false,left:Math.round(diff),none:true};
-const raw=(tot7,used)=>(tot7-used)/rem,
-rk=raw(pot,u.k),k=clampG(rk,lo,hi),
-p=clampG(raw(base.p*7,u.p),base.p*.75,base.p*1.25),
-f=clampG(raw(base.f*7,u.f),base.f*.75,base.f*1.25),
-cb=Math.max(0,Math.round((k-p*4-f*9)/4));
-return{...o,k,p,c:cb,f,adj:k-base.k,cap:Math.abs(rk-k)>5,left:Math.round(diff-k*rem),none:false}}
+const rk=(pot-u.k)/rem,k=clampG(rk,lo,hi);
+return{...o,k,...wkMac(base,u,rem,k),adj:k-base.k,cap:Math.abs(rk-k)>5,left:Math.round(diff-k*rem),none:false}}
 const wkEst=d=>wkSpread(d,false);
 const wkClose=d=>wkSpread(d,true);
 /* Roughly how long a brisk walk would have to be to burn an excess. Advice
