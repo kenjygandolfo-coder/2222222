@@ -1229,6 +1229,123 @@ const MRX=[
 [/biceps|curl/i,{p:'biceps',s:[]}],
 [/triceps|pushdown|overhead.*extension/i,{p:'triceps',s:[]}]];
 function muscleOf(name){if(!name)return{p:null,s:[]};if(MMAP[name])return{p:MMAP[name].p,s:[...MMAP[name].s]};const r=MRX.find(x=>x[0].test(name));return r?{p:r[1].p,s:[...r[1].s]}:{p:null,s:[]}}
+/* GPOOL — selectable exercise OPTIONS only (per user instruction: "solo para
+   tener como opciones"). These are the ~110 lifts transcribed from the user's
+   PDF database. They do NOT alter the default routines D3/D4/D5, GR, GN, MUSG,
+   MUSL, or the gMuscleSets() weighting — those stay exactly as-is. Each entry is
+   {n:English canonical name, kind:H compound|I isolation, p:primary MUSG group,
+   s:[secondary MUSG groups]}. The finer PDF muscles are collapsed into the fixed
+   13 MUSG groups (see taxonomy); every p and every s element is one of the 13
+   keys. The parenthetical numbers below are the PDF's fractional per-muscle
+   provenance weights ONLY — they are recorded here for traceability and are NOT
+   stored on the objects and NOT used in compute: the app's own iso/compound/myo
+   weighting in gMuscleSets() remains the single source of truth. Wiring GPOOL
+   into the Add-exercise search and the MMAP name resolution happens in later
+   features; this constant just holds the data. */
+const GPOOL=[
+/* PECHO -> chest; Delt Ant -> front delts; Triceps -> triceps */
+{n:'Flat barbell bench press',kind:H,p:'chest',s:['front delts','triceps']}, /* Pecho(1);Delt Ant(0.5);Triceps(0.5) */
+{n:'Flat dumbbell bench press',kind:H,p:'chest',s:['front delts','triceps']}, /* Pecho(1);Delt Ant(0.5);Triceps(0.5) */
+{n:'Machine chest press (flat)',kind:H,p:'chest',s:['front delts','triceps']}, /* Pecho(1);Delt Ant(0.5);Triceps(0.25) */
+{n:'Smith machine flat press',kind:H,p:'chest',s:['front delts','triceps']}, /* Pecho(1);Delt Ant(0.5);Triceps(0.5) */
+{n:'Incline barbell bench press',kind:H,p:'chest',s:['front delts','triceps']}, /* Pecho Superior(1);Delt Ant(0.75);Triceps(0.5) */
+{n:'Incline dumbbell bench press',kind:H,p:'chest',s:['front delts','triceps']}, /* Pecho Superior(1);Delt Ant(0.75);Triceps(0.5) */
+{n:'Incline machine press',kind:H,p:'chest',s:['front delts','triceps']}, /* Pecho Superior(1);Delt Ant(0.75);Triceps(0.25) */
+{n:'Smith machine incline press',kind:H,p:'chest',s:['front delts','triceps']}, /* Pecho Superior(1);Delt Ant(0.75);Triceps(0.5) */
+{n:'Decline barbell bench press',kind:H,p:'chest',s:['front delts','triceps']}, /* Pecho Inferior(1);Delt Ant(0.25);Triceps(0.5) */
+{n:'Decline dumbbell bench press',kind:H,p:'chest',s:['front delts','triceps']}, /* Pecho Inferior(1);Delt Ant(0.25);Triceps(0.5) */
+{n:'Dumbbell chest fly',kind:I,p:'chest',s:['front delts']}, /* Pecho(1);Delt Ant(0.25) */
+{n:'Pec deck',kind:I,p:'chest',s:[]}, /* Pecho(1) */
+{n:'Cable crossover (high to low)',kind:I,p:'chest',s:[]}, /* Pecho Inferior(1) */
+{n:'Cable crossover (low to high)',kind:I,p:'chest',s:['front delts']}, /* Pecho Superior(1);Delt Ant(0.25) */
+{n:'Cable crossover (mid)',kind:I,p:'chest',s:[]}, /* Pecho Medio(1) */
+{n:'Chest dips',kind:H,p:'chest',s:['triceps','front delts']}, /* Pecho Inferior(1);Triceps(0.5);Delt Ant(0.5) */
+{n:'Push-ups',kind:H,p:'chest',s:['front delts','triceps']}, /* Pecho(1);Delt Ant(0.5);Triceps(0.5) */
+/* ESPALDA -> lats (vertical pulls/pullovers) or upper back (rows); Biceps/Braquial -> biceps; Delt Post -> rear delts; Romboides/Trapecio -> upper back; Lumbar -> abs */
+{n:'Pull-ups (pronated)',kind:H,p:'lats',s:['biceps','rear delts']}, /* Dorsal Ancho(1);Biceps(0.5);Delt Post(0.25) */
+{n:'Chin-ups (supinated)',kind:H,p:'lats',s:['biceps']}, /* Dorsal Ancho(1);Biceps(0.75) */
+{n:'Neutral-grip pull-ups',kind:H,p:'lats',s:['biceps']}, /* Dorsal Ancho(1);Braquial/Biceps(0.5) */
+{n:'Wide-grip lat pulldown',kind:H,p:'lats',s:['biceps','rear delts']}, /* Dorsal Ancho(1);Biceps(1);Delt Post(0.25) */
+{n:'Close-grip lat pulldown',kind:H,p:'lats',s:['biceps','upper back']}, /* Dorsal Ancho(1);Biceps(1);Romboides(0.5) */
+{n:'Supinated lat pulldown',kind:H,p:'lats',s:['biceps']}, /* Dorsal Ancho(1);Biceps(1) */
+{n:'Bent-over barbell row (pronated)',kind:H,p:'upper back',s:['lats','biceps','abs']}, /* Espalda Alta/Dorsal(1);Biceps(0.5);Lumbar(0.5) */
+{n:'Barbell row (supinated)',kind:H,p:'upper back',s:['lats','biceps','abs']}, /* Dorsal Ancho(1);Biceps(0.75);Lumbar(0.5) */
+{n:'One-arm dumbbell row',kind:H,p:'upper back',s:['lats','biceps','rear delts']}, /* Dorsal Ancho(1);Biceps(0.5);Delt Post(0.25) */
+{n:'Chest-supported machine row',kind:H,p:'upper back',s:['biceps','rear delts']}, /* Espalda Alta(1);Biceps(0.5);Delt Post(0.5) */
+{n:'T-bar row',kind:H,p:'upper back',s:['biceps','abs']}, /* Espalda Alta(1);Biceps(0.5);Lumbar(0.25) */
+{n:'Close-grip seated cable row',kind:H,p:'upper back',s:['lats','biceps']}, /* Dorsal Ancho(1);Biceps(0.5);Romboides(0.5) */
+{n:'Wide-grip seated cable row',kind:H,p:'upper back',s:['biceps','rear delts']}, /* Espalda Alta(1);Biceps(0.5);Delt Post(0.5) */
+{n:'Straight-arm cable pullover',kind:I,p:'lats',s:['triceps']}, /* Dorsal Ancho(1);Triceps(0.25) */
+{n:'Dumbbell pullover',kind:I,p:'lats',s:['chest','triceps']}, /* Dorsal Ancho(1);Pecho(0.5);Triceps(0.25) */
+/* HOMBROS -> front/side/rear delts; Trapecio Superior -> upper back */
+{n:'Barbell overhead press',kind:H,p:'front delts',s:['triceps','side delts']}, /* Delt Ant(1);Triceps(0.5);Delt Lat(0.25) */
+{n:'Dumbbell shoulder press',kind:H,p:'front delts',s:['triceps','side delts']}, /* Delt Ant(1);Triceps(0.5);Delt Lat(0.25) */
+{n:'Machine shoulder press',kind:H,p:'front delts',s:['triceps']}, /* Delt Ant(1);Triceps(0.5) */
+{n:'Smith machine shoulder press',kind:H,p:'front delts',s:['triceps']}, /* Delt Ant(1);Triceps(0.5) */
+{n:'Dumbbell lateral raise',kind:I,p:'side delts',s:[]}, /* Delt Lat(1) */
+{n:'Cable lateral raise',kind:I,p:'side delts',s:[]}, /* Delt Lat(1) */
+{n:'Machine lateral raise',kind:I,p:'side delts',s:[]}, /* Delt Lat(1) */
+{n:'Dumbbell front raise',kind:I,p:'front delts',s:[]}, /* Delt Ant(1) */
+{n:'Barbell front raise',kind:I,p:'front delts',s:[]}, /* Delt Ant(1) */
+{n:'Cable front raise',kind:I,p:'front delts',s:[]}, /* Delt Ant(1) */
+{n:'Dumbbell rear delt fly',kind:I,p:'rear delts',s:['upper back']}, /* Delt Post(1);Espalda Alta(0.25) */
+{n:'Cable reverse fly',kind:I,p:'rear delts',s:['upper back']}, /* Delt Post(1);Espalda Alta(0.25) */
+{n:'Reverse pec deck',kind:I,p:'rear delts',s:['upper back']}, /* Delt Post(1);Espalda Alta(0.25) */
+{n:'Dumbbell shrugs',kind:I,p:'upper back',s:[]}, /* Trapecio Superior(1) */
+{n:'Barbell shrugs',kind:I,p:'upper back',s:[]}, /* Trapecio Superior(1) */
+/* PIERNAS -> quads/hamstrings/glutes/calves; Lumbar/Core -> abs */
+{n:'Barbell back squat',kind:H,p:'quads',s:['glutes','abs']}, /* Cuadriceps(1);Gluteos(0.5);Lumbar(0.25) */
+{n:'Smith machine squat',kind:H,p:'quads',s:['glutes']}, /* Cuadriceps(1);Gluteos(0.5) */
+{n:'Front squat',kind:H,p:'quads',s:['glutes','abs']}, /* Cuadriceps(1);Gluteos(0.25);Core(0.25) */
+{n:'Hack squat machine',kind:H,p:'quads',s:['glutes']}, /* Cuadriceps(1);Gluteos(0.25) */
+{n:'Bulgarian split squat (dumbbell)',kind:H,p:'quads',s:['glutes']}, /* Cuadriceps(1);Gluteos(0.75) */
+{n:'Goblet squat',kind:H,p:'quads',s:['glutes','abs']}, /* Cuadriceps(1);Gluteos(0.25);Core(0.25) */
+{n:'Leg press',kind:H,p:'quads',s:['glutes','hamstrings']}, /* Cuadriceps(1);Gluteos(0.5);Isquiosurales(0.25) */
+{n:'Machine leg extension',kind:I,p:'quads',s:[]}, /* Cuadriceps(1) */
+{n:'Barbell hip thrust',kind:H,p:'glutes',s:['hamstrings','quads']}, /* Gluteos(1);Isquiosurales(0.25);Cuadriceps(0.1) */
+{n:'Machine hip thrust',kind:H,p:'glutes',s:['hamstrings']}, /* Gluteos(1);Isquiosurales(0.25) */
+{n:'Barbell Romanian deadlift',kind:H,p:'hamstrings',s:['glutes','abs']}, /* Isquiosurales(1);Gluteos(0.75);Lumbar(0.5) */
+{n:'Dumbbell Romanian deadlift',kind:H,p:'hamstrings',s:['glutes','abs']}, /* Isquiosurales(1);Gluteos(0.75);Lumbar(0.25) */
+{n:'Conventional barbell deadlift',kind:H,p:'hamstrings',s:['glutes','abs']}, /* Isquiosurales(1);Gluteos(0.75);Lumbar(1) */
+{n:'Lying leg curl machine',kind:I,p:'hamstrings',s:['calves']}, /* Isquiosurales(1);Gemelos(0.1) */
+{n:'Seated leg curl machine',kind:I,p:'hamstrings',s:['calves']}, /* Isquiosurales(1);Gemelos(0.1) */
+{n:'Dumbbell lunges',kind:H,p:'quads',s:['glutes','hamstrings']}, /* Cuadriceps(1);Gluteos(0.75);Isquiosurales(0.25) */
+{n:'Barbell lunges',kind:H,p:'quads',s:['glutes','hamstrings']}, /* Cuadriceps(1);Gluteos(0.75);Isquiosurales(0.25) */
+{n:'Standing calf raise machine',kind:I,p:'calves',s:[]}, /* Gemelos(1) */
+{n:'Seated calf raise machine',kind:I,p:'calves',s:[]}, /* Soleo(1) */
+{n:'Leg press calf raise',kind:I,p:'calves',s:[]}, /* Gemelos(1) */
+/* BRAZOS -> biceps/triceps; Antebrazo/Braquial/Braquiorradial -> biceps */
+{n:'Straight-bar barbell curl',kind:I,p:'biceps',s:[]}, /* Biceps(1);Antebrazo(0.25) */
+{n:'EZ-bar curl',kind:I,p:'biceps',s:[]}, /* Biceps(1);Braquial(0.25);Antebrazo(0.25) */
+{n:'Alternating dumbbell curl',kind:I,p:'biceps',s:[]}, /* Biceps(1) */
+{n:'Dumbbell hammer curl',kind:I,p:'biceps',s:[]}, /* Braquiorradial(1);Biceps(0.5);Braquial(0.5) */
+{n:'Cable rope hammer curl',kind:I,p:'biceps',s:[]}, /* Braquiorradial(1);Biceps(0.5);Braquial(0.5) */
+{n:'Preacher curl',kind:I,p:'biceps',s:[]}, /* Biceps(1) */
+{n:'Dumbbell spider curl',kind:I,p:'biceps',s:[]}, /* Biceps(1) */
+{n:'Low cable curl (straight bar)',kind:I,p:'biceps',s:[]}, /* Biceps(1) */
+{n:'Cable rope triceps pushdown',kind:I,p:'triceps',s:[]}, /* Triceps(1) */
+{n:'Cable bar triceps pushdown',kind:I,p:'triceps',s:[]}, /* Triceps(1) */
+{n:'Single-arm overhead cable extension',kind:I,p:'triceps',s:[]}, /* Triceps(1) */
+{n:'EZ-bar skullcrusher',kind:I,p:'triceps',s:[]}, /* Triceps(1) */
+{n:'Dumbbell lying triceps extension',kind:I,p:'triceps',s:[]}, /* Triceps(1) */
+{n:'Overhead dumbbell triceps extension',kind:I,p:'triceps',s:[]}, /* Triceps Cabeza Larga(1) */
+{n:'Close-grip barbell bench press',kind:H,p:'triceps',s:['chest','front delts']}, /* Triceps(1);Pecho(0.5);Delt Ant(0.5) */
+{n:'Bench triceps dips',kind:H,p:'triceps',s:['chest','front delts']}, /* Triceps(1);Pecho(0.25);Delt Ant(0.25) */
+{n:'Assisted machine dips',kind:H,p:'triceps',s:['chest','front delts']}, /* Triceps(1);Pecho(0.5);Delt Ant(0.25) */
+{n:'Dumbbell triceps kickback',kind:I,p:'triceps',s:[]}, /* Triceps(1) */
+{n:'Cable triceps kickback',kind:I,p:'triceps',s:[]}, /* Triceps(1) */
+{n:'Supinated wrist curl',kind:I,p:'biceps',s:[]}, /* Antebrazo Flexores(1) */
+{n:'Pronated wrist curl',kind:I,p:'biceps',s:[]}, /* Antebrazo Extensores(1) */
+/* CORE -> abs */
+{n:'Floor crunch',kind:I,p:'abs',s:[]}, /* Recto Abdominal(1) */
+{n:'Machine crunch',kind:I,p:'abs',s:[]}, /* Recto Abdominal(1) */
+{n:'Cable rope crunch',kind:I,p:'abs',s:[]}, /* Recto Abdominal(1) */
+{n:'Hanging leg raise',kind:I,p:'abs',s:[]}, /* Recto Abdominal Inf(1);Flexores de Cadera(0.5) */
+{n:'Lying leg raise',kind:I,p:'abs',s:[]}, /* Recto Abdominal Inf(1);Flexores de Cadera(0.5) */
+{n:'Ab wheel rollout',kind:I,p:'abs',s:[]}, /* Recto Abdominal(1);Core Estabilizador(1) */
+{n:'Plank',kind:I,p:'abs',s:[]}, /* Core Estabilizador(1);Recto Abdominal(0.5) */
+{n:'Russian twist',kind:I,p:'abs',s:[]}, /* Oblicuos(1);Recto Abdominal(0.5) */
+{n:'Roman chair back extension',kind:I,p:'abs',s:['glutes','hamstrings']}]; /* Lumbar(1);Gluteos(0.5);Isquiosurales(0.25) */
 /* Weekly effective sets per muscle for the LIVE routine.
    We iterate gday(i) (post time-tier trim) so hidden accessories are NOT
    counted, but use the AUTHORED sets e.s (NOT gsets) so the summary reflects
