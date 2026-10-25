@@ -933,9 +933,9 @@ stats(){return`<h2>Your progress</h2><div id="sc"></div>`},
 gym(){return`<h2>Gym planner</h2><div id="gout"></div>`}};
 
 const E=(n,s,r,rir,k,alt=[],x='')=>({n,s,r,rir,k,alt,x}),H='H',I='I';
-const D3=[['Mon','Session A',[E('Hack squat',3,'6–8','2',H,['Pendulum squat','Smith squat']),E('Flat bench press',3,'6–8','2',H,['Machine chest press']),E('Lat pulldown',3,'8–10','1–0',I,['Neutral-grip pulldown']),E('Romanian deadlift',2,'6–8','2',H,['Hip thrust']),E('T-bar row',3,'8–10','1–0',I,['Seated cable row']),E('Lateral raise',3,'10–12','0 last set',I,['Cable lateral raise'])]],
-['Wed','Session B',[E('Leg extension',3,'10–12','0',I),E('Incline machine press',3,'8–10','1–0',I,['Incline dumbbell press']),E('Pull-ups or pulldown',3,'6–8','2',H,['Lat pulldown']),E('Hip thrust or Romanian deadlift',3,'8–10','1–2',H,['Romanian deadlift']),E('Gironda row',3,'8–10','1–0',I,['Chest-supported row']),E('Incline biceps curl',3,'8–12','0',I,['EZ-bar curl']),E('Overhead triceps extension',3,'8–12','0',I,['Cable pushdown'])]],
-['Fri','Session C',[E('Pendulum squat',3,'6–8','2',H,['Hack squat']),E('Flat dumbbell press',3,'6–8','2',H,['Flat bench press']),E('Neutral-grip pulldown',3,'8–10','1–0',I,['Lat pulldown']),E('Seated leg curl',3,'8–12','0',I),E('Open-elbow row',3,'8–10','1–0',I,['T-bar row']),E('Lateral raise',3,'10–12','0 last set',I,['Cable lateral raise'])]]];
+const D3=[['Mon','Session A',[E('Hack squat',3,'6–8','2',H,['Pendulum squat','Smith squat']),E('Flat bench press',3,'6–8','2',H,['Machine chest press']),E('Lat pulldown',3,'8–10','1–0',I,['Neutral-grip pulldown']),E('Romanian deadlift',2,'6–8','2',H,['Hip thrust']),E('T-bar row',3,'8–10','1–0',I,['Seated cable row']),E('Lateral raise',3,'10–12','0 last set',I,['Cable lateral raise']),E('EZ-bar curl',2,'8–12','0',I,['Incline biceps curl']),E('Cable pushdown',2,'8–12','0',I,['Overhead triceps extension'])]],
+['Wed','Session B',[E('Leg extension',3,'10–12','0',I),E('Incline machine press',3,'8–10','1–0',I,['Incline dumbbell press']),E('Pull-ups or pulldown',3,'6–8','2',H,['Lat pulldown']),E('Hip thrust or Romanian deadlift',3,'8–10','1–2',H,['Romanian deadlift']),E('Gironda row',3,'8–10','1–0',I,['Chest-supported row']),E('Cable lateral raise',2,'10–12','0 last set',I,['Lateral raise']),E('Incline biceps curl',3,'8–12','0',I,['EZ-bar curl']),E('Overhead triceps extension',3,'8–12','0',I,['Cable pushdown'])]],
+['Fri','Session C',[E('Pendulum squat',3,'6–8','2',H,['Hack squat']),E('Flat dumbbell press',3,'6–8','2',H,['Flat bench press']),E('Neutral-grip pulldown',3,'8–10','1–0',I,['Lat pulldown']),E('Seated leg curl',3,'8–12','0',I),E('Open-elbow row',3,'8–10','1–0',I,['T-bar row']),E('Lateral raise',3,'10–12','0 last set',I,['Cable lateral raise']),E('Incline biceps curl',2,'8–12','0',I,['EZ-bar curl']),E('Overhead triceps extension',2,'8–12','0',I,['Cable pushdown'])]]];
 const D4=[['Mon','Upper 1',[E('Flat bench press (barbell or machine)',3,'5–8','2',H,['Machine chest press','Dumbbell bench press']),E('Incline press (dumbbell or Smith)',2,'8–12','1–0',I,['Incline machine press']),E('T-bar row or Gironda row',3,'5–8','2',H,['Seated cable row']),E('Lat pulldown (neutral or wide)',3,'8–12','1–0',I,['Assisted pull-up']),E('Lateral raise (cable or dumbbell)',3,'10–15','0 last set',I,['Cable lateral raise']),E('Incline bench biceps curl',3,'8–12','0',I,['EZ-bar curl']),E('Overhead triceps extension',3,'8–12','0',I,['Rope overhead extension'])]],
 ['Tue','Lower 1',[E('Romanian deadlift',3,'5–8','2',H,['Dumbbell Romanian deadlift']),E('Pendulum, Hack or Smith squat',3,'6–10','1–2',H,['Leg press (deep)']),E('Leg extension',3,'10–15','0',I),E('Seated leg curl',3,'8–12','0',I),E('Lateral raise',3,'10–15','0 last set',I,['Cable lateral raise']),E('Cable crunch',3,'10–12','0',I,[],'optional')]],
 ['Thu','Upper 2',[E('Incline press (dumbbell or Smith)',3,'6–10','1–2',H,['Incline machine press']),E('Flat press or machine fly',2,'8–12','0',I,['Pec deck']),E('Lat pulldown or pull-ups',3,'6–10','1–2',H,['Neutral-grip pulldown']),E('Chest-supported row (elbows out)',3,'8–12','0',I,['Gironda row']),E('Cable lateral raise (+ drop set last)',3,'10–15','0',I,['Dumbbell lateral raise']),E('EZ-bar curl',3,'8–12','0',I,['Incline biceps curl']),E('High-cable triceps extension',3,'8–12','0',I,['Overhead triceps extension'])]],
@@ -1149,6 +1149,86 @@ return'pick a load you can lift for '+e.r+' reps'};
 function gdl(){const g=S.gym,x=g.dl;if(!x)return null;if(today()>x.e){g.dle=x.e;delete g.dl;save();return null}return x}
 const grir=e=>gdl()?[3,4]:e.k==H?[1,2]:[0,0],grirT=e=>{const r=grir(e);return r[0]==r[1]?''+r[0]:r[0]+'–'+r[1]},gsets=e=>gdl()?Math.max(1,Math.round(e.s/2)):e.s;
 let GK=null;const gkind=n=>{if(!GK){GK={};Object.values(GR).forEach(P=>P.forEach(dy=>dy[2].forEach(e=>{[e.n,...e.alt].forEach(x=>{GK[x]??=e.k})})))}return GK[n]||(/squat|deadlift|bench|overhead|row|pull-?up|hip thrust/i.test(n)?H:I)};
+/* ---- Muscle model + weekly effective-set compute (gymkb § frecuencia/volumen)
+   Tracked muscle groups in a fixed display order. Lowercase keys are stable and
+   used everywhere; MUSL holds the Spanish label for the (future) summary UI. */
+const MUSG=['chest','lats','upper back','front delts','side delts','rear delts','biceps','triceps','quads','hamstrings','glutes','calves','abs'];
+const MUSL={chest:'pecho',lats:'dorsales','upper back':'espalda alta','front delts':'deltoides anterior','side delts':'deltoides lateral','rear delts':'deltoides posterior',biceps:'bíceps',triceps:'tríceps',quads:'cuádriceps',hamstrings:'isquios',glutes:'glúteos',calves:'gemelos',abs:'abdomen'};
+/* Resolve a (already name-resolved) exercise to its target muscles.
+   Mirrors the gkind pattern: an explicit per-name override table (MMAP) first,
+   then a regex/keyword fallback (MRX) seeded from the GRP movement clusters.
+   Returns {p:primary|null, s:[secondary...]}; the compute step skips a null
+   primary. KB effective-set weights: isolation = 1 to its one target; compound
+   (e.k=='H') = 1 to primary + 0.5 to each secondary; myo = 3 to primary + 1.5
+   to each secondary. Key off the RESOLVED name (what gnm() returns) so swaps
+   change the mapping with the displayed lift. */
+const MMAP={
+/* squats / leg press -> quads (glutes) */
+'Hack squat':{p:'quads',s:['glutes']},'Pendulum squat':{p:'quads',s:['glutes']},'Smith squat':{p:'quads',s:['glutes']},'Leg press (deep)':{p:'quads',s:['glutes']},'Hack or pendulum squat':{p:'quads',s:['glutes']},'Pendulum, Hack or Smith squat':{p:'quads',s:['glutes']},'Squat (free or hack)':{p:'quads',s:['glutes']},'Barbell back squat':{p:'quads',s:['glutes']},
+/* RDL -> hamstrings (glutes); hip thrust -> glutes (hamstrings); combined
+   names hit both, so prefer glutes primary + hamstrings secondary. */
+'Romanian deadlift':{p:'hamstrings',s:['glutes']},'Dumbbell Romanian deadlift':{p:'hamstrings',s:['glutes']},
+'Hip thrust':{p:'glutes',s:['hamstrings']},'Hip thrust or Romanian deadlift':{p:'glutes',s:['hamstrings']},'Romanian deadlift or hip thrust':{p:'glutes',s:['hamstrings']},
+/* conventional deadlift -> hamstrings (glutes + upper back) */
+'Conventional deadlift':{p:'hamstrings',s:['glutes','upper back']},
+/* presses / chest machines -> chest (triceps + front delts) */
+'Bench press':{p:'chest',s:['triceps','front delts']},'Flat bench press':{p:'chest',s:['triceps','front delts']},'Flat bench press (barbell or machine)':{p:'chest',s:['triceps','front delts']},'Flat dumbbell press':{p:'chest',s:['triceps','front delts']},'Flat machine press':{p:'chest',s:['triceps','front delts']},'Dumbbell bench press':{p:'chest',s:['triceps','front delts']},'Machine chest press':{p:'chest',s:['triceps','front delts']},
+'Incline press':{p:'chest',s:['triceps','front delts']},'Incline press (dumbbell or Smith)':{p:'chest',s:['triceps','front delts']},'Incline dumbbell press':{p:'chest',s:['triceps','front delts']},'Incline Smith press':{p:'chest',s:['triceps','front delts']},'Incline machine press':{p:'chest',s:['triceps','front delts']},
+/* chest isolation (fly / pec deck) -> chest only */
+'Pec deck':{p:'chest',s:[]},'Flat press or machine fly':{p:'chest',s:['triceps','front delts']},
+/* vertical pulls -> lats (biceps) */
+'Lat pulldown':{p:'lats',s:['biceps']},'Neutral-grip pulldown':{p:'lats',s:['biceps']},'Lat pulldown (neutral or wide)':{p:'lats',s:['biceps']},'Lat pulldown or pull-ups':{p:'lats',s:['biceps']},'Pull-ups or pulldown':{p:'lats',s:['biceps']},'Assisted pull-up':{p:'lats',s:['biceps']},'Weighted pull-ups':{p:'lats',s:['biceps']},
+/* rows -> upper back (lats + biceps) */
+'T-bar row':{p:'upper back',s:['lats','biceps']},'T-bar row or Gironda row':{p:'upper back',s:['lats','biceps']},'Gironda row':{p:'upper back',s:['lats','biceps']},'Chest-supported row':{p:'upper back',s:['lats','biceps']},'Chest-supported row (elbows out)':{p:'upper back',s:['lats','biceps']},'Seated cable row':{p:'upper back',s:['lats','biceps']},'Open-elbow row':{p:'upper back',s:['lats','biceps']},
+/* pullover / straight-arm -> lats isolation */
+'Pullover':{p:'lats',s:[]},'Straight-arm pulldown':{p:'lats',s:[]},
+/* lateral raises -> side delts isolation */
+'Lateral raise':{p:'side delts',s:[]},'Cable lateral raise':{p:'side delts',s:[]},'Cable lateral raise (+ drop set last)':{p:'side delts',s:[]},'Dumbbell lateral raise':{p:'side delts',s:[]},'Lateral raise (cable or dumbbell)':{p:'side delts',s:[]},
+/* quad / hamstring isolation */
+'Leg extension':{p:'quads',s:[]},'Leg extension (pause when squeezed)':{p:'quads',s:[]},
+'Leg curl':{p:'hamstrings',s:[]},'Seated leg curl':{p:'hamstrings',s:[]},
+/* biceps / triceps isolation */
+'Incline biceps curl':{p:'biceps',s:[]},'Incline bench biceps curl':{p:'biceps',s:[]},'EZ-bar curl':{p:'biceps',s:[]},
+'Overhead triceps extension':{p:'triceps',s:[]},'Cable triceps extension':{p:'triceps',s:[]},'High-cable triceps extension':{p:'triceps',s:[]},'Rope overhead extension':{p:'triceps',s:[]},'Cable pushdown':{p:'triceps',s:[]},
+/* calves / abs isolation */
+'Standing calf raise':{p:'calves',s:[]},'Cable crunch':{p:'abs',s:[]}};
+/* Keyword fallback for names not in MMAP (swapped-in GRP variants, free text).
+   Order matters: more specific patterns first. */
+const MRX=[
+[/hip thrust/i,{p:'glutes',s:['hamstrings']}],
+[/romanian|\brdl\b/i,{p:'hamstrings',s:['glutes']}],
+[/deadlift/i,{p:'hamstrings',s:['glutes','upper back']}],
+[/squat|leg press/i,{p:'quads',s:['glutes']}],
+[/leg extension/i,{p:'quads',s:[]}],
+[/leg curl|nordic/i,{p:'hamstrings',s:[]}],
+[/calf/i,{p:'calves',s:[]}],
+[/crunch|knee raise|ab /i,{p:'abs',s:[]}],
+[/lateral raise/i,{p:'side delts',s:[]}],
+[/rear delt|reverse fly|face pull/i,{p:'rear delts',s:[]}],
+[/pullover|straight-arm/i,{p:'lats',s:[]}],
+[/row/i,{p:'upper back',s:['lats','biceps']}],
+[/pulldown|pull-?ups|chin-?ups/i,{p:'lats',s:['biceps']}],
+[/fly|pec deck/i,{p:'chest',s:[]}],
+[/bench|chest press|incline.*press|flat.*press/i,{p:'chest',s:['triceps','front delts']}],
+[/biceps|curl/i,{p:'biceps',s:[]}],
+[/triceps|pushdown|overhead.*extension/i,{p:'triceps',s:[]}]];
+function muscleOf(name){if(!name)return{p:null,s:[]};if(MMAP[name])return{p:MMAP[name].p,s:[...MMAP[name].s]};const r=MRX.find(x=>x[0].test(name));return r?{p:r[1].p,s:[...r[1].s]}:{p:null,s:[]}}
+/* Weekly effective sets per muscle for the LIVE routine.
+   We iterate gday(i) (post time-tier trim) so hidden accessories are NOT
+   counted, but use the AUTHORED sets e.s (NOT gsets) so the summary reflects
+   the planned routine independent of a transient deload week. Weights: myo ->
+   primary +3*sets / each secondary +1.5*sets; compound (e.k=='H') -> primary
+   +1*sets / each secondary +0.5*sets; isolation -> primary +1*sets only.
+   Returns an object keyed by muscle: {weekly, freq, sessions:[idx...]}.
+   Immutable: builds fresh objects, never mutates gPlan()/gday() output. */
+function gMuscleSets(){const acc={},plan=gPlan();
+plan.forEach((_,i)=>{const seen=new Set();
+gday(i).forEach(({e,j})=>{const name=gnm(i,j,e),m=muscleOf(name);if(!m.p)return;
+const sets=e.s,myo=gMethod(name)=='myo',pw=myo?3:1,sw=myo?1.5:(e.k==H?0.5:0);
+const add=(mus,w)=>{if(!mus||w<=0)return;(acc[mus]??={weekly:0,sessions:[]}).weekly+=w*sets;seen.add(mus)};
+add(m.p,pw);if(e.k==H||myo)m.s.forEach(s=>add(s,sw));
+seen.forEach(mus=>{const a=acc[mus];if(!a.sessions.includes(i))a.sessions.push(i)})})});
+Object.values(acc).forEach(a=>{a.freq=a.sessions.length});return acc}
 const GF=[['bench','Bench press',n=>/bench/i.test(n)&&!/incline/i.test(n)],['squat','Squat',n=>/squat/i.test(n)&&!/split|bulgarian/i.test(n)],['dead','Deadlift',n=>/deadlift/i.test(n)]],gmain=n=>GF.some(f=>f[2](n));
 const ge1=q=>{let m=0;q.forEach(s=>{const w=s[0],r=s[1],x=s[2]||0;if(w>0&&r>0)m=Math.max(m,w*(1+(r+x)/30))});return Math.round(m*10)/10};
 
@@ -1298,10 +1378,41 @@ ${first?'':'<button class="btn t" style="margin-left:8px" data-a="sgcancel">Canc
 /* Per-exercise equipment + method editor, shown under the main setup card.
    Equipment is required before an exercise can be logged (unless its method is
    microplates). Method defaults to the global pick but can be overridden here. */
+/* ---- Weekly sets-per-muscle summary (gymkb § frecuencia/volumen) ----------
+   Renders gMuscleSets() as one row per trained muscle so the user can SEE the
+   weekly effective-set total + session frequency and decide whether to add or
+   cut sets. Colour coding reuses the existing .hst / .hst.ok / .hst.w pills
+   (no new colours). Bands are grounded in the KB sweet spot (5-7 per session,
+   10-14 per week) and kept in MBAND so they stay easy to tune:
+     large muscles  -> 10-18 weekly is in range (10-14 ideal, up to ~18 ok)
+     smaller muscles -> 8-16 weekly is in range
+   Under or over the band is amber; a muscle sitting at freq 1 on the D3
+   full-body plan is also flagged amber (low frequency). */
+const MBIG=['chest','lats','upper back','quads','hamstrings','glutes'];
+const MBAND={big:[10,18],small:[8,16]};
+/* Display total: one decimal, drop a trailing .0 on whole numbers. */
+const gfmtSets=n=>{const r=Math.round(n*10)/10;return r%1===0?''+r:r.toFixed(1)};
+/* Classify a muscle's weekly total + frequency -> {ok, hint} where hint is an
+   English key (translated by the i18n layer) describing why it is amber. */
+function gMuscleState(mus,weekly,freq){const[lo,hi]=MBAND[MBIG.includes(mus)?'big':'small'];
+if(weekly<lo)return{ok:false,hint:'under'};
+if(weekly>hi)return{ok:false,hint:'over'};
+if(freq<=1&&gdn()==3)return{ok:false,hint:'low frequency'};
+return{ok:true,hint:'in range'}}
+function gMuscleSummary(){let data;try{data=gMuscleSets()}catch(e){return''}
+const rows=MUSG.filter(m=>data[m]&&data[m].weekly>0);
+if(!rows.length)return`<div class="card" style="max-width:720px"><h3>📊 Weekly sets per muscle</h3><p class="mut" style="margin:0">No muscles tracked yet. Add exercises to your routine to see your weekly volume.</p></div>`;
+const esLabel=m=>LANG=='es'?(MUSL[m]||m):m;
+const list=rows.map(m=>{const a=data[m],st=gMuscleState(m,a.weekly,a.freq);
+return`<div class="li" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0"><div style="min-width:0"><b style="font-size:15px">${esc(esLabel(m))}</b> <span class="gtag">×${a.freq}</span></div><div class="row" style="flex:none;gap:8px;align-items:center"><span class="mut">${gfmtSets(a.weekly)} <span>sets/week</span></span><span class="hst ${st.ok?'ok':'w'}">${st.hint}</span></div></div>`}).join('');
+return`<div class="card" style="max-width:720px"><h3>📊 Weekly sets per muscle</h3>
+<p class="cap" style="margin:0 0 8px">Ideal around 10-14 sets per muscle per week. Green means in range, amber means under or over.</p>
+${list}</div>`}
 function gequipCard(){const P=gPlan(),u=GUNIT();
 /* One card per SESSION so reorder / remove / add work by position. Each row
    keeps the equipment + method + swap controls, plus reorder/remove. */
-return`<div class="card" style="max-width:720px"><h3>🔧 Your sessions</h3>
+return`${gMuscleSummary()}
+<div class="card" style="max-width:720px"><h3>🔧 Your sessions</h3>
 <p class="cap" style="margin:0 0 8px">Set each lift\u2019s equipment (it fixes the weight jump and rep range), reorder with the ≡ handles, or remove / add lifts. A lift with no equipment can\u2019t be logged (unless it uses microplates).</p>
 <p class="cap" style="margin:0"><b>Progress vs Stimulus</b>: 2 progress lifts per session are recommended (up to 4). On stimulus lifts, chasing weight matters far less — you train them in a higher 10–15 rep range and progression is optional.</p></div>
 ${P.map((dy,i)=>`<div class="card" style="max-width:720px"><div class="row" style="justify-content:space-between;flex-wrap:nowrap;align-items:center;gap:8px;margin:0 0 8px"><div class="mt" style="margin:0;min-width:0">${gsched()[i]||dy[0]} · ${dy[1]}</div><button class="btn s" style="flex:none;font-size:12px" data-a="gcpy" data-i="${i}" aria-label="Copy this session to another day" title="Copy this session">📋 Copy</button></div>
@@ -1873,6 +1984,7 @@ const D={
 "Two hits per muscle a week. Pick 3 days if that is all you have, or 5 for strength plus hypertrophy (PHAT).":"Dos estímulos por músculo a la semana. Elige 3 días si es todo lo que tienes, o 5 para fuerza más hipertrofia (PHAT).","You are on":"Estás en",
 "Full body (3 days)":"Cuerpo completo (3 días)","Upper / Lower (4 days)":"Torso / Pierna (4 días)","PHAT adapted (5 days)":"PHAT adaptado (5 días)",
 "📋 Copy":"📋 Copiar","Copy":"Copiar","Copy session":"Copiar sesión","Copy to":"Copiar a","Copies everything — exercises, order, equipment, method, jumps and Progress/Stimulus tags.":"Copia todo — ejercicios, orden, equipo, método, saltos y etiquetas Progreso/Estímulo.","This overwrites the chosen session completely — same exercises, order, equipment and tags. It affects your routine; experts only.":"Esto sobrescribe por completo la sesión elegida — mismos ejercicios, orden, equipo y etiquetas. Afecta tu rutina; solo para expertos.","Session copied":"Sesión copiada","Need at least two sessions to copy":"Necesitas al menos dos sesiones para copiar","Copy this session":"Copiar esta sesión","Copy this session to another day":"Copiar esta sesión a otro día","Move up":"Mover arriba","Move down":"Mover abajo",
+"📊 Weekly sets per muscle":"📊 Series semanales por músculo","Ideal around 10-14 sets per muscle per week. Green means in range, amber means under or over.":"Ideal ~10-14 series por músculo a la semana. Verde = en rango; ámbar = por debajo o por encima.","No muscles tracked yet. Add exercises to your routine to see your weekly volume.":"Aún no hay músculos registrados. Agrega ejercicios a tu rutina para ver tu volumen semanal.","sets/week":"series/sem","in range":"en rango","under":"por debajo","over":"por encima","low frequency":"frecuencia baja",
 "Micro plates (0.25–0.5 kg)":"Microdiscos (0,25–0,5 kg)","Fixed reps, add +0.25 kg every session.":"Repeticiones fijas, suma +0,25 kg cada sesión.","Plates of 1.25 kg (+2.5 kg)":"Discos de 1,25 kg (+2,5 kg)",
 "Double progression in a 2-rep window: add a rep each session, then +2.5 kg and restart at the bottom.":"Doble progresión en una ventana de 2 repeticiones: suma una repetición por sesión, luego +2,5 kg y reinicia desde abajo.",
 "Machine stacks (+5 kg)":"Placas de máquina (+5 kg)","Wide 4-rep window: climb reps set by set, then +5 kg and restart at the bottom.":"Ventana amplia de 4 repeticiones: sube repeticiones serie a serie, luego +5 kg y reinicia desde abajo.","⬆️ Progression":"⬆️ Progresión",
