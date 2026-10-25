@@ -2,6 +2,17 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Forma — Gym Companion</title>
+<meta name="theme-color" content="#5C1A22" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#171813" media="(prefers-color-scheme:dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Forma">
+<meta name="description" content="Forma — calorie, macro and training companion that works offline.">
+<!-- App icon, inline SVG as a data URI so the whole app stays a single file.
+     Android/iOS rasterise it for the home-screen and task switcher. -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20180%20180'%3E%3Crect%20width='180'%20height='180'%20rx='40'%20fill='%235C1A22'/%3E%3Cpath%20d='M70%2048h44a8%208%200%200%201%200%2016H86v18h24a8%208%200%200%201%200%2016H86v34a8%208%200%200%201-16%200V56a8%208%200%200%201%200-8z'%20fill='%23F8F2E7'/%3E%3Ccircle%20cx='126'%20cy='120'%20r='12'%20fill='%238E9358'/%3E%3C/svg%3E">
+<link rel="manifest" href='data:application/manifest+json,{"name":"Forma — Gym Companion","short_name":"Forma","description":"Calorie, macro and training companion that works offline.","start_url":".","scope":".","display":"standalone","orientation":"portrait","background_color":"%23ECE5D6","theme_color":"%235C1A22","categories":["health","fitness","lifestyle"],"lang":"en","icons":[{"src":"data:image/svg%2bxml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20512%20512%27%3E%3Crect%20width=%27512%27%20height=%27512%27%20fill=%27%235C1A22%27/%3E%3Cpath%20d=%27M198%20136h126a22%2022%200%200%201%200%2044H246v52h68a22%2022%200%200%201%200%2044h-68v96a22%2022%200%200%201-44%200V158a22%2022%200%200%201-6-22z%27%20fill=%27%23F8F2E7%27/%3E%3Ccircle%20cx=%27358%27%20cy=%27340%27%20r=%2734%27%20fill=%27%238E9358%27/%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml","purpose":"any maskable"}]}'>
 <script>
 /* FOUC guard: runs before the stylesheet paints. data-theme is what the CSS keys
    off; .dark-theme is a convenience hook. data-theme is left UNSET when the user
@@ -1474,4 +1485,37 @@ LANG=S.lang||((navigator.language||'').toLowerCase().startsWith('es')?'es':'en')
 new MutationObserver(rs=>{for(const r of rs){if(r.type=='characterData')tr(r.target);r.addedNodes.forEach(tr)}}).observe(document.body,{childList:true,subtree:true,characterData:true});tr(document.body);
 document.addEventListener('keydown',e=>{if(e.key!='Enter')return;const m={stv:'stset',slv:'slset',npv:'npset'}[e.target.id];if(m){e.preventDefault();const b=document.querySelector('[data-a="'+m+'"]');if(b)b.click()}});
 setInterval(wtick,20000);go('today');if(!S.done){$('#ob').hidden=false;obr()}else mprompt()
+
+/* ---- PWA: installable, offline-first ------------------------------------
+   Registers the companion service worker (sw.js, which must sit next to this
+   file on the server) so the app installs to the home screen and opens with
+   no connection. localStorage already holds every byte of user data, so the
+   worker only has to cache the shell: this page and the Google font files.
+   A service worker must be a real same-origin script, so it cannot be inlined
+   here; opening the HTML straight from disk (file://) simply skips it and the
+   app keeps working exactly as before. */
+(function(){
+if(!('serviceWorker'in navigator))return;
+if(location.protocol!=='https:'&&location.hostname!=='localhost'&&location.hostname!=='127.0.0.1')return;
+navigator.serviceWorker.register('sw.js').catch(function(){});
+})();
+
+/* Optional in-app "Install" affordance: surfaces Android's install prompt on a
+   small chip instead of leaving it only in the browser menu. Self-removes once
+   installed or dismissed. */
+(function(){
+var deferred=null;
+window.addEventListener('beforeinstallprompt',function(e){
+  e.preventDefault();deferred=e;
+  if(document.getElementById('instChip'))return;
+  var b=document.createElement('button');
+  b.id='instChip';b.className='btn p';
+  b.textContent=(typeof LANG!=='undefined'&&LANG=='es')?'📲 Instalar app':'📲 Install app';
+  b.style.cssText='position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;box-shadow:var(--shh)';
+  b.addEventListener('click',function(){if(!deferred)return;deferred.prompt();
+    deferred.userChoice.finally(function(){deferred=null;b.remove()})});
+  document.body.appendChild(b);
+});
+window.addEventListener('appinstalled',function(){var c=document.getElementById('instChip');if(c)c.remove();deferred=null});
+})();
 </script></body></html>
