@@ -1040,7 +1040,7 @@ const gPlan=()=>{const d=gdn(),p=(S.gym.plan||{})[d];return p||GR[d]};
 const gPlanClone=()=>{const d=gdn();if(!(S.gym.plan||{})[d]){(S.gym.plan??={})[d]=GR[d].map(dy=>[dy[0],dy[1],dy[2].map(e=>({...e,alt:[...(e.alt||[])]}))])}return S.gym.plan[d]};
 /* Every exercise known to the app, for the "add exercise" search — names +
    their alternatives from all three KB routines, de-duplicated. */
-let GALL=null;const gAllNames=()=>{if(GALL)return GALL;const s=new Set();Object.values(GR).forEach(P=>P.forEach(dy=>dy[2].forEach(e=>{s.add(e.n);(e.alt||[]).forEach(a=>s.add(a))})));GALL=[...s].sort((a,b)=>a.localeCompare(b));return GALL};
+let GALL=null;const gAllNames=()=>{if(GALL)return GALL;const s=new Set();Object.values(GR).forEach(P=>P.forEach(dy=>dy[2].forEach(e=>{s.add(e.n);(e.alt||[]).forEach(a=>s.add(a))})));GPOOL.forEach(x=>s.add(x.n));GALL=[...s].sort((a,b)=>a.localeCompare(b));return GALL};
 /* Expert-edit confirmation: removing or adding exercises bends the routine away
    from the KB's functional design. Show one warning with Yes / No / don't-ask.
    If the user ticked "don't ask again" (S.gym.noexpert) it runs straight away.
@@ -1346,6 +1346,10 @@ const GPOOL=[
 {n:'Plank',kind:I,p:'abs',s:[]}, /* Core Estabilizador(1);Recto Abdominal(0.5) */
 {n:'Russian twist',kind:I,p:'abs',s:[]}, /* Oblicuos(1);Recto Abdominal(0.5) */
 {n:'Roman chair back extension',kind:I,p:'abs',s:['glutes','hamstrings']}]; /* Lumbar(1);Gluteos(0.5);Isquiosurales(0.25) */
+/* Additively resolve every GPOOL name through muscleOf() by merging into MMAP.
+   ??= only sets the key when ABSENT, so exact-reuse names and any pre-existing
+   MMAP entries keep their current {p,s} and are never overwritten. */
+GPOOL.forEach(x=>{MMAP[x.n]??={p:x.p,s:[...x.s]}});
 /* Weekly effective sets per muscle for the LIVE routine.
    We iterate gday(i) (post time-tier trim) so hidden accessories are NOT
    counted, but use the AUTHORED sets e.s (NOT gsets) so the summary reflects
