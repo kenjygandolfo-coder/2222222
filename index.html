@@ -115,6 +115,11 @@ button.chip:hover{transform:translateY(-1px);box-shadow:var(--sh)}.chip.on{backg
 input:not([type=range]){-webkit-appearance:none;appearance:none;box-sizing:border-box;min-width:0;max-width:100%}
 input[type=number]{-moz-appearance:textfield}input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 input[type=range]{accent-color:var(--olv-t);padding:0;border:0;background:none;box-shadow:none}
+/* Checkboxes must keep their native tick: the blanket input reset above strips
+   -webkit-appearance (so a ticked box shows nothing) and the later `input`
+   rules force min-height:48px + padding, which stretch the box into a blank
+   rectangle. Restore a real, visibly-tickable checkbox (only #cfmx uses it). */
+input[type=checkbox]{-webkit-appearance:checkbox;appearance:checkbox;accent-color:var(--pri);width:18px;height:18px;min-width:18px;min-height:18px;max-width:18px;padding:0;border:0;border-radius:0;background:none;box-shadow:none;flex:none;cursor:pointer}
 .f,.dd{min-width:0;max-width:100%}
 .ob{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:calc(20px + env(safe-area-inset-top,0px)) 20px calc(20px + env(safe-area-inset-bottom,0px));overflow:auto}.ob[hidden]{display:none}
 .obc{width:min(520px,100%);margin:auto;animation:in .5s ease}
