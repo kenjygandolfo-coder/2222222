@@ -2,8 +2,8 @@
    Paired with index.html; they must be served from the same folder. Bump CACHE
    whenever you want returning installs to drop the old shell. User data lives
    in localStorage, which the worker never touches, so a cache reset is safe. */
-const CACHE = 'forma-v2';
-const SHELL = ['./', 'index.html'];
+const CACHE = 'forma-v3';
+const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
   self.skipWaiting();
