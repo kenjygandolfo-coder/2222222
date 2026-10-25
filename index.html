@@ -949,16 +949,31 @@ const GR={3:D3,4:D4,5:D5},GN={3:'Full body (3 days)',4:'Upper / Lower (4 days)',
              jump the load once all five mini-sets hit 3 (refined in phase B).
    [label, explanation]. */
 const INC={micro:['Microplates','Fixed staggered reps (8-7-6); the weight creeps up by the smallest jump your microplates allow.'],equip:['By equipment','Double progression: climb reps to the top of the window, then add the jump your equipment allows and restart at 6.'],myo:['Myo-reps','One all-out set then five mini-sets of 3; progress reps, add weight once all five hit 3.']};
-/* Equipment per exercise -> [label, jump, repRange]. Jump is per session, in the
-   gym unit; rep window is the double-progression range for the equip method. */
-const EQUIP={machine:['Machine / barbell',5,'6–8'],dumbbell:['Dumbbells',10,'6–9'],cable:['Cable',15,'6–10']};
-/* Per-exercise equipment and method, keyed by the resolved exercise name so a
-   swapped-in variant keeps its own setting. Method falls back to the global
-   default (S.gym.inc); equipment has NO default — it must be set before logging. */
+/* Equipment per exercise -> [label, defaultJump, repRange, platable].
+   `platable` means you can physically load plates on it (machine/barbell), so
+   microplates can set the jump. Dumbbells and cables have a fixed step the gym
+   decides — editable per exercise, never micro. Jump is in the gym unit. */
+const EQUIP={machine:['Machine / barbell',5,'6–8',true],dumbbell:['Dumbbells',10,'6–9',false],cable:['Cable',15,'6–10',false]};
+/* Per-exercise settings, keyed by the resolved exercise name so a swapped-in
+   variant keeps its own. Method falls back to the global default; equipment has
+   none (must be set before logging). */
 const gEquip=n=>(S.gym.eq||{})[n]||null;
 const gMethod=n=>(S.gym.mx||{})[n]||S.gym.inc||'equip';
-/* Session jump + rep window for an exercise under the equipment method. */
 const equipOf=n=>EQUIP[gEquip(n)]||null;
+/* Does the user own microplates (config-level yes/no + at least one plate)? */
+const gHasMicro=()=>!!S.gym.hasmicro&&!!gstep();
+/* Can this lift use microplates? Only platable equipment, and only if owned. */
+const microFits=n=>{const eq=EQUIP[gEquip(n)];return gHasMicro()&&!!eq&&eq[3]};
+/* Per-exercise "jump with microplates" toggle (only meaningful where microFits). */
+const gMicroJump=n=>microFits(n)&&!!(S.gym.mj||{})[n];
+/* The per-session weight jump for a lift. Priority:
+     - microplate method -> always the microplate step.
+     - equip/myo with the micro-jump toggle on a platable lift -> microplate step.
+     - dumbbell/cable -> the per-exercise editable jump (default from EQUIP).
+     - machine/barbell without micro -> EQUIP default (5). */
+function gJump(n){const eq=gEquip(n),def=eq?EQUIP[eq][1]:2.5,m=gMethod(n);
+if(m=='micro'||gMicroJump(n))return gstep()||def;
+return (S.gym.jmp||{})[n]??def}
 /* Staggered rep scheme for microplate progression: one fewer rep per set so
    every set sits at the same RIR. 3 sets -> 8,7,6 · 2 -> 7,6 · 1 -> 6. */
 const microReps=sets=>{const top=5+sets;return Array.from({length:sets},(_,i)=>top-i)};
@@ -1028,13 +1043,14 @@ return ex.filter(e=>!e.x)};
    original indices so saved swaps / logging still line up. */
 const gday=di=>{const full=GR[gdn()][di][2],keep=gcut(full);
 return full.map((e,j)=>({e,j})).filter(x=>keep.includes(x.e))};
-function gsug(name,e){const h=Object.keys(S.gym.wl||{}).sort().reverse().map(k=>S.gym.wl[k]).find(v=>!v.dl&&v.ex[name]);if(!h)return null;const q=h.ex[name],inc=gMethod(name),w=Math.max(...q.map(x=>x[0]));
-if(inc=='micro'){ // fixed staggered reps, weight creeps up every session by the plate-derived jump
-  const step=gstep()||2.5,top=5+gsets(e);
+function gsug(name,e){const h=Object.keys(S.gym.wl||{}).sort().reverse().map(k=>S.gym.wl[k]).find(v=>!v.dl&&v.ex[name]);if(!h)return null;const q=h.ex[name],inc=gMethod(name),w=Math.max(...q.map(x=>x[0])),step=gJump(name);
+if(inc=='micro'){ // fixed staggered reps, weight creeps up every session by the microplate jump
+  const top=5+gsets(e);
   const o={last:q.map(x=>x[0]+'×'+x[1]).join(', '),w:Math.round((w+step)*100)/100,reps:top,up:true,step,fixed:1};
   if(gdl()){o.w=Math.round(w*.9*4)/4;o.up=false}return o}
-// equip (and myo for now): double progression using the exercise's equipment jump/window.
-const eq=equipOf(name),step=eq?eq[1]:2.5,range=eq?eq[2]:(e.r||'6–8'),lo=+range.split('–')[0],topd=+range.split('–')[1],mr=Math.min(...q.map(x=>x[1])),up=mr>=topd;
+// equip / myo: double progression. Rep window from equipment; jump from gJump
+// (which already resolves micro-jump vs the editable equipment step).
+const eq=equipOf(name),range=eq?eq[2]:(e.r||'6–8'),lo=+range.split('–')[0],topd=+range.split('–')[1],mr=Math.min(...q.map(x=>x[1])),up=mr>=topd;
 const o={last:q.map(x=>x[0]+'×'+x[1]).join(', '),w:up?Math.round((w+step)*100)/100:w,reps:up?lo:Math.min(topd,Math.max(lo,mr+1)),up,step};if(gdl()){o.w=Math.round(w*.9*4)/4;o.reps=lo;o.up=false}return o}
 const gnx=(n,e)=>{const u=GUNIT(),q=gsug(n,e);if(q)return`last ${q.last} · next <b>${q.w} ${u} × ${q.reps}</b>${q.up?' (+'+q.step+' '+u+')':''}`;
 /* No logged history yet: fall back to the calibrated working weight if the
@@ -1103,7 +1119,10 @@ document.addEventListener('input',e=>{const m=/^lx(\d+)_(\d+)$/.exec(e.target.id
    the other inputs are not disturbed). */
 document.addEventListener('input',e=>{const sz=e.target.dataset&&e.target.dataset.plate;if(sz===undefined)return;
 const n=Math.max(0,Math.round(+e.target.value||0));(S.gym.plates??={})[sz]=n;if(!n)delete S.gym.plates[sz];save();
-const hint=[...document.querySelectorAll('#gout .note .cap')].pop();if(hint){const st=gstep();hint.innerHTML=st?`<span>Smallest jump</span>: <b>+${st} ${GUNIT()}</b> <span>per session</span>`:'Add at least one microplate, or the plan falls back to +2.5.'}});
+const hint=[...document.querySelectorAll('#gout .note .cap')].pop();if(hint){const st=gstep();hint.innerHTML=st?`<span>Smallest jump</span>: <b>+${st} ${GUNIT()}</b> <span>per session on platable lifts</span>`:'Add at least one microplate above.'}});
+/* Per-exercise editable jump (dumbbell/cable), stored live without a re-render. */
+document.addEventListener('input',e=>{const n=e.target.dataset&&e.target.dataset.jmp;if(n===undefined)return;
+const v=Math.max(0,+e.target.value||0);(S.gym.jmp??={})[n]=v;save()});
 
 
 /* charts */
@@ -1148,9 +1167,11 @@ return`<h2>${first?'Set up your plan':'Reconfigure plan'}</h2>
 <p class="cap" style="margin:4px 0 0">Under ~55 min keeps only the heavy compounds (the lifts you progress). Over ~85 min adds the optional accessories. In between runs the full session.</p>
 <label class="f" style="margin-top:16px">Gym weight unit</label><div class="seg" style="margin-bottom:4px">${[['kg','Kilograms'],['lb','Pounds']].map(([v,l])=>`<button class="btn ${GUNIT()==v?'on':''}" data-a="sgunit" data-v="${v}">${l}</button>`).join('')}</div>
 <p class="cap" style="margin:0 0 16px">Separate from your body-weight unit, since the gym\u2019s plates may differ.</p>
-<label class="f">Default progression</label><div class="seg" style="margin-bottom:4px">${Object.entries(INC).map(([k,v])=>`<button class="btn ${(g.inc||'equip')==k?'on':''}" data-a="sginc" data-v="${k}">${v[0]}</button>`).join('')}</div>
-<p class="cap" style="margin:0 0 ${(g.inc||'equip')=='micro'?'8px':'16px'}">${INC[g.inc||'equip'][1]} <span>Applied to every lift; you can override it per lift below.</span></p>
-${(g.inc||'equip')=='micro'?`<div class="note" style="margin-bottom:16px"><b class="sxt">Your microplates</b><div class="mut" style="margin:4px 0 8px">How many plates you own of each size (${GUNIT()}), so the app knows your smallest jump. One per side = that jump \u00d72.</div><div class="row" style="flex-wrap:wrap;gap:8px">${MICRO_SIZES[GUNIT()].map(sz=>`<label class="f" style="margin:0;min-width:72px">${sz} ${GUNIT()}<input type="number" min="0" max="20" step="1" inputmode="numeric" data-plate="${sz}" value="${(g.plates||{})[sz]||''}" placeholder="0"></label>`).join('')}</div>${gstep()?`<p class="cap" style="margin:8px 0 0"><span>Smallest jump</span>: <b>+${gstep()} ${GUNIT()}</b> <span>per session</span></p>`:'<p class="cap" style="margin:8px 0 0">Add at least one microplate, or the plan falls back to +2.5.</p>'}</div>`:''}
+<label class="f">Do you have microplates?</label><div class="seg" style="margin-bottom:4px">${[['1','Yes'],['0','No']].map(([v,l])=>`<button class="btn ${(g.hasmicro?'1':'0')==v?'on':''}" data-a="sgmic" data-v="${v}">${l}</button>`).join('')}</div>
+<p class="cap" style="margin:0 0 ${g.hasmicro?'8px':'16px'}">Small plates (0.25–1.25 ${GUNIT()}) you can add to machines and barbells for tiny jumps.</p>
+${g.hasmicro?`<div class="note" style="margin-bottom:16px"><b class="sxt">Which microplates</b><div class="mut" style="margin:4px 0 8px">How many you own of each size (${GUNIT()}). One per side = that jump \u00d72.</div><div class="row" style="flex-wrap:wrap;gap:8px">${MICRO_SIZES[GUNIT()].map(sz=>`<label class="f" style="margin:0;min-width:72px">${sz} ${GUNIT()}<input type="number" min="0" max="20" step="1" inputmode="numeric" data-plate="${sz}" value="${(g.plates||{})[sz]||''}" placeholder="0"></label>`).join('')}</div>${gstep()?`<p class="cap" style="margin:8px 0 0"><span>Smallest jump</span>: <b>+${gstep()} ${GUNIT()}</b> <span>per session on platable lifts</span></p>`:'<p class="cap" style="margin:8px 0 0">Add at least one microplate above.</p>'}</div>`:''}
+<label class="f">Default progression</label><div class="seg" style="margin-bottom:4px">${Object.entries(INC).map(([k,v])=>{const lock=k=='micro'&&!gHasMicro();return`<button class="btn ${(g.inc||'equip')==k?'on':''}" data-a="sginc" data-v="${k}" ${lock?'disabled style="opacity:.45"':''}>${v[0]}</button>`}).join('')}</div>
+<p class="cap" style="margin:0 0 16px">${INC[g.inc||'equip'][1]} <span>Applied to every lift; you can override it per lift below.</span>${!gHasMicro()?' <span>Microplates needs plates registered above.</span>':''}</p>
 <button class="btn p" style="margin-top:8px" data-a="sgo">${first?'Create my routine':'Save and rebuild'}</button>
 ${first?'':'<button class="btn t" style="margin-left:8px" data-a="sgcancel">Cancel</button>'}</div>
 ${gequipCard()}`}
@@ -1161,10 +1182,12 @@ function gequipCard(){const d=gdn(),P=GR[d],seen={},rows=[];
 P.forEach((dy,i)=>dy[2].forEach((e,j)=>{const n=gnm(i,j,e);if(seen[n])return;seen[n]=1;rows.push({n,e})}));
 return`<div class="card" style="max-width:720px"><h3>🔧 Equipment & progression per lift</h3>
 <p class="cap" style="margin:0 0 16px">Pick each lift\u2019s equipment — it sets the weight jump and rep range. A lift with no equipment can\u2019t be logged (unless it uses microplates).</p>
-${rows.map(({n,e})=>{const eq=gEquip(n),mth=gMethod(n),need=mth!='micro';return`<div class="li" style="display:block;padding:12px 0">
-<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><b style="font-size:15px">${esc(n)}</b>${need&&!eq?'<span class="hst w" style="flex:none">needs equipment</span>':eq?`<span class="chip" style="flex:none">+${EQUIP[eq][1]} ${GUNIT()} · ${EQUIP[eq][2]}</span>`:''}</div>
+${rows.map(({n,e})=>{const eq=gEquip(n),mth=gMethod(n),need=mth!='micro',E=eq?EQUIP[eq]:null,u=GUNIT();return`<div class="li" style="display:block;padding:12px 0">
+<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><b style="font-size:15px">${esc(n)}</b>${need&&!eq?'<span class="hst w" style="flex:none">needs equipment</span>':eq?`<span class="chip" style="flex:none">+${gJump(n)} ${u}${mth!='micro'?' · '+E[2]:''}</span>`:''}</div>
 <div class="chips" style="margin:8px 0 0">${Object.entries(EQUIP).map(([k,v])=>`<button class="chip ${eq==k?'on':''}" data-a="sgeq" data-n="${esc(n)}" data-v="${k}">${v[0]}</button>`).join('')}</div>
-<div class="chips" style="margin:8px 0 0">${Object.entries(INC).map(([k,v])=>`<button class="chip ${mth==k?'on':''}" data-a="sgmx" data-n="${esc(n)}" data-v="${k}" style="font-size:11px">${v[0]}</button>`).join('')}</div>
+<div class="chips" style="margin:8px 0 0">${Object.entries(INC).map(([k,v])=>{const lock=k=='micro'&&!(E&&E[3]&&gHasMicro());return`<button class="chip ${mth==k?'on':''}" data-a="sgmx" data-n="${esc(n)}" data-v="${k}" style="font-size:11px" ${lock?'disabled style="font-size:11px;opacity:.4"':''}>${v[0]}</button>`}).join('')}</div>
+${E&&E[3]&&gHasMicro()&&mth!='micro'?`<div class="chips" style="margin:8px 0 0"><button class="chip ${gMicroJump(n)?'on':''}" data-a="sgmj" data-n="${esc(n)}">Jump with microplates (+${gstep()} ${u})</button></div>`:''}
+${E&&!E[3]?`<label class="f" style="margin:8px 0 0;max-width:180px">Jump at this gym (${u})<input type="number" min="0.5" max="50" step="0.5" inputmode="decimal" data-jmp="${esc(n)}" value="${(S.gym.jmp||{})[n]??E[1]}"></label>`:''}
 </div>`}).join('')}</div>`}
 /* The calibration screen: one row per exercise in the current routine. The user
    enters a weight and the reps they hit to failure; the app estimates the 1RM
@@ -1554,8 +1577,16 @@ else if(a=='mch')mk=b.dataset.k;
 else if(a=='sgd'){S.gym.days=+b.dataset.v;S.gym.schedPick=SCHED_DEFAULT[+b.dataset.v].slice()}
 else if(a=='sgunit'){S.gym.unit=b.dataset.v}
 else if(a=='sginc'){S.gym.inc=b.dataset.v}
-else if(a=='sgeq'){(S.gym.eq??={})[b.dataset.n]=b.dataset.v}
+else if(a=='sgmic'){const yes=b.dataset.v=='1';S.gym.hasmicro=yes;
+if(!yes){ // no microplates: drop the micro method anywhere it was chosen, and any micro-jump toggles
+  if(S.gym.inc=='micro')S.gym.inc='equip';
+  if(S.gym.mx)for(const k in S.gym.mx)if(S.gym.mx[k]=='micro')S.gym.mx[k]='equip';
+  delete S.gym.mj;}}
+else if(a=='sgeq'){(S.gym.eq??={})[b.dataset.n]=b.dataset.v;
+  // if the new equipment can't take microplates, clear any micro choice on this lift
+  const E=EQUIP[b.dataset.v];if(E&&!E[3]){if((S.gym.mx||{})[b.dataset.n]=='micro')S.gym.mx[b.dataset.n]='equip';if(S.gym.mj)delete S.gym.mj[b.dataset.n]}}
 else if(a=='sgmx'){(S.gym.mx??={})[b.dataset.n]=b.dataset.v}
+else if(a=='sgmj'){const mj=(S.gym.mj??={}),n=b.dataset.n;if(mj[n])delete mj[n];else mj[n]=1}
 else if(a=='sgday'){const x=b.dataset.v,n=gdn(),cur=(S.gym.schedPick||gsched()).slice(),i=cur.indexOf(x);
 if(i>=0)cur.splice(i,1);else{if(cur.length>=n)return toast('You already picked '+n+' days — remove one first');cur.push(x)}
 S.gym.schedPick=cur}
@@ -1601,7 +1632,7 @@ else if(a=='npset'){const raw=v('npv'),hh=parseFloat(raw),nn=(S.nap??={});if(raw
 else if(a=='slst'){const s=(S.str??={}),x=+b.dataset.v;if(s[day]==x)delete s[day];else s[day]=x}
 else if(a=='crtog'){const c=(S.cre??={});if(c[day])delete c[day];else c[day]=1;toast(c[day]?'Creatine logged':'Creatine unmarked')}
 else if(a=='wkp'||a=='wkx'){const x=new Date(wk0+'T00:00');x.setDate(x.getDate()+(a=='wkx'?7:-7));wk0=fmt(x)}
-else return;save();if(['gsw','gpick','sgd','sgday','sgunit','sginc','sgeq','sgmx','sgo','greconf','sgcancel','gcal','gcalclose','gcalc','gcalcclose','gcalcgo'].includes(a)&&$('#gout')){const y=scrollY;$('#gout').classList.add('q');gview();scrollTo(0,y);return}go(tab)});
+else return;save();if(['gsw','gpick','sgd','sgday','sgunit','sginc','sgmic','sgeq','sgmx','sgmj','sgo','greconf','sgcancel','gcal','gcalclose','gcalc','gcalcclose','gcalcgo'].includes(a)&&$('#gout')){const y=scrollY;$('#gout').classList.add('q');gview();scrollTo(0,y);return}go(tab)});
 function ap(){const r=document.documentElement;r.dataset.th=S.th||'burgundy';if(S.mode)r.dataset.theme=S.mode;document.querySelectorAll('.sw').forEach(x=>x.classList.toggle('on',x.dataset.th==r.dataset.th))}ap();thSync();
 let LANG='en',LOC='en-US',DOW='MTWTFSS',DWK='MON TUE WED THU FRI SAT SUN';
 const D={
@@ -1676,7 +1707,7 @@ const D={
 "What does maintain do?":"¿Qué hace mantener?","You eat about what your body burns, so your weight stays steady. If you lift weights and get enough protein, you can slowly lose a little fat and gain a little muscle at the same time. It is called body recomposition. It is gradual, so expect to see changes over months, not weeks.":"Comes más o menos lo que tu cuerpo quema, así que tu peso se mantiene estable. Si levantas pesas y consumes suficiente proteína, puedes perder poca grasa y ganar poco músculo al mismo tiempo. Se llama recomposición corporal. Es gradual: espera ver cambios en meses, no en semanas.",
 "Continue":"Continuar","Back":"Atrás","Start tracking":"Empezar","Pick an option to continue":"Elige una opción para continuar","Choose centimeters or inches":"Elige centímetros o pulgadas","Choose kilograms or pounds":"Elige kilogramos o libras","Enter an age between 12 and 100":"Escribe una edad entre 12 y 100","Enter a realistic height":"Escribe una estatura realista","Enter a realistic weight":"Escribe un peso realista","You can change any of this later in Settings.":"Puedes cambiar todo esto después en Ajustes.",
 "Previous month":"Mes anterior","Next month":"Mes siguiente","Swap exercise":"Cambiar ejercicio",
-"Gym planner":"Planificador de gimnasio","Gym weight unit":"Unidad de peso del gym","Kilograms":"Kilogramos","Pounds":"Libras","Separate from your body-weight unit, since the gym’s plates may differ.":"Independiente de la unidad de tu peso corporal, porque los discos del gym pueden variar.","Progression":"Progresión","Default progression":"Progresión por defecto","Microplates":"Microdiscos","By equipment":"Por equipamiento","Myo-reps":"Myo-reps","Double progression: climb reps to the top of the window, then add the jump your equipment allows and restart at 6.":"Doble progresión: sube reps hasta el tope del rango, luego añade el salto que permita tu equipamiento y reinicia en 6.","One all-out set then five mini-sets of 3; progress reps, add weight once all five hit 3.":"Una serie al fallo y cinco mini-series de 3; progresa en reps y sube peso cuando las cinco lleguen a 3.","Applied to every lift; you can override it per lift below.":"Se aplica a cada ejercicio; puedes cambiarlo por ejercicio abajo.","🔧 Equipment & progression per lift":"🔧 Equipamiento y progresión por ejercicio","Pick each lift’s equipment — it sets the weight jump and rep range. A lift with no equipment can’t be logged (unless it uses microplates).":"Elige el equipamiento de cada ejercicio — define el salto de peso y el rango de reps. Un ejercicio sin equipamiento no se puede registrar (salvo que use microdiscos).","Machine / barbell":"Máquina / barra","Dumbbells":"Mancuernas","Cable":"Polea","needs equipment":"falta equipamiento","Set the equipment first":"Primero elige el equipamiento","Pick this lift’s equipment in Reconfigure before logging it, so the jump is right.":"Elige el equipamiento de este ejercicio en Reconfigurar antes de registrarlo, para que el salto sea correcto.","Fixed staggered reps (8-7-6); the weight creeps up by the smallest jump your microplates allow.":"Reps fijas escalonadas (8-7-6); el peso sube por el salto más pequeño que permitan tus microdiscos.","Double progression in a 2-rep window: add a rep each session, then +2.5 and restart at the bottom.":"Doble progresión en ventana de 2 reps: suma una rep por sesión, luego +2,5 y reinicia desde abajo.","Wide 4-rep window: climb reps set by set, then +5 and restart at the bottom.":"Ventana amplia de 4 reps: sube reps serie a serie, luego +5 y reinicia desde abajo.","Your microplates":"Tus microdiscos","How many plates you own of each size (":"Cuántos discos tienes de cada tamaño (","), so the app knows your smallest jump. One per side = that jump ×2.":"), para saber tu salto más pequeño. Uno por lado = ese salto ×2.","Smallest jump":"Salto más pequeño","per session":"por sesión","Add at least one microplate, or the plan falls back to +2.5.":"Añade al menos un microdisco, o el plan usa +2,5.","📆 Main structure: Upper / Lower, 4 days a week":"📆 Estructura principal: Torso / Pierna, 4 días a la semana",
+"Gym planner":"Planificador de gimnasio","Gym weight unit":"Unidad de peso del gym","Kilograms":"Kilogramos","Pounds":"Libras","Separate from your body-weight unit, since the gym’s plates may differ.":"Independiente de la unidad de tu peso corporal, porque los discos del gym pueden variar.","Progression":"Progresión","Default progression":"Progresión por defecto","Microplates":"Microdiscos","By equipment":"Por equipamiento","Myo-reps":"Myo-reps","Double progression: climb reps to the top of the window, then add the jump your equipment allows and restart at 6.":"Doble progresión: sube reps hasta el tope del rango, luego añade el salto que permita tu equipamiento y reinicia en 6.","One all-out set then five mini-sets of 3; progress reps, add weight once all five hit 3.":"Una serie al fallo y cinco mini-series de 3; progresa en reps y sube peso cuando las cinco lleguen a 3.","Applied to every lift; you can override it per lift below.":"Se aplica a cada ejercicio; puedes cambiarlo por ejercicio abajo.","🔧 Equipment & progression per lift":"🔧 Equipamiento y progresión por ejercicio","Do you have microplates?":"¿Tienes microdiscos?","Yes":"Sí","No":"No","Small plates (0.25–1.25":"Discos pequeños (0,25–1,25",") you can add to machines and barbells for tiny jumps.":") que puedes añadir a máquinas y barras para saltos pequeños.","Which microplates":"Cuáles microdiscos","How many you own of each size (":"Cuántos tienes de cada tamaño (","). One per side = that jump ×2.":"). Uno por lado = ese salto ×2.","per session on platable lifts":"por sesión en ejercicios con discos","Add at least one microplate above.":"Añade al menos un microdisco arriba.","Microplates needs plates registered above.":"Microdiscos requiere registrar discos arriba.","Jump at this gym":"Salto en este gym","Pick each lift’s equipment — it sets the weight jump and rep range. A lift with no equipment can’t be logged (unless it uses microplates).":"Elige el equipamiento de cada ejercicio — define el salto de peso y el rango de reps. Un ejercicio sin equipamiento no se puede registrar (salvo que use microdiscos).","Machine / barbell":"Máquina / barra","Dumbbells":"Mancuernas","Cable":"Polea","needs equipment":"falta equipamiento","Set the equipment first":"Primero elige el equipamiento","Pick this lift’s equipment in Reconfigure before logging it, so the jump is right.":"Elige el equipamiento de este ejercicio en Reconfigurar antes de registrarlo, para que el salto sea correcto.","Fixed staggered reps (8-7-6); the weight creeps up by the smallest jump your microplates allow.":"Reps fijas escalonadas (8-7-6); el peso sube por el salto más pequeño que permitan tus microdiscos.","Double progression in a 2-rep window: add a rep each session, then +2.5 and restart at the bottom.":"Doble progresión en ventana de 2 reps: suma una rep por sesión, luego +2,5 y reinicia desde abajo.","Wide 4-rep window: climb reps set by set, then +5 and restart at the bottom.":"Ventana amplia de 4 reps: sube reps serie a serie, luego +5 y reinicia desde abajo.","Your microplates":"Tus microdiscos","How many plates you own of each size (":"Cuántos discos tienes de cada tamaño (","), so the app knows your smallest jump. One per side = that jump ×2.":"), para saber tu salto más pequeño. Uno por lado = ese salto ×2.","Smallest jump":"Salto más pequeño","per session":"por sesión","Add at least one microplate, or the plan falls back to +2.5.":"Añade al menos un microdisco, o el plan usa +2,5.","📆 Main structure: Upper / Lower, 4 days a week":"📆 Estructura principal: Torso / Pierna, 4 días a la semana",
 "Two hits per muscle a week. Pick 3 days if that is all you have, or 5 for strength plus hypertrophy (PHAT).":"Dos estímulos por músculo a la semana. Elige 3 días si es todo lo que tienes, o 5 para fuerza más hipertrofia (PHAT).","You are on":"Estás en",
 "Full body (3 days)":"Cuerpo completo (3 días)","Upper / Lower (4 days)":"Torso / Pierna (4 días)","PHAT adapted (5 days)":"PHAT adaptado (5 días)",
 "Micro plates (0.25–0.5 kg)":"Microdiscos (0,25–0,5 kg)","Fixed reps, add +0.25 kg every session.":"Repeticiones fijas, suma +0,25 kg cada sesión.","Plates of 1.25 kg (+2.5 kg)":"Discos de 1,25 kg (+2,5 kg)",
@@ -1698,7 +1729,7 @@ const D={
 "Flat machine press":"Press plano en máquina","Cable triceps extension":"Extensión de tríceps en polea","Incline Smith press":"Press inclinado en Smith","Triceps pushdown":"Jalón de tríceps","Overhead cable extension":"Extensión sobre la cabeza en polea","Overhead dumbbell extension":"Extensión sobre la cabeza con mancuerna","Preacher curl":"Curl predicador","Cable curl":"Curl en polea","Dumbbell curl":"Curl con mancuernas","Single-leg extension":"Extensión unilateral","Leg extension with pause":"Extensión de cuádriceps con pausa","Lying leg curl":"Curl femoral tumbado","Single-leg seated curl":"Curl femoral sentado unilateral","Assisted Nordic curl":"Curl nórdico asistido",
 "Machine lateral raise":"Elevación lateral en máquina","Leaning cable lateral raise":"Elevación lateral en polea inclinado","Wide-grip pulldown":"Jalón con agarre ancho","Pull-ups":"Dominadas","Chin-ups":"Dominadas supinas","Machine pullover":"Pullover en máquina","Dumbbell pullover":"Pullover con mancuerna","Machine row":"Remo en máquina","One-arm cable row":"Remo unilateral en polea","Incline barbell press":"Press inclinado con barra","Smith bench press":"Press banca en Smith","Barbell back squat":"Sentadilla con barra","Seated calf raise":"Gemelos sentado","Leg press calf raise":"Gemelos en prensa","Machine crunch":"Crunch en máquina","Hanging knee raise":"Elevación de rodillas colgado"};
 const DK=Object.keys(D).filter(k=>k.length>=7).sort((a,b)=>b.length-a.length),DY={Mon:'Lun',Tue:'Mar',Wed:'Mié',Thu:'Jue',Fri:'Vie',Sat:'Sáb',Sun:'Dom'};
-const R=[[/^⏱ Rest (.+)$/,'⏱ Descansar $1'],[/^(\d+)\/(\d+) days chosen$/,'$1/$2 días elegidos'],[/^(\d+)\/(\d+) days chosen · keep a rest day between sessions$/,'$1/$2 días elegidos · deja un día de descanso entre sesiones'],[/^You already picked (\d+) days — remove one first$/,'Ya elegiste $1 días — quita uno primero'],[/^Pick exactly (\d+) training days$/,'Elige exactamente $1 días de entrenamiento'],[/^Target RIR (.+)$/,'RIR objetivo $1'],[/^dropping across (\d+) sessions$/,'bajando en $1 sesiones'],[/^no new best in (\d+) sessions$/,'sin nuevo récord en $1 sesiones'],[/^(\d+) sessions$/,'$1 sesiones'],[/^1 session$/,'1 sesión'],[/^Your sleep averaged ([\d.]+) h this week, below the 7–9 h target\.$/,'Tu sueño promedió $1 h esta semana, por debajo de la meta de 7–9 h.'],[/^Your stress averaged ([\d.]+) out of 5 this week\.$/,'Tu estrés promedió $1 de 5 esta semana.'],[/^(\d[\d,]*) steps to reach 8,000$/,(m,a)=>a.replace(',','.')+' pasos para llegar a 8.000'],[/(\d+) glass(?:es)? to go/,(m,a)=>a+(a==1?' vaso':' vasos')+' por beber'],[/· next at/,'· próximo a las'],[/^🔔 Your (\d+) glasses of (\d+) ml, (\S+) to (\S+)$/,'🔔 Tus $1 vasos de $2 ml, de $3 a $4'],
+const R=[[/^⏱ Rest (.+)$/,'⏱ Descansar $1'],[/^Jump with microplates \(\+(.+)\)$/,'Saltar con microdiscos (+$1)'],[/^(\d+)\/(\d+) days chosen$/,'$1/$2 días elegidos'],[/^(\d+)\/(\d+) days chosen · keep a rest day between sessions$/,'$1/$2 días elegidos · deja un día de descanso entre sesiones'],[/^You already picked (\d+) days — remove one first$/,'Ya elegiste $1 días — quita uno primero'],[/^Pick exactly (\d+) training days$/,'Elige exactamente $1 días de entrenamiento'],[/^Target RIR (.+)$/,'RIR objetivo $1'],[/^dropping across (\d+) sessions$/,'bajando en $1 sesiones'],[/^no new best in (\d+) sessions$/,'sin nuevo récord en $1 sesiones'],[/^(\d+) sessions$/,'$1 sesiones'],[/^1 session$/,'1 sesión'],[/^Your sleep averaged ([\d.]+) h this week, below the 7–9 h target\.$/,'Tu sueño promedió $1 h esta semana, por debajo de la meta de 7–9 h.'],[/^Your stress averaged ([\d.]+) out of 5 this week\.$/,'Tu estrés promedió $1 de 5 esta semana.'],[/^(\d[\d,]*) steps to reach 8,000$/,(m,a)=>a.replace(',','.')+' pasos para llegar a 8.000'],[/(\d+) glass(?:es)? to go/,(m,a)=>a+(a==1?' vaso':' vasos')+' por beber'],[/· next at/,'· próximo a las'],[/^🔔 Your (\d+) glasses of (\d+) ml, (\S+) to (\S+)$/,'🔔 Tus $1 vasos de $2 ml, de $3 a $4'],
 [/^([\d.]+) kg × 32\.5 ml(, \+10% for men)?$/,(m,a,b)=>a+' kg × 32,5 ml'+(b?', +10 % hombres':'')],[/^Adds (\d+) ml$/,'Suma $1 ml'],
 [/(\d+) units\b/,'$1 unidades'],[/^× Activity (.+)$/,'× Actividad $1'],[/Calculation weight (\d+) kg \(height − 100\)\./,'Peso de cálculo $1 kg (estatura − 100).'],
 [/Expected loss: ([\d.]+) to ([\d.]+) kg per week\./,'Pérdida esperada: $1 a $2 kg por semana.'],[/Expected gain: up to ([\d.]+) kg per month\./,'Ganancia esperada: hasta $1 kg por mes.'],[/(\d+) g of /,'$1 g de '],
