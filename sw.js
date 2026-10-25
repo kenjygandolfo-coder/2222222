@@ -1,9 +1,9 @@
 /* Forma service worker — offline shell cache.
-   Paired with forma.html; they must be served from the same folder. Bump CACHE
+   Paired with index.html; they must be served from the same folder. Bump CACHE
    whenever you want returning installs to drop the old shell. User data lives
    in localStorage, which the worker never touches, so a cache reset is safe. */
-const CACHE = 'forma-v1';
-const SHELL = ['./', 'forma.html'];
+const CACHE = 'forma-v2';
+const SHELL = ['./', 'index.html'];
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -31,7 +31,7 @@ self.addEventListener('fetch', e => {
     e.respondWith(
       fetch(r)
         .then(res => { const cp = res.clone(); caches.open(CACHE).then(c => c.put(r, cp)); return res; })
-        .catch(() => caches.match(r).then(m => m || caches.match('forma.html') || caches.match('./')))
+        .catch(() => caches.match(r).then(m => m || caches.match('index.html') || caches.match('./')))
     );
     return;
   }
