@@ -1729,7 +1729,14 @@ else if(a=='sgprog'){const[i,]=b.dataset.k.split(':').map(Number),n=b.dataset.n,
   else{if(set.length>=PROG_MAX)return toast('Max '+PROG_MAX+' progress lifts per session');set=[...set,n]}
   (S.gym.prog??={})[i]=set}
 else if(a=='gmv'){const[i,j]=b.dataset.k.split(':').map(Number),dir=+b.dataset.d,P=gPlanClone(),ex=P[i][2],k=j+dir;
-  if(k<0||k>=ex.length)return;[ex[j],ex[k]]=[ex[k],ex[j]]}
+  if(k<0||k>=ex.length)return;[ex[j],ex[k]]=[ex[k],ex[j]];
+  // swap-picks (S.gym.ch) are keyed by POSITION days:session:index, so they must
+  // travel with the exercise or the moved row would show the wrong name.
+  const ch=S.gym.ch;if(ch){const n=gdn(),kj=n+':'+i+':'+j,kk=n+':'+i+':'+k,vj=ch[kj],vk=ch[kk];
+    if(vk!==undefined)ch[kj]=vk;else delete ch[kj];
+    if(vj!==undefined)ch[kk]=vj;else delete ch[kk];}
+  // if a swap panel is open, move its index marker with the row too
+  if(gopen==i+':'+j)gopen=i+':'+k;else if(gopen==i+':'+k)gopen=i+':'+j}
 else if(a=='grm'){const[i,j]=b.dataset.k.split(':').map(Number);
   confirmExpert(()=>{const P=gPlanClone();P[i][2].splice(j,1);save();const y=scrollY;$('#gout').classList.add('q');gview();scrollTo(0,y);toast('Exercise removed')});return}
 else if(a=='gadd'){const i=+b.dataset.i;confirmExpert(()=>{gaddOpen=i;gaddQ='';const y=scrollY;$('#gout').classList.add('q');gview();scrollTo(0,y)});return}
