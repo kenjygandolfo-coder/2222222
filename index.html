@@ -1679,7 +1679,12 @@ x.innerHTML=`<div class="phero"><div><span>Your daily target</span><div class="p
 
 const closeDD=()=>document.querySelectorAll('.dd.open').forEach(x=>x.classList.remove('open'));
 function dd(){document.querySelectorAll('select').forEach(s=>{if(s.dataset.dd)return;s.dataset.dd=1;const o=[...s.options],w=document.createElement('div');w.className='dd';
-w.innerHTML=`<button type="button" class="ddb"><span>${esc(o[s.selectedIndex].text)}</span></button><div class="ddl">${o.map((x,i)=>`<div class="ddo ${i==s.selectedIndex?'on':''}" data-i="${i}">${esc(x.text)}</div>`).join('')}</div>`;s.after(w);
+/* A <select> with no option selected (selectedIndex === -1, e.g. an empty
+   option list or a value that matches no option) would make o[-1] undefined
+   and throw on .text, aborting the whole render pass. Fall back to the first
+   option, else an empty label, so one odd select never breaks the page. */
+const si=s.selectedIndex>=0?s.selectedIndex:(o.length?0:-1),sel=si>=0?o[si]:null;
+w.innerHTML=`<button type="button" class="ddb"><span>${esc(sel?sel.text:'')}</span></button><div class="ddl">${o.map((x,i)=>`<div class="ddo ${i==si?'on':''}" data-i="${i}">${esc(x.text)}</div>`).join('')}</div>`;s.after(w);
 const b=w.firstChild,l=w.lastChild;b.onclick=e=>{e.stopPropagation();const op=!w.classList.contains('open');closeDD();w.classList.toggle('open',op)};
 l.onclick=e=>{const t=e.target.closest('.ddo');if(!t)return;e.stopPropagation();s.selectedIndex=+t.dataset.i;b.firstChild.textContent=t.textContent;l.querySelectorAll('.ddo').forEach(x=>x.classList.toggle('on',x==t));w.classList.remove('open');s.dispatchEvent(new Event('input',{bubbles:true}));s.dispatchEvent(new Event('change',{bubbles:true}))}})}
 document.addEventListener('click',closeDD);document.addEventListener('keydown',e=>{if(e.key=='Escape')closeDD()});
