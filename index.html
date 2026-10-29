@@ -1576,8 +1576,8 @@ const WARM_MIN=1,WARM_MAX=5;
    first lower-body compound (resolved name -> primary muscle, kind H). Returns
    {up:j|null, lo:j|null}. Works off the full authored session so eligibility
    is stable regardless of the time-tier trim. */
-function gWarmPos(i){const dy=gPlan()[i];if(!dy)return{up:null,lo:null};let up=null,lo=null;
-dy[2].forEach((e,j)=>{if(e.k!=H)return;const p=muscleOf(gnm(i,j,e)).p;if(!p)return;
+function gWarmPos(i){const dy=gPlan()[i];if(!dy||!Array.isArray(dy[2]))return{up:null,lo:null};let up=null,lo=null;
+dy[2].forEach((e,j)=>{if(!e||e.k!=H)return;const m=muscleOf(gnm(i,j,e)),p=m&&m.p;if(!p)return;
 if(up===null&&MUP.includes(p))up=j;if(lo===null&&MLO.includes(p))lo=j});return{up,lo}}
 /* The warm-up count stored on a lift (0 if off/absent). */
 const gWarm=e=>Math.max(0,Math.min(WARM_MAX,Math.round((e&&e.w)||0)));
@@ -1598,7 +1598,7 @@ return`${gMuscleSummary()}
 <p class="cap" style="margin:0 0 8px">Set each lift\u2019s equipment (it fixes the weight jump and rep range), reorder with the ≡ handles, or remove / add lifts. A lift with no equipment can\u2019t be logged (unless it uses microplates).</p>
 <p class="cap" style="margin:0"><b>Progress vs Stimulus</b>: 2 progress lifts per session are recommended (up to 4). On stimulus lifts, chasing weight matters far less — you train them in a higher 10–15 rep range and progression is optional.</p></div>
 ${P.map((dy,i)=>`<div class="card" style="max-width:720px"><div class="row" style="justify-content:space-between;flex-wrap:nowrap;align-items:center;gap:8px;margin:0 0 8px"><div class="mt" style="margin:0;min-width:0">${gsched()[i]||dy[0]} · ${dy[1]}</div><button class="btn s" style="flex:none;font-size:12px" data-a="gcpy" data-i="${i}" aria-label="Copy this session to another day" title="Copy this session">📋 Copy</button></div>
-${dy[2].map((e,j)=>{const n=gnm(i,j,e),eq=gEquip(n),mth=gMethod(n),need=mth!='micro',E=eq?EQUIP[eq]:null,opts=gopts(e),last=j==dy[2].length-1;return`<div class="li" style="display:block;padding:12px 0">
+${dy[2].map((e,j)=>{try{const n=gnm(i,j,e),eqk=gEquip(n),E=eqk?(EQUIP[eqk]||null):null,eq=E?eqk:null,mth=gMethod(n),need=mth!='micro',opts=gopts(e),last=j==dy[2].length-1;return`<div class="li" style="display:block;padding:12px 0">
 <div class="row" style="justify-content:space-between;flex-wrap:nowrap;align-items:flex-start"><div class="row" style="gap:8px;align-items:center;min-width:0"><div class="gmvh" aria-hidden="true"><span class="gmvg">≡</span><button class="gmvb" data-a="gmv" data-k="${i}:${j}" data-d="-1" ${j==0?'disabled':''} aria-label="Move up" title="Move up">↑</button><button class="gmvb" data-a="gmv" data-k="${i}:${j}" data-d="1" ${last?'disabled':''} aria-label="Move down" title="Move down">↓</button></div><b style="font-size:15px">${esc(n)}</b></div><div class="row" style="flex:none;gap:8px;align-items:center">${need&&!eq?'<span class="hst w">needs equipment</span>':eq?`<span class="chip">+${gJump(n)} ${u}${mth!='micro'?' · '+E[2]:''}</span>`:''}${opts.length>1?`<button class="btn s" style="flex:none;font-size:12px" data-a="gsw" data-k="${i}:${j}" aria-label="Swap exercise" title="Swap exercise">Swap</button>`:''}<button class="btn s t" style="flex:none;font-size:12px" data-a="grm" data-k="${i}:${j}" aria-label="Remove exercise">Remove</button></div></div>
 <div class="chips" style="margin:8px 0 0"><button class="chip ${isProg(i,n)?'on':''}" data-a="sgprog" data-k="${i}:${j}" data-n="${esc(n)}">${isProg(i,n)?'● Progress':'○ Stimulus'}</button><span class="cap" style="align-self:center">${isProg(i,n)?'load is the point':'reps/technique — progression optional'}</span></div>
 ${gopen==i+':'+j?`<div class="mut" style="margin:8px 0 0">Same movement pattern — your pick is saved:</div><div class="chips" style="margin:8px 0 0">${opts.map(o=>`<button class="chip ${o==n?'on':''}" data-a="gpick" data-k="${i}:${j}" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>`:''}
@@ -1608,7 +1608,7 @@ ${mth=='myo'?`<div class="row" style="margin:8px 0 0;align-items:center;gap:8px"
 ${(()=>{const wp=gWarmPos(i),elig=j===wp.up||j===wp.lo;if(!elig)return'';const w=gWarm(e);const slot=j===wp.up?'upper-body':'lower-body';return`<div class="chips" style="margin:8px 0 0"><button class="chip ${w?'on':''}" data-a="sgwarm" data-k="${i}:${j}">${w?'● Approach sets on':'○ Add approach sets'}</button>${w?`<span class="cap" style="align-self:center">warm-up, not counted in weekly volume</span>`:''}</div>${w?`<label class="f" style="margin:8px 0 0;max-width:170px"><span class="sxt">Approach sets</span><input type="number" min="${WARM_MIN}" max="${WARM_MAX}" step="1" inputmode="numeric" data-warmk="${i}:${j}" value="${w}"></label><p class="cap" style="margin:4px 0 0">Recommended 4-5 on the first ${slot} compound.</p>`:''}`})()}
 ${E&&E[3]&&gHasMicro()&&mth!='micro'?`<div class="chips" style="margin:8px 0 0"><button class="chip ${gMicroJump(n)?'on':''}" data-a="sgmj" data-n="${esc(n)}">Jump with microplates (+${gstep()} ${u})</button></div>`:''}
 ${E&&!E[3]?`<label class="f" style="margin:8px 0 0;max-width:180px">Jump at this gym (${u})<input type="number" min="0.5" max="50" step="0.5" inputmode="decimal" data-jmp="${esc(n)}" value="${(S.gym.jmp||{})[n]??E[1]}"></label>`:''}
-</div>`}).join('')}
+</div>`}catch(err){const nm=(()=>{try{return gnm(i,j,e)}catch(_){return(e&&e.n)||'Exercise'}})();return`<div class="li" style="display:block;padding:12px 0"><div class="row" style="justify-content:space-between;flex-wrap:nowrap;align-items:flex-start"><b style="font-size:15px">${esc(nm)}</b><button class="btn s t" style="flex:none;font-size:12px" data-a="grm" data-k="${i}:${j}" aria-label="Remove exercise">Remove</button></div><p class="cap" style="margin:6px 0 0">This lift\u2019s saved settings were out of date and have been reset. Set its equipment again, or remove it.</p></div>`}}).join('')}
 <button class="btn s" style="margin-top:8px" data-a="gadd" data-i="${i}">+ Add exercise</button>
 ${gaddOpen===i?gaddSearch():''}</div>`).join('')}`}
 /* Add-exercise search panel (opens after the expert warning). Lists every known
@@ -2040,7 +2040,7 @@ else if(a=='gmv'){const[i,j]=b.dataset.k.split(':').map(Number),dir=+b.dataset.d
   if(gopen==i+':'+j)gopen=i+':'+k;else if(gopen==i+':'+k)gopen=i+':'+j}
 else if(a=='grm'){const[i,j]=b.dataset.k.split(':').map(Number);
   confirmExpert(()=>{const P=gPlanClone();P[i][2].splice(j,1);save();const y=scrollY;$('#gout').classList.add('q');gview();scrollTo(0,y);toast('Exercise removed')});return}
-else if(a=='gadd'){const i=+b.dataset.i;confirmExpert(()=>{gaddOpen=i;gaddQ='';$('#gout').classList.add('q');gview();const q=$('#gaddq');if(q){q.scrollIntoView({block:'center'});q.focus()}});return}
+else if(a=='gadd'){const i=+b.dataset.i;confirmExpert(()=>{gaddOpen=i;gaddQ='';const o=$('#gout');if(o)o.classList.add('q');gview();const q=$('#gaddq');if(q){q.scrollIntoView({block:'center'});q.focus()}});return}
 else if(a=='gaddpick'){const nm=b.dataset.v,P=gPlanClone();if(gaddOpen!=null){P[gaddOpen][2].push(E(nm,3,'6–8','2',I,[]));gaddOpen=null;save();const y=scrollY;$('#gout').classList.add('q');gview();scrollTo(0,y);toast('Added: '+nm)}return}
 else if(a=='gaddclose'){gaddOpen=null}
 else if(a=='gcpy'){openCopy(+b.dataset.i);return}
