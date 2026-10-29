@@ -1710,7 +1710,17 @@ return`<h2>Log your maxes</h2>
 <div class="row" style="margin-top:16px"><button class="btn t" data-a="gcalclose">‹ Back to plan</button></div>`}
 /* The one-line summary under each calibration row. */
 function calLine(c,hv){const ws=workSet(c.rm,hv);return`<span>1RM ≈</span> <b>${c.rm} kg</b> · <span>work set</span> <b>${ws.w} kg × ${ws.reps}</b> <span>(${ws.range})</span>${c.warn?` · <span class="hst w">${c.warn=='high'?'high reps, rough estimate':'estimate drifts past 12 reps'}</span>`:''}`}
-function gview(){const g=S.gym;
+/* gview() renders the gym tab straight into #gout on nearly every gym action
+   (unlike go(), it is the re-render path). Native <select>s are hidden by CSS
+   (select{display:none}) and only become visible once dd() builds a custom
+   .dd widget beside them. dd() is idempotent (it skips any <select> already
+   carrying dataset.dd), so we run it after every gview() render to give any
+   select in #gout — e.g. the per-exercise "Rest time" dropdown — a visible,
+   usable control. Without this, a select rendered only through gview() stays
+   display:none with no widget. gviewImpl holds the real render (with its early
+   returns); the wrapper guarantees dd() runs no matter which path returns. */
+function gview(){gviewImpl();dd()}
+function gviewImpl(){const g=S.gym;
 if(!g.set||g.reconf){$('#gout').innerHTML=gsetup(!g.set);const mi=$('#gmin');if(mi)mi.oninput=()=>{const t=TIER(+mi.value||0),el=document.querySelector('[data-gtier]');if(el)el.textContent=t=='short'?'short — compounds only':t=='long'?'long — everything + accessories':'standard — the full session'};return}
 if(g.cal_open){$('#gout').innerHTML=gcalView();return}
 if(g.calc_open){$('#gout').innerHTML=gcalcView();return}
