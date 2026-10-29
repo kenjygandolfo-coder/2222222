@@ -1028,10 +1028,11 @@ return Math.min(...owned)*2;     // smallest total jump = smallest plate, one pe
    Standard US pounds plate colors, largest-first: [lb, hex, name]. Colors are
    semantically fixed (not theme vars). */
 const PLATE_LB=[[45,'#e23b3b','red'],[25,'#2f6fd0','blue'],[10,'#2f9e4f','green'],[5,'#e8c020','yellow'],[2.5,'#e8842a','orange']];
-/* Per-lift bar weight (default Olympic bar = 45 lb). For Smith / resistance
-   profiles the user sets a custom bar weight, stored in S.gym.barw keyed by the
-   resolved lift name. */
-const barWeight=n=>{const v=(S.gym.barw||{})[n];return Number.isFinite(v)&&v>=0?v:45};
+/* Per-lift bar weight (default = 0: the logged weight is taken as-is, i.e. the
+   total across both sides with no bar subtracted). For Smith / resistance
+   profiles the user sets a custom bar weight (e.g. 45), stored in S.gym.barw
+   keyed by the resolved lift name; an explicit value (including 0) is honored. */
+const barWeight=n=>{const v=(S.gym.barw||{})[n];return Number.isFinite(v)&&v>=0?v:0};
 /* Pure greedy breakdown. `total` is the TOTAL on the bar across BOTH sides
    (user model). Subtract the bar, split the remainder in two, load largest-first
    PER SIDE. leftover = per-side weight the standard plates cannot make (needs
@@ -1611,12 +1612,13 @@ const v=Math.max(0,+e.target.value||0);(S.gym.jmp??={})[n]=v;save()});
    lift's graphic in place from the current #lw{j}_0, with no full re-render.
    Shared redraw routine (mirrors the Calcular handler). */
 function plateRedraw(j,n){const cont=document.querySelector(`.plateld[data-plate-ex="${j}"]`);if(!cont)return;const wi=$('#lw'+j+'_0'),total=wi?parseFloat(wi.value):NaN;cont.innerHTML=plateInner(n,total);if(LANG=='es')tr(cont)}
-/* Smith / resistance-profile toggle: on -> start a custom bar weight (default
-   45), on -> reveal the input; off -> drop the per-lift override (back to 45). */
+/* Smith / resistance-profile toggle: on -> seed an editable bar weight (reuse an
+   existing override if set, else 45) and reveal the input; off -> drop the
+   per-lift override (reverts to the default 0: weight taken as-is). */
 document.addEventListener('change',e=>{const n=e.target.dataset&&e.target.dataset.barsw;if(n===undefined)return;
 const j=+((e.target.closest('.row')||document).querySelector('[data-barj]')||{}).dataset?.barj;
 const inp=(e.target.closest('.row')||document).querySelector('[data-barw]');
-if(e.target.checked){(S.gym.barw??={})[n]=barWeight(n);if(inp){inp.value=barWeight(n);inp.style.display=''}}
+if(e.target.checked){const init=Number.isFinite((S.gym.barw||{})[n])?(S.gym.barw)[n]:45;(S.gym.barw??={})[n]=init;if(inp){inp.value=init;inp.style.display=''}}
 else{if(S.gym.barw)delete S.gym.barw[n];if(inp){inp.value='';inp.style.display='none'}}
 save();if(Number.isFinite(j))plateRedraw(j,n)});
 /* Custom bar-weight number input: clamp >=0, live-save, redraw in place. */
