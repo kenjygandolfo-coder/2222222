@@ -1609,8 +1609,8 @@ ${(()=>{const wp=gWarmPos(i),elig=j===wp.up||j===wp.lo;if(!elig)return'';const w
 ${E&&E[3]&&gHasMicro()&&mth!='micro'?`<div class="chips" style="margin:8px 0 0"><button class="chip ${gMicroJump(n)?'on':''}" data-a="sgmj" data-n="${esc(n)}">Jump with microplates (+${gstep()} ${u})</button></div>`:''}
 ${E&&!E[3]?`<label class="f" style="margin:8px 0 0;max-width:180px">Jump at this gym (${u})<input type="number" min="0.5" max="50" step="0.5" inputmode="decimal" data-jmp="${esc(n)}" value="${(S.gym.jmp||{})[n]??E[1]}"></label>`:''}
 </div>`}).join('')}
-<button class="btn s" style="margin-top:8px" data-a="gadd" data-i="${i}">+ Add exercise</button></div>`).join('')}
-${gaddOpen!=null?gaddSearch():''}`}
+<button class="btn s" style="margin-top:8px" data-a="gadd" data-i="${i}">+ Add exercise</button>
+${gaddOpen===i?gaddSearch():''}</div>`).join('')}`}
 /* Add-exercise search panel (opens after the expert warning). Lists every known
    exercise filtered by the query; picking one appends it to the target session. */
 let gaddOpen=null,gaddQ='';
@@ -2040,7 +2040,7 @@ else if(a=='gmv'){const[i,j]=b.dataset.k.split(':').map(Number),dir=+b.dataset.d
   if(gopen==i+':'+j)gopen=i+':'+k;else if(gopen==i+':'+k)gopen=i+':'+j}
 else if(a=='grm'){const[i,j]=b.dataset.k.split(':').map(Number);
   confirmExpert(()=>{const P=gPlanClone();P[i][2].splice(j,1);save();const y=scrollY;$('#gout').classList.add('q');gview();scrollTo(0,y);toast('Exercise removed')});return}
-else if(a=='gadd'){const i=+b.dataset.i;confirmExpert(()=>{gaddOpen=i;gaddQ='';const y=scrollY;$('#gout').classList.add('q');gview();scrollTo(0,y)});return}
+else if(a=='gadd'){const i=+b.dataset.i;confirmExpert(()=>{gaddOpen=i;gaddQ='';$('#gout').classList.add('q');gview();const q=$('#gaddq');if(q){q.scrollIntoView({block:'center'});q.focus()}});return}
 else if(a=='gaddpick'){const nm=b.dataset.v,P=gPlanClone();if(gaddOpen!=null){P[gaddOpen][2].push(E(nm,3,'6–8','2',I,[]));gaddOpen=null;save();const y=scrollY;$('#gout').classList.add('q');gview();scrollTo(0,y);toast('Added: '+nm)}return}
 else if(a=='gaddclose'){gaddOpen=null}
 else if(a=='gcpy'){openCopy(+b.dataset.i);return}
