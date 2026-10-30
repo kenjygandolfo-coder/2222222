@@ -83,6 +83,26 @@ for (const [name, t] of Object.entries(THEMES)) {
 console.log('Forma accent-theme contrast gate (WCAG 2.2)\n');
 console.table(rows);
 
+// --- Macro-ladder non-text check (1.4.11): --data-2 (carbs) / --data-3 (fat)
+// each >= 3:1 against --card in light AND dark. Light hexes come from :root,
+// dark hexes from the two identical dark blocks in index.html. ---
+const MACRO = {
+  light: { 'data-2': '#7A8FB5', 'data-3': '#6F7340' },
+  dark:  { 'data-2': '#8F9BB5', 'data-3': '#DCD5B8' },
+};
+const macroRows = [];
+for (const scheme of ['light', 'dark']) {
+  const card = SURF[scheme].card;
+  for (const [token, hex] of Object.entries(MACRO[scheme])) {
+    const r = ratio(hex, card);
+    const ok = r >= AA_NON;
+    if (!ok) failed = true;
+    macroRows.push({ token, scheme, hex, 'vs card(>=3)': R(r), result: ok ? 'PASS' : 'FAIL' });
+  }
+}
+console.log('\nMacro data tokens vs --card (WCAG 2.2 1.4.11)\n');
+console.table(macroRows);
+
 if (failed) {
   console.error('\nFAIL: one or more accent themes did not meet the thresholds.');
   process.exit(1);
