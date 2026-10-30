@@ -2,11 +2,11 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Forma — Gym Companion</title>
-<meta name="theme-color" content="#5C1A22" media="(prefers-color-scheme:light)">
-<meta name="theme-color" content="#18191E" media="(prefers-color-scheme:dark)">
+<meta name="theme-color" content="#ECE5D6" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#161613" media="(prefers-color-scheme:dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Forma">
 <meta name="description" content="Forma — calorie, macro and training companion that works offline.">
 <!-- Real PNG icons + an external manifest. Chrome/Brave refuse to install a PWA
@@ -27,10 +27,10 @@ r.classList.toggle('dark-theme',d)}catch(e){}})();
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--pri-l:#5C1A22;--pri-d:#A8404F;--acc-l:#4B4D2C;--acc-d:#7E815F;--n0:#121316;--n1:#18191E;--n2:#202127;--n3:#2A2B31;--n4:#34353B;--n5:#4A4B52;--n6:#6E6F77;--n7:#9A9BA3;--n8:#EDEEF2;--bgd:var(--n1);--cardd:var(--n2);--lined:var(--n3);--onpd:#F3EAD9;--bg:#ECE5D6;--card:#F8F2E7;--ink:#2B2C1A;--mut:hsl(63 26% 26%);--pri:var(--pri-l);--onpri:#F8F2E7;--acc:var(--acc-l);--olv-t:#4B4D2C;--olv-tx:#4B4D2C;--olv-s:#4B4D2C;--gold:#7C8048;--line:#D6CDB6;--sh:0 4px 14px rgba(42,42,28,.08);--shh:0 14px 32px rgba(42,42,28,.16);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--pri-h:353;--pri-s:56%;--pri-l:#5C1A22;--pri-d:#A8404F;--pri-hov:hsl(var(--pri-h) var(--pri-s) 20%);--pri-dk:hsl(var(--pri-h) var(--pri-s) 15%);--acc-l:#4B4D2C;--acc-d:#7E815F;--n0:hsl(64 8% 5%);--n1:hsl(64 8% 8%);--n2:hsl(64 7% 11%);--n3:hsl(64 6% 15%);--n4:hsl(64 6% 20%);--n5:hsl(63 5% 30%);--n6:#6E6F77;--n7:#9A9BA3;--n8:#EDEEF2;--bgd:var(--n1);--cardd:var(--n2);--lined:var(--n3);--elev:var(--card);--elevd:var(--n3);--onpd:#F3EAD9;--bg:#ECE5D6;--card:#FBF7EE;--ink:#2B2C1A;--mut:hsl(63 26% 26%);--pri:var(--pri-l);--onpri:#F8F2E7;--acc:var(--acc-l);--olv-t:#4B4D2C;--olv-tx:#4B4D2C;--olv-s:#4B4D2C;--gold:#7C8048;--line:#D6CDB6;--line-ui:#8F8567;--data-1:#5C1A22;--data-2:#5E6B86;--data-3:#30321B;--sh:0 4px 14px rgba(42,42,28,.08);--shh:0 14px 32px rgba(42,42,28,.16);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 :root:not([data-theme="light"]){color-scheme:light dark}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--ink:#EDE6D6;--mut:var(--n7);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:#26272A;--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}}
-:root[data-theme="dark"]{--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--ink:#EDE6D6;--mut:var(--n7);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:#26272A;--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:#6E6F77;--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#EDE6D6;--mut:var(--n7);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 6% 17%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}}
+:root[data-theme="dark"]{--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:#6E6F77;--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#EDE6D6;--mut:var(--n7);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 6% 17%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Montserrat,system-ui,sans-serif;transition:background .4s,color .4s}
 h1,h2,h3{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;margin:0;letter-spacing:.02em}
@@ -168,14 +168,14 @@ nav{left:50%;right:auto;transform:translateX(-50%);width:min(560px,calc(100% - 1
 .tab.on::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:28px;height:3px;border-radius:0 0 3px 3px;background:var(--pri)}
 .tab.on .ti{transform:scale(1.08)}
 .btn{border:1px solid color-mix(in srgb,var(--line) 70%,transparent);padding:8px 24px;font-weight:600}
-.btn.p{background:linear-gradient(135deg,var(--pri),color-mix(in srgb,var(--pri) 62%,#000));border-color:transparent;box-shadow:0 10px 22px -10px var(--pri)}
+.btn.p{background:linear-gradient(135deg,var(--pri),var(--pri-hov));border-color:transparent;box-shadow:0 10px 22px -10px var(--pri)}
 .btn.a{background:linear-gradient(135deg,var(--acc),color-mix(in srgb,var(--acc) 62%,#000));border-color:transparent}
 .btn:active,.tab:active,.fab:active{transform:scale(.95)}
 .card{border:1px solid color-mix(in srgb,var(--line) 75%,transparent);border-radius:30px;padding:24px;box-shadow:0 1px 0 rgba(255,255,255,.12) inset,0 14px 34px -16px rgba(42,42,28,.28)}
 @keyframes rise{from{opacity:0;transform:translateY(18px) scale(.985)}}
 .card,.tile,.note,.phero,main>h2{animation:rise .55s cubic-bezier(.2,.8,.2,1) backwards}
 .g>:nth-child(2),.g2>:nth-child(2),.tile:nth-child(2){animation-delay:.07s}.g>:nth-child(3),.g2>:nth-child(3),.tile:nth-child(3){animation-delay:.14s}.tile:nth-child(n+4){animation-delay:.2s}
-.hero{position:relative;overflow:hidden;border:0;border-radius:38px;padding:32.0px;background:linear-gradient(150deg,var(--pri),color-mix(in srgb,var(--pri) 52%,#000))}
+.hero{position:relative;overflow:hidden;border:0;border-radius:38px;padding:32.0px;background:linear-gradient(150deg,var(--pri),var(--pri-dk))}
 .hero::before{content:"";position:absolute;right:-90px;top:-90px;width:300px;height:300px;border-radius:50%;border:1px solid rgba(243,234,217,.2);box-shadow:0 0 0 40px rgba(243,234,217,.04),0 0 0 84px rgba(243,234,217,.03);pointer-events:none}
 .hero::after{content:"";position:absolute;left:-70px;bottom:-130px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--gold) 50%,transparent),transparent 70%);opacity:.5;pointer-events:none}
 .hero>*{position:relative;z-index:1}
@@ -185,21 +185,21 @@ nav{left:50%;right:auto;transform:translateX(-50%);width:min(560px,calc(100% - 1
 .f{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:600}
 input,.ddb{border-radius:16px;padding:16px 16px;background:color-mix(in srgb,var(--bg) 65%,var(--card))}
 .li{padding:16px 0}.chip{background:color-mix(in srgb,var(--gold) 22%,var(--card));font-weight:500}
-.seg .btn{background:color-mix(in srgb,var(--bg) 65%,var(--card));box-shadow:none}.seg .btn.on{background:linear-gradient(135deg,var(--pri),color-mix(in srgb,var(--pri) 62%,#000))}
+.seg .btn{background:color-mix(in srgb,var(--bg) 65%,var(--card));box-shadow:none}.seg .btn.on{background:linear-gradient(135deg,var(--pri),var(--pri-hov))}
 .note{border:1px solid color-mix(in srgb,var(--gold) 40%,transparent);border-left:5px solid var(--gold);border-radius:20px}
 .tile{position:relative;overflow:hidden;border:1px solid color-mix(in srgb,var(--line) 75%,transparent);border-radius:24px;padding:16px 16.0px}
 .tile::before{content:"";position:absolute;left:0;top:0;height:3px;width:44%;background:linear-gradient(90deg,var(--gold),transparent)}
 .tile b{font-size:36px;font-style:italic}
 .hc{border-radius:12px;background:color-mix(in srgb,var(--line) 65%,transparent)}.yr .hc{border-radius:3px}
-.hc.l1{background:color-mix(in srgb,var(--gold) 50%,var(--card))}.hc.l2{background:color-mix(in srgb,var(--olv-t) 45%,var(--card))}.hc.l3{background:linear-gradient(135deg,var(--pri),color-mix(in srgb,var(--pri) 62%,#000));box-shadow:0 4px 10px -4px var(--pri)}
+.hc.l1{background:color-mix(in srgb,var(--gold) 50%,var(--card))}.hc.l2{background:color-mix(in srgb,var(--olv-t) 45%,var(--card))}.hc.l3{background:linear-gradient(135deg,var(--data-1),var(--pri-dk));box-shadow:0 4px 10px -4px var(--data-1)}
 .mb i{background:linear-gradient(180deg,var(--gold),var(--pri))}
-.phero{border-radius:32px;position:relative;overflow:hidden;background:linear-gradient(150deg,var(--pri),color-mix(in srgb,var(--pri) 52%,#000))}.pbig{font-size:76px;font-style:italic}
+.phero{border-radius:32px;position:relative;overflow:hidden;background:linear-gradient(150deg,var(--pri),var(--pri-dk))}.pbig{font-size:76px;font-style:italic}
 .mac3>div{border-radius:22px;background:color-mix(in srgb,var(--bg) 65%,var(--card))}
 .drops{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:16.0px 0 4px}.drops i{width:15px;height:15px;border-radius:0 50% 50% 50%;transform:rotate(45deg);background:var(--line);transition:.35s}.drops i.on{background:linear-gradient(135deg,var(--gold),var(--acc));box-shadow:0 4px 10px -3px var(--acc)}
 .fabs{right:18px;gap:16px}
 .fab{position:relative;width:60px;height:60px;font-size:27px;display:grid;place-items:center;background:color-mix(in srgb,var(--card) 82%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--line)}
 .fab:hover{transform:translateY(-3px) rotate(-6deg) scale(1.08)}
-.fab.on{background:linear-gradient(135deg,var(--pri),color-mix(in srgb,var(--pri) 60%,#000));box-shadow:0 0 0 5px color-mix(in srgb,var(--olv-t) 22%,transparent),var(--shh)}
+.fab.on{background:linear-gradient(135deg,var(--pri),var(--pri-hov));box-shadow:0 0 0 5px color-mix(in srgb,var(--olv-t) 22%,transparent),var(--shh)}
 .fab::after{content:attr(aria-label);position:absolute;right:72px;top:50%;transform:translate(8px,-50%);background:var(--ink);color:var(--bg);font:600 12px Montserrat,sans-serif;padding:8px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:.2s;white-space:nowrap}
 .fab:hover::after{opacity:1;transform:translate(0,-50%)}
 #toast{padding:16px 24.0px;font-weight:500;box-shadow:var(--shh)}#toast::before{content:"✦";color:var(--gold);margin-right:8px}
@@ -238,7 +238,7 @@ body{font-variant-numeric:lining-nums}
 .dpn{width:34px;height:34px;border-radius:50%;border:0;background:color-mix(in srgb,var(--olv-t) 10%,var(--card));color:var(--olv-t);font-size:18px;line-height:1;cursor:pointer;transition:.2s;padding:0}.dpn:hover{background:var(--pri);color:var(--onpri)}
 .dpg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}.dpw{font:600 10px Montserrat,sans-serif;color:var(--mut);padding:4px 0;letter-spacing:.1em}
 .dpc{aspect-ratio:1;border:0;border-radius:50%;background:none;font:500 13px Montserrat,sans-serif;color:var(--ink);cursor:pointer;padding:0;transition:.15s}.dpc:hover:not(:disabled){background:color-mix(in srgb,var(--olv-t) 14%,var(--card))}
-.dpc.tod{box-shadow:inset 0 0 0 1.5px var(--gold)}.dpc.sel{background:linear-gradient(135deg,var(--pri),color-mix(in srgb,var(--pri) 62%,#000));color:var(--onpri);box-shadow:0 6px 14px -6px var(--pri)}.dpc:disabled{opacity:.3;cursor:default}
+.dpc.tod{box-shadow:inset 0 0 0 1.5px var(--gold)}.dpc.sel{background:linear-gradient(135deg,var(--pri),var(--pri-hov));color:var(--onpri);box-shadow:0 6px 14px -6px var(--pri)}.dpc:disabled{opacity:.3;cursor:default}
 .dpf{display:flex;justify-content:center;margin-top:8px}
 #gout.q .card,#gout.q .note{animation:none}
 .lgb.on,.hd .btn.s.lgb.on{background:var(--pri);color:var(--onpri)}.hd .lgb{font-size:12px!important;font-weight:700}
@@ -262,7 +262,7 @@ body{font-variant-numeric:lining-nums}
 .crd{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:16px}
 .crd div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--mut)}
 .crd i{display:block;width:100%;max-width:30px;aspect-ratio:1;border-radius:50%;background:var(--line)}
-.crd i.on{background:linear-gradient(135deg,var(--pri),color-mix(in srgb,var(--pri) 62%,#000))}
+.crd i.on{background:linear-gradient(135deg,var(--data-1),var(--pri-dk))}
 .crd .cur span{color:var(--olv-t);font-weight:700}
 
 .rt{position:fixed;left:16px;right:92px;max-width:380px;bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:45;background:var(--pri);color:var(--onpri);border-radius:22px;padding:8px 16px 16px;box-shadow:var(--shh);display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:center;overflow:hidden}
@@ -467,9 +467,9 @@ nav,.fab,#toast,.rt,.ddl,.dpl,.sov-p,.mdl .card{box-shadow:var(--shp)}
 /* ===== v6: button hierarchy - primary solid wine / secondary olive outline / tertiary text ===== */
 .btn,.btn.s,.btn.a{background:transparent;color:var(--olv-t);border:1.5px solid var(--olv-t);box-shadow:none}
 .btn:hover{background:color-mix(in srgb,var(--olv-t) 8%,transparent);box-shadow:var(--shh);transform:translateY(-1px)}
-.btn.p{background:linear-gradient(135deg,var(--pri),color-mix(in srgb,var(--pri) 62%,#000));color:var(--onpri);border-color:transparent;box-shadow:var(--shv)}
-.btn.p:hover,.btn.p:focus-visible{background:linear-gradient(135deg,color-mix(in srgb,var(--pri) 86%,#000),color-mix(in srgb,var(--pri) 55%,#000));box-shadow:var(--shvh)}
-.seg .btn.on:hover,.seg .btn.on:focus-visible,.fab.on:hover,.fab.on:focus-visible{background:linear-gradient(135deg,color-mix(in srgb,var(--pri) 86%,#000),color-mix(in srgb,var(--pri) 53%,#000))}
+.btn.p{background:linear-gradient(135deg,var(--pri),var(--pri-hov));color:var(--onpri);border-color:transparent;box-shadow:var(--shv)}
+.btn.p:hover,.btn.p:focus-visible{background:linear-gradient(135deg,var(--pri-hov),var(--pri-dk));box-shadow:var(--shvh)}
+.seg .btn.on:hover,.seg .btn.on:focus-visible,.fab.on:hover,.fab.on:focus-visible{background:linear-gradient(135deg,var(--pri-hov),var(--pri-dk))}
 .btn.t{background:transparent;border-color:transparent;box-shadow:none;padding-left:16px;padding-right:16px}
 .btn.t:hover{background:color-mix(in srgb,var(--olv-t) 8%,transparent);box-shadow:none;transform:none}
 .seg .btn,.hq .btn{background:transparent}
@@ -535,7 +535,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
    ~2.1-3.3:1 on cream, so it can never carry text), the -fg tone is the text/icon
    colour (>=4.5:1 on both cream surfaces). */
 :root{--ok:#3E9E5A;--err:#D9483A;--warn:#CBA363;--info:#748796;
---ok-fg:#2C7A44;--err-fg:#B5362A;--warn-fg:#775828;--info-fg:#4F5D69}
+--ok-fg:#2C7A44;--err-fg:#A82B22;--warn-fg:#775828;--info-fg:#4F5D69}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ok-fg:#72CC8D;--err-fg:#EB8C7E;--warn-fg:#CBA362;--info-fg:#94A2AE}}
 :root[data-theme="dark"]{--ok-fg:#72CC8D;--err-fg:#EB8C7E;--warn-fg:#CBA362;--info-fg:#94A2AE}
 .note.ok{--sx:var(--ok);--sx-fg:var(--ok-fg)}
@@ -715,11 +715,42 @@ border:1px solid color-mix(in srgb,var(--olv-t) 32%,transparent)}
 color:var(--ink);margin-bottom:0;font-size:var(--fs-body)}
 
 /* ===== v13: selected / active states are solid wine, not a wine-to-black gradient ===== */
-.btn.p,.btn.p:hover,.seg .btn.on,.fab.on,.dpc.sel,.crd i.on,.ddo.on,.fo.on,.dpn:hover,.lgb.on,.hd .btn.s.lgb.on,.obc .lgb.on{background:var(--pri)}
+.btn.p,.seg .btn.on,.fab.on,.dpc.sel,.ddo.on,.fo.on,.dpn:hover,.lgb.on,.hd .btn.s.lgb.on,.obc .lgb.on{background:var(--pri)}
+/* hover/press lower L while holding H/S (no mix-with-black) */
+.btn.p:hover,.btn.p:focus-visible,.seg .btn.on:hover,.seg .btn.on:focus-visible,.fab.on:hover,.fab.on:focus-visible{background:var(--pri-hov)}
+.crd i.on{background:var(--data-1)}
 .chip.on{background:var(--pri)!important}
 /* the gradient's dark end was doing contrast work for the label; dark mode --pri is a
    lighter wine, so the on-wine text tone is pinned here instead */
 .btn.p,.seg .btn.on,.ddo.on,.fo.on{color:var(--onpri)}
+
+/* ===== v24: data tokens, form-control border, dark elevation, 7-day threshold mark =====
+   Audit: the wine accent is reserved for actions/active states; graphs and streaks
+   get their own --data-1/2/3 so the 60-30-10 balance holds and every data fill clears
+   3:1 on its surface. Form-control borders move to --line-ui (decorative --line stays).
+   Dark overlays express elevation with a lighter surface (--elev), not black shadow.
+   The 7-day bars gain a non-chromatic .tk cap so ok/mid/below read without colour. */
+/* POINT 1+3: data fills off var(--pri) onto data tokens (protein=--data-1) */
+.bar i,.pbar i,.mb i{background:var(--data-1)}
+.hero .bar i{background:var(--onpri)}
+/* POINT 4: three separable macro families (wine / slate-blue / olive) */
+.bar.c i,.pbar i.c,.mac3 .c span::before{background:var(--data-2)}
+.bar.f i,.pbar i.f,.mac3 .f span::before{background:var(--data-3)}
+.mac3 span::before{background:var(--data-1)}
+.hero .bar.c i{background:#C9CC9A}.hero .bar.f i{background:var(--onpri);opacity:.55}
+/* creatine streak + water drops are data, not actions */
+.drops i.on{background:var(--data-1)}
+/* POINT 2: form-control borders only -> --line-ui (decorative dividers keep --line) */
+input,select,.ddb,.ftog{border-color:var(--line-ui)}
+.gmvh{border-color:var(--line-ui)}
+/* POINT 7: dark-mode elevation by surface (light mode keeps shadow via --elev==--card) */
+.ddl,.dpl,.sov-p,.mdl .card{background:var(--elev)}
+/* POINT 5: non-chromatic threshold cap on the 7-day bars (reuses the .tk idea).
+   ok = full cap, mid = dashed/half cap, below = none, so state survives greyscale. */
+.hb i{position:relative}
+.hb i.ok::after,.hb i.mid::after{content:"";position:absolute;left:0;right:0;top:0;height:3px;border-radius:3px 3px 0 0}
+.hb i.ok::after{background:var(--ink);opacity:.85}
+.hb i.mid::after{background:repeating-linear-gradient(90deg,var(--ink) 0 3px,transparent 3px 6px);opacity:.7}
 
 /* ===== v12: reduced motion (must stay last) =====
    Kills entry travel and every hover/press displacement, keeps colour feedback.
@@ -881,7 +912,7 @@ const V={
 today(){const hb=hab(day),d=day,c=calc(),dg=dayGoal(d),t=tot(d),bud=dg.k,left=Math.round(bud-t.k),pr=bud?Math.min(1,t.k/bud):(t.k?1:0),over=left<0,goal={cut:'Losing fat',maint:'Maintaining',bulk:'Building muscle'}[S.p.goal],nb='style="min-width:48px;flex:none"';
 return`<div class="dbg"><div><span class="dbg-k">${d==today()?'Logging today':'Logging'}</span><h2 style="margin:0">${d==today()?'Today':d}</h2><div class="cap">${new Date(d+'T00:00').toLocaleDateString(LOC,{weekday:'long',month:'long',day:'numeric'})}</div></div><div class="row" style="flex:none;gap:8.0px"><button class="btn s" ${nb} data-a="dback" aria-label="Previous day">‹</button><button class="btn s" ${nb} data-a="dnext" aria-label="Next day">›</button></div></div>
 <div class="bt-alt">${galmini()}</div><div class="bento">
-<div class="bt-L"><div class="card hero split bt-hero"><div><div class="ring"><svg viewBox="0 0 120 120"><defs><linearGradient id="rgf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:#C9CC9A"/><stop offset="1" style="stop-color:color-mix(in srgb,#A8404F 78%,#F3EAD9)"/></linearGradient></defs><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(243,234,217,.3)" stroke-width="10"/><circle cx="60" cy="60" r="52" fill="none" stroke="${over?'var(--warn)':'url(#rgf)'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="${326.7*(1-pr)}" transform="rotate(-90 60 60)"/></svg><b>${Math.abs(left)}<span class="mut" style="font:13px Montserrat">${over?'kcal over':'kcal left'}</span></b></div><p class="mut" style="text-align:center;margin:8px 0 0">${goal}</p>${dg.on&&dg.adj?`<p class="mut cap" style="text-align:center;margin:8px 0 0">${dg.adj>0?'+':'\u2212'}${n0(Math.abs(dg.adj))} <span>kcal vs base</span> \u00b7 ${dg.rem} <span>${dg.rem>1?'days left':'day left'}</span>${dg.cap?' \u00b7 <span>safety limit applied</span>':''}</p>`:''}
+<div class="bt-L"><div class="card hero split bt-hero"><div><div class="ring"><svg viewBox="0 0 120 120"><defs><linearGradient id="rgf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:#C9CC9A"/><stop offset="1" style="stop-color:var(--data-1)"/></linearGradient></defs><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(243,234,217,.3)" stroke-width="10"/><circle cx="60" cy="60" r="52" fill="none" stroke="${over?'var(--warn)':'url(#rgf)'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="${326.7*(1-pr)}" transform="rotate(-90 60 60)"/></svg><b>${Math.abs(left)}<span class="mut" style="font:13px Montserrat">${over?'kcal over':'kcal left'}</span></b></div><p class="mut" style="text-align:center;margin:8px 0 0">${goal}</p>${dg.on&&dg.adj?`<p class="mut cap" style="text-align:center;margin:8px 0 0">${dg.adj>0?'+':'\u2212'}${n0(Math.abs(dg.adj))} <span>kcal vs base</span> \u00b7 ${dg.rem} <span>${dg.rem>1?'days left':'day left'}</span>${dg.cap?' \u00b7 <span>safety limit applied</span>':''}</p>`:''}
 ${dg.on&&dg.carry?`<p class="mut cap" style="text-align:center;margin:4px 0 0">${dg.carry>0?'+':'\u2212'}${n0(Math.abs(dg.carry))} <span>kcal carried from last week</span></p>`:''}
 ${dg.on&&dg.left&&Math.abs(dg.left)>=25?`<p class="mut cap" style="text-align:center;margin:4px 0 0">${n0(Math.abs(dg.left))} <span>${dg.left>0?'kcal could not fit this week':'kcal over what the week can absorb'}</span></p>`:''}</div>
 <div><div class="stats"><div><span class="mut">Budget</span><b>${bud}</b></div><div><span class="mut">Eaten</span><b>${Math.round(t.k)}</b></div><div><span class="mut">Left</span><b>${left}</b></div></div><div class="hmac">${meter('Protein',t.p,dg.p,'g','')}${meter('Carbs',t.c,dg.c,'g','c')}${meter('Fat',t.f,dg.f,'g','f')}</div></div></div><div class="bt-pair">${hb[0]}${hb[1]}${hb[2]}</div></div>
