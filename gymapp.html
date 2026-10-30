@@ -14,6 +14,14 @@ input,textarea,select{caret-color:var(--olv-t)}
 ::selection{background:color-mix(in srgb,var(--olv-t) 30%,transparent);color:var(--ink)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:hsl(64 6% 47%);--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#D2CBBC;--mut:hsl(64 6% 62%);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 18% 20%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}}
 :root[data-theme="dark"]{--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:hsl(64 6% 47%);--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#D2CBBC;--mut:hsl(64 6% 62%);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 18% 20%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}
+/* The .wine cream-flip is LIGHT-MODE ONLY. In dark mode a .wine card must render
+   like any normal dark card (the surface itself is wine-tinted in FEAT-002), so
+   reset the surface and hand every local token back to the inherited dark value. */
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card.wine{background:var(--card);color:var(--ink);--ink:inherit;--mut:inherit;--line-ui:inherit;--line:inherit;--data-1:inherit;--data-2:inherit;--ok-fg:inherit;--err-fg:inherit;--warn-fg:inherit;--pri:inherit;--pri-hov:inherit;--pri-dk:inherit;--onpri:inherit}}
+:root[data-theme="dark"] .card.wine{background:var(--card);color:var(--ink);--ink:inherit;--mut:inherit;--line-ui:inherit;--line:inherit;--data-1:inherit;--data-2:inherit;--ok-fg:inherit;--err-fg:inherit;--warn-fg:inherit;--pri:inherit;--pri-hov:inherit;--pri-dk:inherit;--onpri:inherit}
+/* likewise undo the wine-card button text/border flip in dark */
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card.wine .btn,:root:not([data-theme="light"]) .card.wine .btn.s,:root:not([data-theme="light"]) .card.wine .btn.a{color:var(--olv-t);border-color:var(--olv-t)}}
+:root[data-theme="dark"] .card.wine .btn,:root[data-theme="dark"] .card.wine .btn.s,:root[data-theme="dark"] .card.wine .btn.a{color:var(--olv-t);border-color:var(--olv-t)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Montserrat,system-ui,sans-serif;transition:background .4s,color .4s}
 html,body{overflow-x:hidden}
@@ -51,6 +59,18 @@ input:focus,select:focus,button:focus-visible{outline:0;border-color:var(--olv-t
 table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8.0px 4px;border-bottom:1px solid var(--line)}th{color:var(--mut);font-weight:500;font-size:13px}
 .wrap{overflow-x:auto}
 .hero{background:var(--pri);color:var(--onpri)}.hero .mut{color:inherit;opacity:.78}
+/* ===== wine figure-ground anchor (light mode): cream-on-wine summary card =====
+   Analogous to .hero but implemented by REDEFINING LOCAL TOKENS so every internal
+   component that reads --ink/--mut/--line(-ui)/--data-*/state -fg/--pri/--onpri
+   inherits inverted (cream-on-wine) values. Measured on #5C1A22: ink 10.81, mut
+   9.02, line-ui 4.36, data-2 5.53, ok 6.6, err 5.28, warn 5.51, primary-button
+   text 10.81 - all >= WCAG thresholds. Scoped to LIGHT mode only (the dark resets
+   below hand it back to the normal dark card, because FEAT-002 makes the whole
+   dark theme wine and a cream card there would look wrong). */
+.card.wine{background:#5C1A22;color:#F3EAD9;--ink:#F3EAD9;--mut:#E3D6C2;--line-ui:#B88A92;--line:#B88A92;--data-1:#F3EAD9;--data-2:#A8AE78;--ok-fg:#72CC8D;--err-fg:#EB8C7E;--warn-fg:#CBA362;--pri:#F3EAD9;--pri-hov:#F3EAD9;--pri-dk:#F3EAD9;--onpri:#5C1A22}
+/* olive-outline secondary/tertiary buttons would read olive-on-wine inside a wine
+   card; flip their text/border to cream so they stay legible (>=4.5:1). */
+.card.wine .btn,.card.wine .btn.s,.card.wine .btn.a{color:var(--ink);border-color:var(--ink)}
 .card:has(.dd.open){position:relative;z-index:6}
 select{display:none}
 .dd{position:relative}
@@ -596,7 +616,7 @@ return[`<div class="card bt-stp"><h3>👟 Steps</h3>
 ${low?`<div class="note" style="margin-bottom:16px">Low sleep or high stress: consider trimming volume or intensity today.</div>`:''}
 <div class="mut">Last 7 days</div>${hmini(d,x=>(S.slp||{})[x],9,slCls)}
 <div class="hav"><span class="mut">Avg</span><b>${la?r1(la):'–'}</b></div>
-<p class="mut" style="margin:8px 0 0">Sleep and stress set how much training volume you can tolerate and how well you build muscle.</p></div>`,`<div class="card bt-cre"><h3>💊 Creatine</h3>
+<p class="mut" style="margin:8px 0 0">Sleep and stress set how much training volume you can tolerate and how well you build muscle.</p></div>`,`<div class="card wine bt-cre"><h3>💊 Creatine</h3>
 <button class="btn crb ${cr?'':'p'}" data-a="crtog">${cr?'Taken today ✅':'Mark as taken'}</button>
 <div class="crd">${l7(d).map(x=>`<div class="${x==d?'cur':''}"><i class="${(S.cre||{})[x]?'on':''}"></i><span>${dl(x)}</span></div>`).join('')}</div>
 <div class="tiles" style="grid-template-columns:repeat(2,1fr);margin:16.0px 0 0"><div class="tile"><b style="font:600 26px 'Cormorant Garamond',Georgia,serif;display:block">${cs}</b><span class="mut">Day streak</span></div><div class="tile"><b style="font:600 26px 'Cormorant Garamond',Georgia,serif;display:block">${l7(d).filter(x=>(S.cre||{})[x]).length}/7</b><span class="mut">This week</span></div></div>
