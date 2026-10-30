@@ -12,8 +12,8 @@
 /* FINDING 5a/b: brand wine caret on text fields and an olive-tinted selection highlight; --ink over the 30% olive composite clears 4.5:1 on bg and card in light and dark. */
 input,textarea,select{caret-color:var(--olv-t)}
 ::selection{background:color-mix(in srgb,var(--olv-t) 30%,transparent);color:var(--ink)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:hsl(64 6% 47%);--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#D2CBBC;--mut:hsl(64 6% 62%);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 18% 20%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}}
-:root[data-theme="dark"]{--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:hsl(64 6% 47%);--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#D2CBBC;--mut:hsl(64 6% 62%);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 18% 20%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bgd:#240F12;--cardd:#2F181B;--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:hsl(353 10% 52%);--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#D2CBBC;--mut:hsl(353 12% 68%);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 18% 20%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}}
+:root[data-theme="dark"]{--bgd:#240F12;--cardd:#2F181B;--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:hsl(353 10% 52%);--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#D2CBBC;--mut:hsl(353 12% 68%);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 18% 20%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}
 /* The .wine cream-flip is LIGHT-MODE ONLY. In dark mode a .wine card must render
    like any normal dark card (the surface itself is wine-tinted in FEAT-002), so
    reset the surface and hand every local token back to the inherited dark value. */
@@ -22,6 +22,16 @@ input,textarea,select{caret-color:var(--olv-t)}
 /* likewise undo the wine-card button text/border flip in dark */
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card.wine .btn,:root:not([data-theme="light"]) .card.wine .btn.s,:root:not([data-theme="light"]) .card.wine .btn.a{color:var(--olv-t);border-color:var(--olv-t)}}
 :root[data-theme="dark"] .card.wine .btn,:root[data-theme="dark"] .card.wine .btn.s,:root[data-theme="dark"] .card.wine .btn.a{color:var(--olv-t);border-color:var(--olv-t)}
+/* ===== FEAT-002 dark primary button: cream fill + wine text =====
+   On the new wine dark surface (#2F181B card) the old wine button (--pri #A8404F)
+   is only 2.77:1 against the card, so for coherence with the light .wine cards the
+   DARK primary button becomes a solid cream fill with wine text (#5C1A22 on
+   #F3EAD9 = 10.81:1). Scoped to .btn.p ONLY (NOT global --pri) so tabs (.tab.on),
+   segment on-states (.seg .btn.on), fabs (.fab.on), the accent button (.btn.a) and
+   data fills (which read --data-1) are untouched. The :not([data-th]) guard mirrors
+   index.html so the two files stay in sync. Both dark selectors carry an identical rule. */
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]):not([data-th="olive"]):not([data-th="cream"]) .btn.p{background:#F3EAD9;color:#5C1A22;box-shadow:0 10px 22px -10px rgba(0,0,0,.6)}}
+:root[data-theme="dark"]:not([data-th="olive"]):not([data-th="cream"]) .btn.p{background:#F3EAD9;color:#5C1A22;box-shadow:0 10px 22px -10px rgba(0,0,0,.6)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Montserrat,system-ui,sans-serif;transition:background .4s,color .4s}
 html,body{overflow-x:hidden}

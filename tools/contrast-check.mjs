@@ -35,7 +35,9 @@ function ratio(a, b) {
 // Surfaces are shared across accents (they come from the base :root / dark blocks):
 const SURF = {
   light: { card: '#FBF7EE', bg: '#ECE5D6' },
-  dark:  { card: '#1E1E1A', bg: '#161613' },
+  // FEAT-002: the dark theme is now a deep WINE field, not warm charcoal.
+  // card = --cardd hsl(353 32% 14%) = #2F181B ; bg = --bgd hsl(353 40% 10%) = #240F12.
+  dark:  { card: '#2F181B', bg: '#240F12' },
 };
 
 // burgundy is the DEFAULT identity (no CSS override): these are today's values.
@@ -103,8 +105,70 @@ for (const scheme of ['light', 'dark']) {
 console.log('\nMacro data tokens vs --card (WCAG 2.2 1.4.11)\n');
 console.table(macroRows);
 
+// --- FEAT-002: LIGHT .wine card locals (cream-on-wine) vs the wine surface ---
+// The .card.wine selector in index.html / gymapp.html redefines local tokens on a
+// #5C1A22 surface. KEEP THESE HEXES IN SYNC WITH THE .card.wine CSS block.
+const WINE_LIGHT = '#5C1A22';
+const wineLightRows = [];
+function wineRow(label, fg, bg, min) {
+  const r = ratio(fg, bg);
+  const ok = r >= min;
+  if (!ok) failed = true;
+  wineLightRows.push({ element: label, fg, bg, [`vs(>=${min})`]: R(r), result: ok ? 'PASS' : 'FAIL' });
+}
+wineRow('ink',        '#F3EAD9', WINE_LIGHT, AA_TEXT);
+wineRow('mut',        '#E3D6C2', WINE_LIGHT, AA_TEXT);
+wineRow('border',     '#B88A92', WINE_LIGHT, AA_NON);
+wineRow('data-1',     '#F3EAD9', WINE_LIGHT, AA_NON);
+wineRow('data-2',     '#A8AE78', WINE_LIGHT, AA_NON);
+wineRow('ok-fg',      '#72CC8D', WINE_LIGHT, AA_TEXT);
+wineRow('err-fg',     '#EB8C7E', WINE_LIGHT, AA_TEXT);
+wineRow('warn-fg',    '#CBA362', WINE_LIGHT, AA_TEXT);
+// inverted primary button: wine text on cream fill
+wineRow('btn.p text', '#5C1A22', '#F3EAD9', AA_TEXT);
+console.log('\nLight .wine card locals vs #5C1A22 surface (WCAG 2.2)\n');
+console.table(wineLightRows);
+
+// --- FEAT-002: DARK wine surface tokens vs the #2F181B card ---
+// KEEP THESE HEXES IN SYNC WITH THE TWO DARK BLOCKS in index.html / gymapp.html.
+const DARK_CARD = SURF.dark.card;   // #2F181B
+const darkWineRows = [];
+function darkRow(label, fg, min) {
+  const r = ratio(fg, DARK_CARD);
+  const ok = r >= min;
+  if (!ok) failed = true;
+  darkWineRows.push({ element: label, fg, card: DARK_CARD, [`vs(>=${min})`]: R(r), result: ok ? 'PASS' : 'FAIL' });
+}
+darkRow('ink',        '#D2CBBC', AA_TEXT);  // actual shipped dark --ink
+darkRow('mut',        '#B7A4A6', AA_TEXT);  // hsl(353 12% 68%)
+darkRow('line-ui',    '#91787B', AA_NON);   // hsl(353 10% 52%)
+darkRow('data-1',     '#BF4A5B', AA_NON);   // 3.43:1 at 14% L; FAILS if card lightened past ~17%
+// dark .btn.p is a CREAM fill with WINE text, so measure wine text vs the cream
+// fill (#F3EAD9), NOT vs the card. Pushed through wineRow-style inline check.
+{
+  const r = ratio('#5C1A22', '#F3EAD9');
+  const ok = r >= AA_TEXT;
+  if (!ok) failed = true;
+  darkWineRows.push({ element: 'btn.p text', fg: '#5C1A22', card: '#F3EAD9', 'vs(>=4.5)': R(r), result: ok ? 'PASS' : 'FAIL' });
+}
+// enforce the 17% dark-card luminosity ceiling: a lighter card pushes --data-1
+// (#BF4A5B) below the 3:1 non-text gate (at ~20% L it is ~2.88:1).
+const cardL = lum(DARK_CARD);
+const CEIL = 0.17;
+const ceilOk = cardL <= CEIL;
+if (!ceilOk) failed = true;
+darkWineRows.push({
+  element: 'card L<=17%',
+  fg: DARK_CARD,
+  card: DARK_CARD,
+  'vs(>=3)': R(cardL * 100),
+  result: ceilOk ? 'PASS' : 'FAIL',
+});
+console.log('\nDark wine surface tokens vs #2F181B card (WCAG 2.2; card luminosity ceiling 17%)\n');
+console.table(darkWineRows);
+
 if (failed) {
-  console.error('\nFAIL: one or more accent themes did not meet the thresholds.');
+  console.error('\nFAIL: one or more contrast checks did not meet the thresholds.');
   process.exit(1);
 }
-console.log('\nAll accent themes PASS in light and dark.');
+console.log('\nAll accent themes + light/dark wine surfaces PASS.');
