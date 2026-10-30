@@ -132,7 +132,8 @@ nav{left:50%;right:auto;transform:translateX(-50%);width:min(620px,calc(100% - 1
 .tab .ti{font-size:20px;line-height:1}
 .tab .tl{font-size:11px;line-height:1.1;letter-spacing:.01em}
 .tab:hover{box-shadow:none;transform:none;background:color-mix(in srgb,var(--olv-t) 8%,transparent)}
-.tab.on,.tab.on:hover{background:color-mix(in srgb,var(--pri) 12%,transparent);box-shadow:none;color:var(--olv-tx);font-weight:700}
+.tab.on{background:color-mix(in srgb,var(--pri) 12%,transparent);box-shadow:none;color:var(--olv-tx);font-weight:700}
+.tab.on:hover,.tab.on:focus-visible{background:color-mix(in srgb,var(--pri) 18%,transparent);box-shadow:none;color:var(--olv-tx);font-weight:700}
 .tab.on::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:28px;height:3px;border-radius:0 0 3px 3px;background:var(--pri)}
 .tab.on .ti{transform:scale(1.08)}
 .btn{border:1px solid color-mix(in srgb,var(--line) 70%,transparent);padding:8px 24px;font-weight:600}
@@ -471,7 +472,8 @@ p,.note{max-width:60ch}
 p[style*="text-align:center"],[style*="text-align:center"]>p{margin-left:auto!important;margin-right:auto!important}
 
 /* ===== selected / active states are solid wine (matches index.html's v13 treatment) ===== */
-.btn.p,.btn.p:hover,.seg .btn.on,.fo.on,.ddo.on,.lgb.on,.hd .btn.s.lgb.on,.dpn:hover{background:var(--pri)}
+.btn.p,.seg .btn.on,.fo.on,.ddo.on,.lgb.on,.hd .btn.s.lgb.on,.dpn:hover{background:var(--pri)}
+.btn.p:hover,.btn.p:focus-visible,.seg .btn.on:hover,.seg .btn.on:focus-visible,.fab.on:hover,.fab.on:focus-visible{background:color-mix(in srgb,var(--pri) 86%,#000)}
 .chip.on{background:var(--pri)!important}
 </style></head><body>
 <header><h1>Forma</h1><div class="hd"><button class="btn s lgb" data-lg="en" aria-label="English">EN</button><button class="btn s lgb" data-lg="es" aria-label="Español">ES</button><button class="btn s" id="th" aria-label="Toggle light or dark">🌗</button></div></header>
