@@ -6,8 +6,14 @@
 <style>
 :root{--pri-h:353;--pri-s:56%;--pri-l:#5C1A22;--pri-d:#A8404F;--pri-hov:hsl(var(--pri-h) var(--pri-s) 20%);--pri-dk:hsl(var(--pri-h) var(--pri-s) 15%);--acc-l:#4B4D2C;--acc-d:#7E815F;--n0:hsl(64 8% 5%);--n1:hsl(64 8% 8%);--n2:hsl(64 7% 11%);--n3:hsl(64 6% 15%);--n4:hsl(64 6% 20%);--n5:hsl(63 5% 30%);--n6:#6E6F77;--n7:#9A9BA3;--n8:#EDEEF2;--bgd:var(--n1);--cardd:var(--n2);--lined:var(--n3);--elev:var(--card);--elevd:var(--n3);--onpd:#F3EAD9;--bg:#ECE5D6;--card:#FBF7EE;--ink:#2B2C1A;--mut:#5A5C36;--pri:var(--pri-l);--onpri:#F8F2E7;--acc:var(--acc-l);--olv-t:#4B4D2C;--olv-tx:#4B4D2C;--olv-s:#4B4D2C;--gold:#7C8048;--line:#D6CDB6;--line-ui:#8F8567;--data-1:#5C1A22;--data-2:#5E6B86;--data-3:#30321B;--sh:0 4px 14px rgba(42,42,28,.08);--shh:0 14px 32px rgba(42,42,28,.16);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 :root:not([data-theme="light"]){color-scheme:light dark}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:#6E6F77;--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#EDE6D6;--mut:var(--n7);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 6% 17%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}}
-:root[data-theme="dark"]{--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:#6E6F77;--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#EDE6D6;--mut:var(--n7);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 6% 17%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}
+/* FINDING 5c: forced themes pin color-scheme so native selects/scrollbars/caret match the chosen theme (the auto case above keeps light dark). */
+:root[data-theme="light"]{color-scheme:light}
+:root[data-theme="dark"]{color-scheme:dark}
+/* FINDING 5a/b: brand wine caret on text fields and an olive-tinted selection highlight; --ink over the 30% olive composite clears 4.5:1 on bg and card in light and dark. */
+input,textarea,select{caret-color:var(--pri)}
+::selection{background:color-mix(in srgb,var(--olv-t) 30%,transparent);color:var(--ink)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:#6E6F77;--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#D2CBBC;--mut:var(--n7);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 6% 17%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}}
+:root[data-theme="dark"]{--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:#6E6F77;--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#D2CBBC;--mut:var(--n7);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 6% 17%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Montserrat,system-ui,sans-serif;transition:background .4s,color .4s}
 html,body{overflow-x:hidden}
@@ -124,7 +130,7 @@ h3{font-size:23px}
 header{padding:8px 16px}
 header h1{display:flex;align-items:center;gap:8px;font-size:19px;font-style:normal}
 header h1::before{content:"";width:18px;height:18px;border-radius:50% 50% 50% 4px;transform:rotate(-18deg);background:linear-gradient(135deg,var(--pri),var(--gold));box-shadow:0 4px 10px -4px var(--pri)}
-.hd{gap:4px;padding:4px 4px 4px 8px;border-radius:999px;background:color-mix(in srgb,var(--card) 70%,transparent);border:1px solid var(--line);backdrop-filter:blur(10px)}
+.hd{gap:4px;padding:4px 4px 4px 8px;border-radius:999px;background:color-mix(in srgb,var(--card) 70%,transparent);border:1px solid var(--line);backdrop-filter:blur(10px);flex:none}header h1{min-width:0;overflow:hidden}
 .sw{width:24px;height:24px}.hd .btn.s{background:transparent;padding:4px 8px;font-size:14px;line-height:1}
 .hd .btn.s#th{font-size:16px;padding:4px 6px}
 nav{left:50%;right:auto;transform:translateX(-50%);width:min(620px,calc(100% - 16px));max-width:none;margin:0;gap:4px;border-radius:24px 24px 0 0;background:color-mix(in srgb,var(--card) 92%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);border:1px solid var(--line);border-bottom:0;box-shadow:0 -10px 30px -14px color-mix(in srgb,#000 30%,transparent)}
@@ -503,6 +509,26 @@ input,select,.ddb,.ftog{border-color:var(--line-ui)}
 .hb i.ok::after,.hb i.mid::after{content:"";position:absolute;left:0;right:0;top:0;height:3px;border-radius:3px 3px 0 0}
 .hb i.ok::after{background:var(--ink);opacity:.85}
 .hb i.mid::after{background:repeating-linear-gradient(90deg,var(--ink) 0 3px,transparent 3px 6px);opacity:.7}
+/* ===== FINDING 7a: high-contrast mode (prefers-contrast:more) =====
+   Additive only: raise the structural line tokens to values that clear >=4.5:1 on
+   the surface (light #5E5D45 on bg/card; dark #B8B896 on n1/n2) and firm up the
+   hairline borders. The default (no-preference) appearance is untouched. */
+@media (prefers-contrast:more){
+:root{--line-ui:#5E5D45;--line:#5E5D45}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--line-ui:#B8B896;--line:#B8B896}}
+:root[data-theme="dark"]{--line-ui:#B8B896;--line:#B8B896}
+input,.ddb,.ftog,.card{border-color:var(--line-ui)}
+.li,td,th{border-color:var(--line-ui)}
+}
+/* ===== FINDING 7b: forced-colors (Windows High Contrast) =====
+   Disabled controls swap opacity:.3 for a GrayText system-colour indicator at full
+   opacity; focus gets a visible Highlight outline and selected/active states are
+   pinned to Highlight so they stay distinguishable against the OS palette. */
+@media (forced-colors:active){
+.dpc:disabled,button:disabled,input:disabled,select:disabled,textarea:disabled{opacity:1;color:GrayText;border-color:GrayText}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.wnt:focus{outline:2px solid Highlight;outline-offset:2px}
+.tab.on,.btn.p,.sw.on,.dpc.sel,.ddo.on,.fo.on{outline:2px solid Highlight;outline-offset:-2px}
+}
 </style></head><body>
 <header><h1>Forma</h1><div class="hd"><button class="btn s lgb" data-lg="en" aria-label="English">EN</button><button class="btn s lgb" data-lg="es" aria-label="Español">ES</button><button class="btn s" id="th" aria-label="Toggle light or dark">🌗</button></div></header>
 <nav id="nav"></nav><main id="main"></main><div id="toast"></div><div class="mdl" id="mdl" hidden><div class="card"><div style="font-size:44px">📏</div><h3>Monthly measurements</h3><p class="mut" id="mdt2"></p><div class="row" style="flex-wrap:nowrap"><button class="btn p" data-a="mgo">Measure now</button><button class="btn t" data-a="mlater">Tomorrow</button></div></div></div>

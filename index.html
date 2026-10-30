@@ -29,8 +29,30 @@ r.classList.toggle('dark-theme',d)}catch(e){}})();
 <style>
 :root{--pri-h:353;--pri-s:56%;--pri-l:#5C1A22;--pri-d:#A8404F;--pri-hov:hsl(var(--pri-h) var(--pri-s) 20%);--pri-dk:hsl(var(--pri-h) var(--pri-s) 15%);--acc-l:#4B4D2C;--acc-d:#7E815F;--n0:hsl(64 8% 5%);--n1:hsl(64 8% 8%);--n2:hsl(64 7% 11%);--n3:hsl(64 6% 15%);--n4:hsl(64 6% 20%);--n5:hsl(63 5% 30%);--n6:#6E6F77;--n7:#9A9BA3;--n8:#EDEEF2;--bgd:var(--n1);--cardd:var(--n2);--lined:var(--n3);--elev:var(--card);--elevd:var(--n3);--onpd:#F3EAD9;--bg:#ECE5D6;--card:#FBF7EE;--ink:#2B2C1A;--mut:hsl(63 26% 26%);--pri:var(--pri-l);--onpri:#F8F2E7;--acc:var(--acc-l);--olv-t:#4B4D2C;--olv-tx:#4B4D2C;--olv-s:#4B4D2C;--gold:#7C8048;--line:#D6CDB6;--line-ui:#8F8567;--data-1:#5C1A22;--data-2:#5E6B86;--data-3:#30321B;--sh:0 4px 14px rgba(42,42,28,.08);--shh:0 14px 32px rgba(42,42,28,.16);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 :root:not([data-theme="light"]){color-scheme:light dark}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:#6E6F77;--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#EDE6D6;--mut:var(--n7);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 6% 17%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}}
-:root[data-theme="dark"]{--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:#6E6F77;--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#EDE6D6;--mut:var(--n7);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 6% 17%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}
+/* FINDING 5c: forced themes pin color-scheme so native selects/scrollbars/caret match the chosen theme (the auto case above keeps light dark). */
+:root[data-theme="light"]{color-scheme:light}
+:root[data-theme="dark"]{color-scheme:dark}
+/* FINDING 5a/b: brand wine caret on text fields and an olive-tinted selection highlight; --ink over the 30% olive composite clears 4.5:1 on bg and card in light and dark. */
+input,textarea,select{caret-color:var(--pri)}
+::selection{background:color-mix(in srgb,var(--olv-t) 30%,transparent);color:var(--ink)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:#6E6F77;--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#D2CBBC;--mut:var(--n7);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 6% 17%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}}
+:root[data-theme="dark"]{--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:#6E6F77;--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#D2CBBC;--mut:var(--n7);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 6% 17%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}
+/* ===== FEAT-002 accent themes (data-th) =====
+   burgundy is the DEFAULT identity (no override: it keeps the :root + dark values
+   above, so the current look is byte-unchanged). olive and cream override only
+   --pri / --onpri / --data-1 (+ decorative --pri-hov/--pri-dk) for light AND BOTH
+   dark contexts. The two dark blocks must stay in sync with each other, so each
+   accent repeats its dark override under BOTH dark selectors. The dark accent rules
+   carry extra specificity (data-th combined with the dark selector) so they beat the
+   generic dark overrides above regardless of source order. Every --onpri/--pri and
+   --data-1/surface pair is validated by tools/contrast-check.mjs. */
+:root[data-th="olive"]{--pri:#3C3F1E;--pri-hov:#2E3016;--pri-dk:#24260F;--onpri:#F3EAD9;--data-1:#5A5E30}
+:root[data-th="cream"]{--pri:#7A5A1E;--pri-hov:#634915;--pri-dk:#4E3A10;--onpri:#FBF4E3;--data-1:#8A6A28}
+@media(prefers-color-scheme:dark){
+:root:not([data-theme="light"])[data-th="olive"]{--pri:#8A8F5C;--pri-hov:#6F744A;--pri-dk:#5A5E3C;--onpri:#17170F;--data-1:#A7AD74}
+:root:not([data-theme="light"])[data-th="cream"]{--pri:#C9A05A;--pri-hov:#A98448;--pri-dk:#876938;--onpri:#17150F;--data-1:#D8B26A}}
+:root[data-theme="dark"][data-th="olive"]{--pri:#8A8F5C;--pri-hov:#6F744A;--pri-dk:#5A5E3C;--onpri:#17170F;--data-1:#A7AD74}
+:root[data-theme="dark"][data-th="cream"]{--pri:#C9A05A;--pri-hov:#A98448;--pri-dk:#876938;--onpri:#17150F;--data-1:#D8B26A}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Montserrat,system-ui,sans-serif;transition:background .4s,color .4s}
 h1,h2,h3{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;margin:0;letter-spacing:.02em}
@@ -155,7 +177,7 @@ h3{font-size:23px}
 header{padding:8px 16px}
 header h1{display:flex;align-items:center;gap:8px;font-size:19px;font-style:normal}
 header h1::before{content:"";width:18px;height:18px;border-radius:50% 50% 50% 4px;transform:rotate(-18deg);background:linear-gradient(135deg,var(--pri),var(--gold));box-shadow:0 4px 10px -4px var(--pri)}
-.hd{gap:4px;padding:4px 4px 4px 8px;border-radius:999px;background:color-mix(in srgb,var(--card) 70%,transparent);border:1px solid var(--line);backdrop-filter:blur(10px)}
+.hd{gap:4px;padding:4px 4px 4px 8px;border-radius:999px;background:color-mix(in srgb,var(--card) 70%,transparent);border:1px solid var(--line);backdrop-filter:blur(10px);flex:none}header h1{min-width:0;overflow:hidden;text-overflow:ellipsis}
 .sw{width:24px;height:24px}.hd .btn.s{background:transparent;padding:4px 8px;font-size:14px;line-height:1}
 .hd .btn.s.thb{font-size:16px;padding:4px 6px}
 nav{left:50%;right:auto;transform:translateX(-50%);width:min(560px,calc(100% - 16px));max-width:none;margin:0;gap:4px;border-radius:24px 24px 0 0;background:color-mix(in srgb,var(--card) 92%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);border:1px solid var(--line);border-bottom:0;box-shadow:0 -10px 30px -14px color-mix(in srgb,#000 30%,transparent)}
@@ -250,6 +272,20 @@ body{font-variant-numeric:lining-nums}
 .hb .cur span{color:var(--olv-t);font-weight:700}
 .hq{display:flex;gap:8.0px;margin:8px 0 0}.hq .btn{flex:1;min-width:0;box-shadow:none;background:var(--bg);padding:8.0px 8px;font-size:13px}
 .bar.tg{position:relative}.bar.tg .tk{position:absolute;top:0;bottom:0;width:2px;background:var(--gold);opacity:.9}
+/* FINDING 1: a macro consumed>goal bar reads EXCEEDED with BOTH colour and a
+   non-chromatic mark. The fill switches to the warn text-tier tone (>=3:1 on the
+   track in light and dark; the pure --warn surface fails on the light track), and
+   an ::after end-cap stripe (same idea as the .hb i.ok::after cap) survives
+   greyscale/forced-colors. Normal (<=100%) bars are untouched. */
+.bar.over i{position:relative;background:var(--warn-fg)}
+.bar.over i::after{content:"";position:absolute;top:0;right:0;width:4px;height:100%;background:var(--ink);opacity:.85;border-radius:0 9px 9px 0}
+/* FINDING 2: weekly weight-change chip. On a plain --card surface (with a hairline
+   border so it stays a chip) so each state -fg tone reaches >=4.5:1. Neutral keeps
+   the olive identity; .ok/.warn carry the goal-aware state, always paired with the
+   arrow glyph rendered in the markup. */
+.chip.wch{background:var(--card);border:1px solid var(--line);color:var(--olv-t);font-weight:600}
+.chip.wch.ok{color:var(--ok-fg)}
+.chip.wch.warn{color:var(--warn-fg)}
 .hv{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px}
 .hv .big{flex:none}
 .hst{display:inline-block;border-radius:999px;padding:4px 16px;font-size:13px;font-weight:600;background:color-mix(in srgb,var(--olv-t) 16%,var(--card));color:var(--olv-t)}
@@ -752,6 +788,27 @@ input,select,.ddb,.ftog{border-color:var(--line-ui)}
 .hb i.ok::after{background:var(--ink);opacity:.85}
 .hb i.mid::after{background:repeating-linear-gradient(90deg,var(--ink) 0 3px,transparent 3px 6px);opacity:.7}
 
+/* ===== FINDING 7a: high-contrast mode (prefers-contrast:more) =====
+   Additive only: when the user asks for more contrast, push the structural line
+   tokens to values that clear >=4.5:1 on the surface (light #5E5D45 on bg/card;
+   dark #B8B896 on n1/n2) and firm up the hairline borders that normally sit at a
+   soft --line. The default (no-preference) appearance is untouched. */
+@media (prefers-contrast:more){
+:root{--line-ui:#5E5D45;--line:#5E5D45}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--line-ui:#B8B896;--line:#B8B896}}
+:root[data-theme="dark"]{--line-ui:#B8B896;--line:#B8B896}
+input,.ddb,.ftog,.card{border-color:var(--line-ui)}
+.li,td,th{border-color:var(--line-ui)}
+}
+/* ===== FINDING 7b: forced-colors (Windows High Contrast) =====
+   opacity:.3 nearly vanishes against the OS palette, so disabled controls switch to
+   a GrayText system-colour indicator at full opacity. Selected/active states and the
+   solid focus ring are pinned to Highlight/CanvasText so they stay distinguishable. */
+@media (forced-colors:active){
+.gmvb[disabled],.dpc:disabled,button:disabled,input:disabled,select:disabled,textarea:disabled{opacity:1;color:GrayText;border-color:GrayText}
+:focus-visible,button:focus-visible,.wnt:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline-color:Highlight}
+.tab.on,.btn.p,.sw.on,.dpc.sel,.ddo.on,.fo.on{outline:2px solid Highlight;outline-offset:-2px}
+}
 /* ===== v12: reduced motion (must stay last) =====
    Kills entry travel and every hover/press displacement, keeps colour feedback.
    Deliberately NOT a blanket `*{transform:none}` - transform is load-bearing for the
@@ -763,7 +820,7 @@ transition-duration:1ms!important;transition-delay:0ms!important;scroll-behavior
 :is(.card,.tile,.btn,.tab,.fab,.sw,.ddb,.ftog,.chip,button.chip,.opt,.wkn,.fo,.ddo,.dpc,.hc,.crb,.dpn):is(:hover,:active,:focus-visible){transform:none!important}
 }
 </style></head><body>
-<header><h1>Forma</h1><div class="hd"><button class="btn s lgb" data-lg="en" aria-label="English">EN</button><button class="btn s lgb" data-lg="es" aria-label="Español">ES</button><button class="btn s thb" data-a="theme" aria-label="Toggle light or dark">🌗</button></div></header>
+<header><h1>Forma</h1><div class="hd"><button class="sw" data-th="burgundy" aria-label="Burgundy theme" style="background:#5C1A22"></button><button class="sw" data-th="olive" aria-label="Olive theme" style="background:#3C3F1E"></button><button class="sw" data-th="cream" aria-label="Cream theme" style="background:#7A5A1E"></button><button class="btn s lgb" data-lg="en" aria-label="English">EN</button><button class="btn s lgb" data-lg="es" aria-label="Español">ES</button><button class="btn s thb" data-a="theme" aria-label="Toggle light or dark">🌗</button></div></header>
 <nav id="nav"></nav><main id="main"></main><div id="toast"></div><div class="mdl" id="mdl" hidden><div class="card"><div style="font-size:44px">📏</div><h3>Monthly measurements</h3><p class="mut" id="mdt2"></p><div class="row" style="flex-wrap:nowrap"><button class="btn p" data-a="mgo">Measure now</button><button class="btn t" data-a="mlater">Tomorrow</button></div></div></div>
 <div class="mdl" id="cfm" hidden><div class="card"><div style="font-size:40px">⚠️</div><h3 id="cfmt"></h3><p class="mut" id="cfmb"></p><label class="row" id="cfmxw" style="flex-wrap:nowrap;align-items:center;gap:8px;justify-content:center;font-size:13px;color:var(--mut);margin-bottom:8px"><input type="checkbox" id="cfmx" style="width:auto;flex:none"> <span id="cfmxl">Don’t ask again</span></label><div class="row" style="flex-wrap:nowrap"><button class="btn p" data-a="cfmyes" id="cfmyes">Yes, I’m sure</button><button class="btn t" data-a="cfmno">No</button></div></div></div>
 <div class="mdl" id="cpy" hidden><div class="card"><div style="font-size:40px">📋</div><h3 id="cpyt">Copy session</h3><p class="mut" id="cpyb"></p><div class="f" style="text-align:left"><span>Copy to</span><div class="chips" id="cpysel" style="margin:4px 0 0"></div></div><p class="cap" style="margin:0 0 8px">This overwrites the chosen session completely — same exercises, order, equipment and tags. It affects your routine; experts only.</p><div class="row" style="flex-wrap:nowrap"><button class="btn p" data-a="cpyyes">Copy</button><button class="btn t" data-a="cpyno">Cancel</button></div></div></div>
@@ -802,7 +859,7 @@ const C=Math.max(0,Math.round((target-P*4-F*9)/4));return{kg,cm,base,ob,formula,
    the frozen target it was closed at, so every total reads exactly on goal. */
 function tot(d){const t={k:0,p:0,c:0,f:0},sk=(S.skip||{})[d];if(sk&&!(S.log[d]||[]).length)return{k:sk.k,p:sk.p,c:sk.c,f:sk.f};(S.log[d]||[]).forEach(e=>{const f=S.foods.find(x=>x.id==e.i);if(!f)return;const m=f.b=='g'?e.q/100:e.q;for(const n of['k','p','c','f'])t[n]+=f[n]*m});return t}
 const inp=(l,k,t,v,x='')=>`<label class="f">${l}<input data-k="${k}" type="${t}" value="${v}" ${x}></label>`;
-const meter=(l,v,g,u,c)=>`<div class="mtr"><div class="row" style="justify-content:space-between"><span>${l}</span><span class="mut" style="flex:none">${Math.round(v)} / ${g} ${u}</span></div><div class="bar ${c}"><i style="width:${Math.min(100,g?v/g*100:0)}%"></i></div></div>`;
+const meter=(l,v,g,u,c)=>{const ov=g>0&&v>g;return`<div class="mtr"><div class="row" style="justify-content:space-between"><span>${l}</span><span class="mut" style="flex:none">${Math.round(v)} / ${g} ${u}${ov?' \u25B2':''}</span></div><div class="bar ${c}${ov?' over':''}"><i style="width:${Math.min(100,g?v/g*100:0)}%"></i></div></div>`};
 
 const spark=ks=>{ks=ks.slice(-30);if(ks.length<2)return'';const v=ks.map(k=>S.wt[k]),a=Math.min(...v),R=Math.max(...v)-a||1,Y=y=>70-(y-a)/R*60,xy=v.map((y,i)=>[i/(v.length-1)*280+10,Y(y)]),pt=xy.map(q=>q.join(',')).join(' '),av=v.reduce((t,x)=>t+x,0)/v.length,l=xy[xy.length-1];return`<svg viewBox="0 0 300 80" style="width:100%;margin-bottom:8.0px" role="img"><defs><linearGradient id="sgf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--pri);stop-opacity:.24"/><stop offset="1" style="stop-color:var(--card);stop-opacity:.04"/></linearGradient></defs><polygon points="10,76 ${pt} 290,76" fill="url(#sgf)"/><line x1="10" x2="290" y1="${Y(av)}" y2="${Y(av)}" stroke="var(--olv-t)" stroke-width="1.5" stroke-dasharray="4 4" opacity=".75"/><polyline points="${pt}" fill="none" stroke="var(--pri)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${l[0]}" cy="${l[1]}" r="5" fill="var(--olv-t)" stroke="var(--card)" stroke-width="2"/></svg>`};
 
@@ -948,9 +1005,15 @@ tracking(){const sub=[['weight','⚖️ Weight'],['body','📏 Measurements']];
 return`<h2>Tracking</h2><div class="seg" style="max-width:420px">${sub.map(([v,l])=>`<button class="btn ${trk==v?'on':''}" data-a="trk" data-v="${v}">${l}</button>`).join('')}</div>${trk=='body'?this.bodyView():this.weightView()}`},
 weightView(){const ks=Object.keys(S.wt).sort(),wk={};ks.forEach(d=>{const x=new Date(d+'T00:00');x.setDate(x.getDate()-(x.getDay()+6)%7);(wk[fmt(x)]??=[]).push(S.wt[d])});
 const ws=Object.keys(wk).sort().reverse(),av=k=>wk[k].reduce((a,b)=>a+b,0)/wk[k].length;
+/* FINDING 2: colour the weekly-average delta by the user's goal, not by a fixed
+   olive. dl<0 means weight went DOWN. For 'cut' a drop is good, for 'bulk' a gain
+   is good, 'maint'/none stays neutral, and dl==0 is always neutral. State is never
+   colour-only: the sign (+/-) stays and an aria-hidden arrow (down/up) is added.
+   Text sits on a plain --card chip so every -fg tone clears 4.5:1. */
+const wchip=dl=>{if(dl==null)return'';const g=S.p.goal,dn=dl<0,up=dl>0,ar=up?'\u25B2':dn?'\u25BC':'',good=(g=='cut'&&dn)||(g=='bulk'&&up),bad=(g=='cut'&&up)||(g=='bulk'&&dn),st=dl==0?'':good?' ok':bad?' warn':'';return`<span class="chip wch${st}">${up?'+':''}${r1(dl)}${ar?` <span aria-hidden="true">${ar}</span>`:''}</span>`};
 return`<div class="g"><div class="card"><h3>⚖️ Log weight</h3><div class="f">Date${dpk('wdt',wdt)}</div><label class="f">Weight (${S.p.wu})<input id="wv" type="number" step="0.1" value="${S.wt[wdt]||''}"></label><button class="btn p" data-a="wt">Save weight</button><p class="mut" style="margin:8px 0 0">Your most recent weight also updates your plan (BMR, calories and macros). Saving on an existing date replaces it.</p>
 <div class="wrap" style="margin-top:16px">${ks.slice(-10).reverse().map(d=>`<div class="li"><span>${d}</span><span style="display:flex;gap:8px;align-items:center"><b>${S.wt[d]}</b><button class="btn s" data-a="wed" data-d="${d}">Edit</button><button class="btn s t" data-a="wdel" data-d="${d}">Delete</button></span></div>`).join('')||'<p class="mut">No entries yet.</p>'}</div></div>
-<div class="card"><h3>📈 Weekly average</h3>${spark(ks)}${ws.slice(0,8).map((k,i)=>{const a=av(k),n=ws[i+1],dl=n?a-av(n):null;return`<div class="li"><span>Week of ${k}</span><span><b>${r1(a)}</b> ${dl==null?'':`<span class="chip" style="color:var(--olv-t)">${dl>0?'+':''}${r1(dl)}</span>`}</span></div>`}).join('')||'<p class="mut">Log a few days to see your average.</p>'}</div></div>`},
+<div class="card"><h3>📈 Weekly average</h3>${spark(ks)}${ws.slice(0,8).map((k,i)=>{const a=av(k),n=ws[i+1],dl=n?a-av(n):null;return`<div class="li"><span>Week of ${k}</span><span><b>${r1(a)}</b> ${wchip(dl)}</span></div>`}).join('')||'<p class="mut">Log a few days to see your average.</p>'}</div></div>`},
 
 bodyView(){const F=[['neck','Neck',"Just below the Adam's apple, tape level all the way around, shoulders relaxed."],['chest','Chest',"Around the fullest part of the chest, under the armpits, after a normal breath out."],['ra','Right arm',"Thickest part of the upper arm, arm relaxed at your side."],['la','Left arm',"Thickest part of the upper arm, arm relaxed at your side."],['waist','Waist',"Narrowest part of the torso, usually just above the belly button, after breathing out."],['hips','Hips',"Widest part of the glutes, feet together, tape level."],['rt','Right thigh',"Thickest part of the thigh, just below the glutes, standing with weight even."],['lt','Left thigh',"Thickest part of the thigh, just below the glutes, standing with weight even."],['calf','Calves',"Thickest part of the calf, standing with weight even."]],ks=Object.keys(S.ms).sort(),l=ks[ks.length-1],pv=ks[ks.length-2],due=mdue(),ent=S.ms[mdt]||{};
 return`${due?`<div class="note">${l?'It has been a month since your last measurements. Time to log new ones.':'Add your first set of measurements to start tracking.'}</div>`:''}<div class="g"><div class="card"><h3>📏 ${S.ms[mdt]?'Edit entry':'New entry'} (cm)</h3><div class="f">Date${dpk('mdt',mdt)}</div><p class="mut" style="margin:0 0 16px">Measure in the morning, relaxed, with the tape snug but not squeezing, and use the same spots each month. Tap ⓘ for where to measure.</p><div class="row">${F.map(([k,n,t])=>`<div style="min-width:130px"><label class="f" style="margin-bottom:4px"><span style="display:flex;justify-content:space-between;align-items:center">${n}<button type="button" class="btn s" data-a="mtip" data-k="${k}" style="padding:0 8px;flex:none" aria-label="How to measure ${n}">ⓘ</button></span><input data-m="${k}" type="number" step="0.1" value="${ent[k]??''}"></label><p class="mut" id="tip-${k}" hidden style="margin:0 0 8px;font-size:12px">${t}</p></div>`).join('')}</div><button class="btn p" data-a="ms">Save measurements</button></div>
