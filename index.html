@@ -2,8 +2,8 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Forma — Gym Companion</title>
-<meta name="theme-color" content="#5C1A22" media="(prefers-color-scheme:light)">
-<meta name="theme-color" content="#171813" media="(prefers-color-scheme:dark)">
+<meta name="theme-color" content="#0593C6" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#0A1821" media="(prefers-color-scheme:dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -27,10 +27,10 @@ r.classList.toggle('dark-theme',d)}catch(e){}})();
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--pri-l:#5C1A22;--pri-d:#A8404F;--acc-l:#4B4D2C;--acc-d:#8E9358;--bgd:#171813;--cardd:#20211A;--lined:#34362A;--onpd:#F3EAD9;--bg:#ECE5D6;--card:#F8F2E7;--ink:#2B2C1A;--mut:hsl(63 26% 26%);--pri:var(--pri-l);--onpri:#F8F2E7;--acc:var(--acc-l);--olv-t:#4B4D2C;--olv-s:#4B4D2C;--gold:#7C8048;--line:#D6CDB6;--sh:0 4px 14px rgba(42,42,28,.08);--shh:0 14px 32px rgba(42,42,28,.16);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--pri-l:#0593C6;--pri-d:#3FB4E6;--acc-l:#D83995;--acc-d:#F15FB0;--bgd:#0A1821;--cardd:#0F2430;--lined:#1E3A48;--onpd:#FCFFFF;--bg:#FCFFFF;--card:#FFFFFF;--ink:#0C2A38;--mut:#4A6472;--pri:var(--pri-l);--onpri:#FCFFFF;--acc:var(--acc-l);--olv-t:#0593C6;--olv-tx:#036C92;--olv-s:#0593C6;--gold:#D83995;--line:#CFE6F0;--sh:0 4px 14px rgba(12,42,56,.08);--shh:0 14px 32px rgba(12,42,56,.16);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 :root:not([data-theme="light"]){color-scheme:light dark}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--ink:#EDE6D6;--mut:#B5B28F;--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8E9358;--olv-t:#A9AE78;--olv-s:#2E301E;--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}}
-:root[data-theme="dark"]{--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--ink:#EDE6D6;--mut:#B5B28F;--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8E9358;--olv-t:#A9AE78;--olv-s:#2E301E;--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--ink:#EAF4F8;--mut:#8FA9B6;--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#F15FB0;--olv-t:#5FC6F0;--olv-tx:#5FC6F0;--olv-s:#14415C;--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}}
+:root[data-theme="dark"]{--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--ink:#EAF4F8;--mut:#8FA9B6;--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#F15FB0;--olv-t:#5FC6F0;--olv-tx:#5FC6F0;--olv-s:#14415C;--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Montserrat,system-ui,sans-serif;transition:background .4s,color .4s}
 h1,h2,h3{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;margin:0;letter-spacing:.02em}
@@ -40,7 +40,7 @@ nav{display:flex;gap:8.0px;overflow-x:auto;max-width:980px;margin:0 auto;padding
 .tab,.btn{font:inherit;font-weight:500;border:0;border-radius:999px;padding:8px 16px;cursor:pointer;white-space:nowrap;transition:all .25s;background:var(--card);color:var(--ink);box-shadow:var(--sh)}
 .tab:hover,.btn:hover{transform:translateY(-2px);box-shadow:var(--shh)}
 .tab.on,.btn.p{background:var(--pri);color:var(--onpri)}
-.btn.a{background:var(--acc);color:#f3ead9}.btn.s{padding:4px 16px;font-size:13px;box-shadow:none;background:var(--line)}
+.btn.a{background:color-mix(in srgb,var(--acc) 90%,#000);color:#FCFFFF}.btn.s{padding:4px 16px;font-size:13px;box-shadow:none;background:var(--line)}
 main{max-width:1120px;margin:0 auto;padding:8px 24px 152px;animation:in .5s ease}
 @keyframes in{from{opacity:0;transform:translateY(10px)}}
 .g{display:grid;gap:16.0px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
@@ -66,7 +66,7 @@ input:focus,select:focus,button:focus-visible{outline:0;border-color:var(--olv-t
 #toast.on{opacity:1;transform:translate(-50%,0)}
 table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8.0px 4px;border-bottom:1px solid var(--line)}th{color:var(--mut);font-weight:500;font-size:13px}
 .wrap{overflow-x:auto}
-.hero{background:var(--pri);color:var(--onpri)}.hero .mut{color:inherit;opacity:.78}
+.hero{background:color-mix(in srgb,var(--pri) 66%,#000);color:var(--onpri)}.hero .mut{color:inherit;opacity:.78}
 .card:has(.dd.open){position:relative;z-index:6}
 select{display:none}
 .dd{position:relative}
@@ -84,7 +84,7 @@ button.chip:hover{transform:translateY(-1px);box-shadow:var(--sh)}.chip.on{backg
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .gmvh{display:flex;align-items:center;gap:2px;flex:none;background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:2px 6px}
 .gmvg{font-size:15px;line-height:1;color:var(--mut);cursor:grab;user-select:none}
-.gmvb{font:inherit;font-size:13px;line-height:1;border:0;background:none;color:var(--olv-t);cursor:pointer;padding:2px 4px;border-radius:6px;min-height:0;transition:background .15s,transform .15s}
+.gmvb{font:inherit;font-size:13px;line-height:1;border:0;background:none;color:var(--olv-tx);cursor:pointer;padding:2px 4px;border-radius:6px;min-height:0;transition:background .15s,transform .15s}
 .gmvb:hover:not([disabled]){background:color-mix(in srgb,var(--olv-t) 16%,var(--card));transform:translateY(-1px)}
 .gmvb[disabled]{opacity:.3;cursor:default}
 .fl{max-height:190px;overflow:auto;border-radius:16px;background:var(--bg);padding:4px;margin-bottom:16px}
@@ -95,7 +95,7 @@ button.chip:hover{transform:translateY(-1px);box-shadow:var(--sh)}.chip.on{backg
 .g2{display:grid;gap:16.0px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin-top:16.0px}.g2 .card{margin:0}
 .split{display:grid;grid-template-columns:auto 1fr;gap:32.0px;align-items:center}@media(max-width:560px){.split{grid-template-columns:1fr}}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8.0px;margin-bottom:16px}.stats b{display:block;font:600 26px 'Cormorant Garamond',Georgia,serif}
-.hero .bar{background:rgba(243,234,217,.22)}.hero .bar i{background:var(--onpri)}.hero .bar.c i{background:var(--gold)}.hero .bar.f i{opacity:.55}
+.hero .bar{background:rgba(252,255,255,.22)}.hero .bar i{background:var(--onpri)}.hero .bar.c i{background:var(--gold)}.hero .bar.f i{opacity:.55}
 .scr{max-height:400px;overflow:auto}.mt{font-weight:600;color:var(--olv-t);margin:16px 0 0}
 .ftog{display:flex;justify-content:space-between;align-items:center;width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:8px 16px;cursor:pointer;margin-bottom:8px;position:relative;transition:border .2s,box-shadow .25s}
 .ftog:hover{border-color:var(--olv-t);box-shadow:var(--sh)}.ftog span:last-of-type{margin-right:24px}
@@ -126,9 +126,9 @@ input[type=checkbox]{-webkit-appearance:checkbox;appearance:checkbox;accent-colo
 .pg{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin-bottom:32px}.pg i{display:block;height:100%;background:var(--pri);border-radius:9px;transition:width .5s}
 .opt{display:flex;flex-direction:column;align-items:flex-start;gap:0;width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--card);border:2px solid transparent;border-radius:18px;padding:16px 16px;margin-bottom:8px;cursor:pointer;box-shadow:var(--sh);transition:all .25s}
 .opt:hover{transform:translateY(-2px);box-shadow:var(--shh)}.opt.on{border-color:var(--olv-t);background:color-mix(in srgb,var(--olv-t) 10%,var(--card))}.opt b{font-weight:600}.opt span{font-size:13px;color:var(--mut)}
-.phero{background:var(--pri);color:var(--onpri);border-radius:22px;padding:24px 24.0px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;box-shadow:var(--sh)}
+.phero{background:color-mix(in srgb,var(--pri) 66%,#000);color:var(--onpri);border-radius:22px;padding:24px 24.0px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;box-shadow:var(--sh)}
 .phero span{opacity:.8;font-size:13px}.pbig{font:600 64px/1 'Cormorant Garamond',Georgia,serif;margin-top:8px}.pbig small{font:500 15px Montserrat,sans-serif;opacity:.8;margin-left:8.0px}
-.phero .gt{background:rgba(243,234,217,.18);border-radius:999px;padding:4px 16px;opacity:1}
+.phero .gt{background:rgba(0,0,0,.18);border-radius:999px;padding:4px 16px;opacity:1}
 .pbar{display:flex;gap:4px;height:12px;margin:24px 0 16px}.pbar i{display:block;background:var(--pri);border-radius:9px;transition:width .6s}.pbar i.c{background:var(--gold)}.pbar i.f{background:var(--acc)}
 .mac3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .mac3>div{background:var(--bg);border-radius:18px;padding:16px;transition:transform .25s,box-shadow .25s}.mac3>div:hover{transform:translateY(-3px);box-shadow:var(--sh)}
@@ -161,18 +161,18 @@ nav{width:min(940px,calc(100% - 24px));max-width:none;margin:8px auto 16.0px;pad
 .tab.on,.tab.on:hover{background:linear-gradient(135deg,var(--pri),color-mix(in srgb,var(--pri) 62%,#000));box-shadow:0 8px 18px -8px var(--pri)}
 .btn{border:1px solid color-mix(in srgb,var(--line) 70%,transparent);padding:8px 24px;font-weight:600}
 .btn.p{background:linear-gradient(135deg,var(--pri),color-mix(in srgb,var(--pri) 62%,#000));border-color:transparent;box-shadow:0 10px 22px -10px var(--pri)}
-.btn.a{background:linear-gradient(135deg,var(--acc),color-mix(in srgb,var(--acc) 62%,#000));border-color:transparent}
+.btn.a{background:linear-gradient(135deg,color-mix(in srgb,var(--acc) 90%,#000),color-mix(in srgb,var(--acc) 62%,#000));border-color:transparent}
 .btn:active,.tab:active,.fab:active{transform:scale(.95)}
-.card{border:1px solid color-mix(in srgb,var(--line) 75%,transparent);border-radius:30px;padding:24px;box-shadow:0 1px 0 rgba(255,255,255,.12) inset,0 14px 34px -16px rgba(42,42,28,.28)}
+.card{border:1px solid color-mix(in srgb,var(--line) 75%,transparent);border-radius:30px;padding:24px;box-shadow:0 1px 0 rgba(255,255,255,.12) inset,0 14px 34px -16px rgba(12,42,56,.28)}
 @keyframes rise{from{opacity:0;transform:translateY(18px) scale(.985)}}
 .card,.tile,.note,.phero,main>h2{animation:rise .55s cubic-bezier(.2,.8,.2,1) backwards}
 .g>:nth-child(2),.g2>:nth-child(2),.tile:nth-child(2){animation-delay:.07s}.g>:nth-child(3),.g2>:nth-child(3),.tile:nth-child(3){animation-delay:.14s}.tile:nth-child(n+4){animation-delay:.2s}
-.hero{position:relative;overflow:hidden;border:0;border-radius:38px;padding:32.0px;background:linear-gradient(150deg,var(--pri),color-mix(in srgb,var(--pri) 52%,#000))}
-.hero::before{content:"";position:absolute;right:-90px;top:-90px;width:300px;height:300px;border-radius:50%;border:1px solid rgba(243,234,217,.2);box-shadow:0 0 0 40px rgba(243,234,217,.04),0 0 0 84px rgba(243,234,217,.03);pointer-events:none}
+.hero{position:relative;overflow:hidden;border:0;border-radius:38px;padding:32.0px;background:linear-gradient(150deg,color-mix(in srgb,var(--pri) 68%,#000),color-mix(in srgb,var(--pri) 50%,#000))}
+.hero::before{content:"";position:absolute;right:-90px;top:-90px;width:300px;height:300px;border-radius:50%;border:1px solid rgba(252,255,255,.2);box-shadow:0 0 0 40px rgba(252,255,255,.04),0 0 0 84px rgba(252,255,255,.03);pointer-events:none}
 .hero::after{content:"";position:absolute;left:-70px;bottom:-130px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--gold) 50%,transparent),transparent 70%);opacity:.5;pointer-events:none}
 .hero>*{position:relative;z-index:1}
-.ring{width:170px}.ring svg{filter:drop-shadow(0 0 10px rgba(243,234,217,.35))}.ring b{font-size:44px;line-height:1}
-.stats{gap:8px}.stats>div{background:rgba(243,234,217,.1);border:1px solid rgba(243,234,217,.12);border-radius:18px;padding:8px 16px}.stats b{font-size:30px}
+.ring{width:170px}.ring svg{filter:drop-shadow(0 0 10px rgba(252,255,255,.35))}.ring b{font-size:44px;line-height:1}
+.stats{gap:8px}.stats>div{background:rgba(252,255,255,.1);border:1px solid rgba(252,255,255,.12);border-radius:18px;padding:8px 16px}.stats b{font-size:30px}
 .bar{height:12px;box-shadow:inset 0 1px 3px rgba(0,0,0,.2)}.bar i{background:linear-gradient(90deg,color-mix(in srgb,var(--pri) 70%,#fff),var(--pri))}
 .f{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:600}
 input,.ddb{border-radius:16px;padding:16px 16px;background:color-mix(in srgb,var(--bg) 65%,var(--card))}
@@ -185,7 +185,7 @@ input,.ddb{border-radius:16px;padding:16px 16px;background:color-mix(in srgb,var
 .hc{border-radius:12px;background:color-mix(in srgb,var(--line) 65%,transparent)}.yr .hc{border-radius:3px}
 .hc.l1{background:color-mix(in srgb,var(--gold) 50%,var(--card))}.hc.l2{background:color-mix(in srgb,var(--olv-t) 45%,var(--card))}.hc.l3{background:linear-gradient(135deg,var(--pri),color-mix(in srgb,var(--pri) 62%,#000));box-shadow:0 4px 10px -4px var(--pri)}
 .mb i{background:linear-gradient(180deg,var(--gold),var(--pri))}
-.phero{border-radius:32px;position:relative;overflow:hidden;background:linear-gradient(150deg,var(--pri),color-mix(in srgb,var(--pri) 52%,#000))}.pbig{font-size:76px;font-style:italic}
+.phero{border-radius:32px;position:relative;overflow:hidden;background:linear-gradient(150deg,color-mix(in srgb,var(--pri) 68%,#000),color-mix(in srgb,var(--pri) 50%,#000))}.pbig{font-size:76px;font-style:italic}
 .mac3>div{border-radius:22px;background:color-mix(in srgb,var(--bg) 65%,var(--card))}
 .drops{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:16.0px 0 4px}.drops i{width:15px;height:15px;border-radius:0 50% 50% 50%;transform:rotate(45deg);background:var(--line);transition:.35s}.drops i.on{background:linear-gradient(135deg,var(--gold),var(--acc));box-shadow:0 4px 10px -3px var(--acc)}
 .fabs{right:18px;gap:16px}
@@ -211,7 +211,7 @@ body{font-size:14px}.wat{gap:16px}.g2{align-items:start}
 .wat .note{margin:0}.wat .how b{font-size:20px}
 body{font-variant-numeric:lining-nums}
 .ring b{font-size:40px;gap:8.0px;line-height:1}.ring b span{font-size:11px!important;letter-spacing:.08em;text-transform:uppercase;line-height:1}
-.mdl{position:fixed;inset:0;z-index:70;background:rgba(20,15,12,.5);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px}.mdl[hidden]{display:none}.mdl .card{width:min(380px,100%);text-align:center;margin:0}
+.mdl{position:fixed;inset:0;z-index:70;background:rgba(10,24,33,.5);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px}.mdl[hidden]{display:none}.mdl .card{width:min(380px,100%);text-align:center;margin:0}
 .wkw{overflow-x:auto;padding:4px 0 8.0px}.wkg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}main.wide{max-width:1380px}@media(max-width:1000px){.wkg{grid-template-columns:repeat(7,minmax(130px,1fr))}}
 .wkh{font:600 11px Montserrat,sans-serif;letter-spacing:.16em;text-align:center;color:var(--mut);margin-bottom:8px}
 .wkd{background:color-mix(in srgb,var(--olv-t) 10%,var(--bg));border-radius:22px;padding:16px 8px;min-height:300px;font-size:11.5px;display:flex;flex-direction:column;gap:4px;border:1.5px solid transparent;transition:border .2s}
@@ -237,12 +237,12 @@ body{font-variant-numeric:lining-nums}
 .hb div{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;height:100%;font-size:11px;color:var(--mut)}
 .hb i{display:block;width:100%;max-width:24px;min-height:4px;border-radius:7px 7px 3px 3px;background:var(--line);transition:height .6s cubic-bezier(.2,.8,.2,1)}
 .hb i.mid{background:var(--gold)}.hb i.ok{background:linear-gradient(180deg,color-mix(in srgb,var(--pri) 70%,#fff),var(--pri))}
-.hb .cur span{color:var(--olv-t);font-weight:700}
+.hb .cur span{color:var(--olv-tx);font-weight:700}
 .hq{display:flex;gap:8.0px;margin:8px 0 0}.hq .btn{flex:1;min-width:0;box-shadow:none;background:var(--bg);padding:8.0px 8px;font-size:13px}
 .bar.tg{position:relative}.bar.tg .tk{position:absolute;top:0;bottom:0;width:2px;background:var(--gold);opacity:.9}
 .hv{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px}
 .hv .big{flex:none}
-.hst{display:inline-block;border-radius:999px;padding:4px 16px;font-size:13px;font-weight:600;background:color-mix(in srgb,var(--olv-t) 16%,var(--card));color:var(--olv-t)}
+.hst{display:inline-block;border-radius:999px;padding:4px 16px;font-size:13px;font-weight:600;background:color-mix(in srgb,var(--olv-t) 16%,var(--card));color:var(--olv-tx)}
 .hst.w{background:color-mix(in srgb,var(--gold) 28%,var(--card));color:var(--ink)}
 .gtag{display:inline-block;border-radius:999px;padding:1px 8px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;vertical-align:middle;background:color-mix(in srgb,var(--mut) 20%,var(--card));color:var(--mut)}
 .gtag.p{background:color-mix(in srgb,#2e7d32 24%,var(--card));color:#2e7d32}
@@ -253,18 +253,18 @@ body{font-variant-numeric:lining-nums}
 .crd div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--mut)}
 .crd i{display:block;width:100%;max-width:30px;aspect-ratio:1;border-radius:50%;background:var(--line)}
 .crd i.on{background:linear-gradient(135deg,var(--pri),color-mix(in srgb,var(--pri) 62%,#000))}
-.crd .cur span{color:var(--olv-t);font-weight:700}
+.crd .cur span{color:var(--olv-tx);font-weight:700}
 
-.rt{position:fixed;left:16px;right:92px;max-width:380px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--pri);color:var(--onpri);border-radius:22px;padding:8px 16px 16px;box-shadow:var(--shh);display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:center;overflow:hidden}
+.rt{position:fixed;left:16px;right:92px;max-width:380px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:30;background:color-mix(in srgb,var(--pri) 66%,#000);color:var(--onpri);border-radius:22px;padding:8px 16px 16px;box-shadow:var(--shh);display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:center;overflow:hidden}
 .rt[hidden]{display:none}
 .rt .rtt{grid-row:1/3;font:600 34px/1 'Cormorant Garamond',Georgia,serif;min-width:70px;font-variant-numeric:tabular-nums}
 .rt .rtl{min-width:0;display:flex;flex-direction:column;line-height:1.25}
 .rt .rtl b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rt .rtl span{font-size:11px;opacity:.85}
 .rt .rbs{display:flex;gap:8px}
-.rt .rb{border:0;border-radius:999px;background:rgba(243,234,217,.22);color:inherit;font:inherit;font-size:12px;font-weight:600;padding:4px 8px;cursor:pointer}
-.rt .rb:hover{background:rgba(243,234,217,.34)}
+.rt .rb{border:0;border-radius:999px;background:rgba(252,255,255,.22);color:inherit;font:inherit;font-size:12px;font-weight:600;padding:4px 8px;cursor:pointer}
+.rt .rb:hover{background:rgba(252,255,255,.34)}
 .rt .rp{position:absolute;left:0;bottom:0;height:4px;background:var(--gold);transition:width .25s linear}
-.rt.done{background:var(--gold);color:#241a10;animation:rtp 1s ease-in-out infinite}.rt.done .rb{background:rgba(36,26,16,.14)}
+.rt.done{background:color-mix(in srgb,var(--gold) 78%,#000);color:#FCFFFF;animation:rtp 1s ease-in-out infinite}.rt.done .rb{background:rgba(255,255,255,.18)}
 @keyframes rtp{0%,100%{box-shadow:var(--shh)}50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--gold) 45%,transparent)}}
 body.rtv #toast{bottom:calc(124px + env(safe-area-inset-bottom,0px))}
 .al{border-left:4px solid var(--gold)}
@@ -272,7 +272,8 @@ body.rtv #toast{bottom:calc(124px + env(safe-area-inset-bottom,0px))}
 
 /* ===== Palette 60-30-10: cream 60 / olive 30 / burgundy 10 ===== */
 body{background:var(--bg)}body::before{opacity:.05}
-h1,h2,.big,.mt,.tile b,.wkn,.dph b,.wrow .wi,.wd summary,.hb .cur span,.crd .cur span,.dpn{color:var(--olv-t)}
+h1,h2,.big,.tile b,.wkn,.dph b,.wrow .wi,.wd summary,.hb .cur span,.crd .cur span,.dpn{color:var(--olv-t)}
+.mt{color:var(--olv-tx)}
 .hst{background:color-mix(in srgb,var(--olv-t) 14%,var(--card));color:var(--olv-t)}
 .wkn:hover{color:var(--pri)}
 h2::after{background:var(--olv-t)}
@@ -281,11 +282,11 @@ h2::after{background:var(--olv-t)}
 .btn{border-color:color-mix(in srgb,var(--olv-t) 25%,transparent)}
 nav{border-color:color-mix(in srgb,var(--olv-t) 35%,transparent)}
 .tab{color:var(--olv-t)}.tab.on,.tab.on:hover{color:var(--onpri)}
-.hero,.phero,.rt{background:linear-gradient(150deg,var(--olv-s),color-mix(in srgb,var(--olv-s) 72%,#000));color:#F3EAD9}
+.hero,.phero,.rt{background:linear-gradient(150deg,var(--olv-s),color-mix(in srgb,var(--olv-s) 72%,#000));color:#FCFFFF}
 .hero .mut,.phero span{color:inherit}
-.hero::after{background:radial-gradient(circle,rgba(243,234,217,.18),transparent 70%)}
-.rt .rp{background:#F3EAD9}
-.rt.done{background:var(--pri);color:var(--onpri)}
+.hero::after{background:radial-gradient(circle,rgba(252,255,255,.18),transparent 70%)}
+.rt .rp{background:#FCFFFF}
+.rt.done{background:color-mix(in srgb,var(--pri) 55%,#000);color:var(--onpri)}
 .note{background:color-mix(in srgb,var(--olv-t) 10%,var(--card));border:1px solid color-mix(in srgb,var(--olv-t) 30%,transparent);border-left:5px solid var(--olv-t)}
 .note.al{border-left-color:var(--olv-t)}.note.al.high{border-left-color:var(--pri)}
 .chip{background:color-mix(in srgb,var(--olv-t) 14%,var(--card))}
@@ -295,7 +296,7 @@ nav{border-color:color-mix(in srgb,var(--olv-t) 35%,transparent)}
 .wkd{background:color-mix(in srgb,var(--olv-t) 9%,var(--bg))}
 .wkd.today{border-color:var(--olv-t)}
 .bar.c i{background:var(--gold)}.bar.f i{background:var(--olv-t)}
-.hero .bar.c i{background:#C9CC9A}.hero .bar.f i{background:#F3EAD9;opacity:.55}
+.hero .bar.c i{background:#F4A6D0}.hero .bar.f i{background:#FCFFFF;opacity:.55}
 
 /* ===== 8pt system: 8 / 16 / 24 / 32 / 48 (4 only for micro details) ===== */
 :root{--s1:8px;--s2:16px;--s3:24px;--s4:32px;--s6:48px}
@@ -503,7 +504,7 @@ p[style*="text-align:center"],[style*="text-align:center"]>p{margin-left:auto!im
 
 /* ===== v8: WCAG 2.2 contrast - focus rings (>=3:1) and secondary text (>=4.5:1) ===== */
 /* Solid outline instead of a translucent box-shadow: survives .btn{box-shadow:none} and forced-colors mode */
-:root{--focus:var(--olv-t);--onpri-mut:hsl(40 42% 86%)}
+:root{--focus:var(--olv-t);--onpri-mut:rgba(252,255,255,.78)}
 input:focus,select:focus,textarea:focus,button:focus-visible{box-shadow:none}
 :focus-visible,button:focus-visible,.wnt:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
@@ -511,9 +512,17 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
 :is(.hero,.phero,.rt,.fo.on) :focus-visible{--focus:var(--onpri)}
 /* Muted text on dark surfaces: solid colour instead of opacity */
 .hero .mut,.phero span,.pbig small,.fo.on .mut,.rt .rtl span{color:var(--onpri-mut);opacity:1}
-/* the goal chip sits on a lightened tint of the hero, so the muted tone only
-   reached 4.29:1 there: full cream text on a darker chip instead */
-.phero .gt{background:rgba(243,234,217,.10);color:var(--onpri)}
+/* Dark mode: the active-primary surfaces resolve color-mix(--pri 66% #000) with the
+   brighter dark --pri (#3FB4E6) to a lighter blue (42,119,152), where --onpri-mut (.78
+   white) drops to ~3.71:1. Raise the muted subtext to full --onpri (#FCFFFF, 4.98:1) on
+   these active-primary states only; light mode keeps --onpri-mut (6.87:1 white / 4.84:1). */
+:root[data-theme="dark"] :is(.fo.on .mut,.rt .rtl span,.opt.on span,.opt.on .mut,.opt.on em,.opt.on small),
+.dark-theme :is(.fo.on .mut,.rt .rtl span,.opt.on span,.opt.on .mut,.opt.on em,.opt.on small){color:var(--onpri)}
+/* The goal chip sits on the Sky-Blue phero surface. A translucent WHITE pill
+   lightens the backing and drops white text below AA (~3.07:1), so use a
+   translucent BLACK pill that darkens the backing instead: white text on it
+   measures ~8.9:1 on the new darkened phero base. */
+.phero .gt{background:rgba(0,0,0,.18);color:var(--onpri)}
 /* Fat macro bar: a light tinted olive via color-mix, not cream at .55 opacity.
    Measured by pixel sampling against the composited track inside the hero. */
 .hero .bar.f i{background:color-mix(in srgb,var(--olv-t) 16%,var(--onpri));opacity:1}
@@ -522,10 +531,10 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
    Two tiers on purpose: the pure tone is a SURFACE/HAIRLINE colour (it only reaches
    ~2.1-3.3:1 on cream, so it can never carry text), the -fg tone is the text/icon
    colour (>=4.5:1 on both cream surfaces). */
-:root{--ok:#7A8B76;--err:#C27365;--warn:#CBA363;--info:#748796;
---ok-fg:#525E50;--err-fg:#8E4538;--warn-fg:#775828;--info-fg:#4F5D69}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ok-fg:#96A493;--err-fg:#CF9186;--warn-fg:#CBA362;--info-fg:#94A2AE}}
-:root[data-theme="dark"]{--ok-fg:#96A493;--err-fg:#CF9186;--warn-fg:#CBA362;--info-fg:#94A2AE}
+:root{--ok:#3A9D6E;--err:#D65A6A;--warn:#E0973F;--info:#0593C6;
+--ok-fg:#1F6B49;--err-fg:#A32F3D;--warn-fg:#8A5410;--info-fg:#0A5E7E}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ok-fg:#62C79A;--err-fg:#F0929D;--warn-fg:#E8AF63;--info-fg:#5FC6F0}}
+:root[data-theme="dark"]{--ok-fg:#62C79A;--err-fg:#F0929D;--warn-fg:#E8AF63;--info-fg:#5FC6F0}
 .note.ok{--sx:var(--ok);--sx-fg:var(--ok-fg)}
 .note.warn{--sx:var(--warn);--sx-fg:var(--warn-fg)}
 .note.err{--sx:var(--err);--sx-fg:var(--err-fg)}
@@ -569,7 +578,7 @@ main{animation:in var(--t-panel) var(--ease)}
 
 /* ===== v11: progressive disclosure - core KPI on the surface, detail in the panel ===== */
 .card>.hdr:first-child{margin-bottom:8px}
-.hdr .dtl{color:var(--olv-t);font-size:18px}
+.hdr .dtl{color:var(--olv-tx);font-size:18px}
 .kpi{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .kpi .big{flex:none}
 body.sov-open{overflow:hidden}
@@ -607,11 +616,11 @@ border:1.5px solid color-mix(in srgb,var(--olv-t) 30%,transparent);color:var(--o
 .opt{transition:background-color var(--t-micro) var(--ease),color var(--t-micro) var(--ease),
 border-color var(--t-micro) var(--ease),box-shadow var(--t-micro) var(--ease),
 fill var(--t-micro) var(--ease),stroke var(--t-micro) var(--ease)}
-.opt.on{background:var(--pri);border-color:transparent;color:var(--onpri);box-shadow:var(--shv)}
+.opt.on{background:color-mix(in srgb,var(--pri) 66%,#000);border-color:transparent;color:var(--onpri);box-shadow:var(--shv)}
 .opt.on b{color:var(--onpri)}
 .opt.on span,.opt.on .mut,.opt.on em,.opt.on small{color:var(--onpri-mut)}
 .opt.on svg{fill:var(--onpri);stroke:var(--onpri)}
-.opt.on .chip{background:rgba(243,234,217,.18);color:var(--onpri)}
+.opt.on .chip{background:rgba(252,255,255,.18);color:var(--onpri)}
 
 /* ===== v18: macro cards share one flex rhythm and one caption treatment ===== */
 .mac3>div{display:flex;flex-direction:column;gap:.5rem}
@@ -680,14 +689,13 @@ background-color var(--t-panel) var(--ease),color var(--t-panel) var(--ease),bor
 transition:background-color var(--t-panel) var(--ease),color var(--t-panel) var(--ease),border-color var(--t-panel) var(--ease)}
 
 /* ===== v23: three separable macro fills + a delineated stacked bar =====
-   --gold and --acc both resolve to #8E9358 in dark mode, so the carbs and fat
-   segments were literally the same hex (1.00:1) and merged into one block.
-   Fat gets its own token, pushed away from carbs in each scheme. Three fills
-   from one earth family cannot all be separated by luminance alone, so the bar
-   also gets a capsule frame (showing where 100% ends) and wider gaps. */
-:root{--mfat:#30321B}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--mfat:#DCD5B8}}
-:root[data-theme="dark"]{--mfat:#DCD5B8}
+   Protein uses --pri (blue) and carbs use --gold (pink); fat gets its own
+   token pushed to a deeper magenta so the three segments stay distinct in
+   both schemes. The bar also gets a capsule frame (showing where 100% ends)
+   and wider gaps so the on-palette fills read clearly. */
+:root{--mfat:#9C2E7A}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--mfat:#C97FD6}}
+:root[data-theme="dark"]{--mfat:#C97FD6}
 .pbar{gap:6px;height:14px;padding:2px;border-radius:999px;
 border:1px solid color-mix(in srgb,var(--olv-t) 32%,transparent)}
 .pbar i{border-radius:999px;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--card) 55%,transparent)}
@@ -702,10 +710,12 @@ border:1px solid color-mix(in srgb,var(--olv-t) 32%,transparent)}
 .mac3>div{text-transform:none;letter-spacing:normal;font-weight:400;
 color:var(--ink);margin-bottom:0;font-size:var(--fs-body)}
 
-/* ===== v13: selected / active states are solid wine, not a wine-to-black gradient ===== */
-.tab.on,.tab.on:hover,.btn.p,.btn.p:hover,.seg .btn.on,.fab.on,.dpc.sel,.crd i.on,.ddo.on,.fo.on{background:var(--pri)}
-/* the gradient's dark end was doing contrast work for the label; dark mode --pri is a
-   lighter wine, so the on-wine text tone is pinned here instead */
+/* ===== v13: selected / active states are a darkened-primary solid, not a primary-to-black gradient ===== */
+/* White label on full Sky-Blue --pri (#0593C6) is only 3.48:1 and muted on-primary text ~2.69:1,
+   both below AA. These active surfaces therefore use a darkened primary (color-mix --pri 66% #000):
+   white label clears 6.87:1 and --onpri-mut (.78) clears 4.85:1 on light --pri. */
+.tab.on,.tab.on:hover,.btn.p,.btn.p:hover,.seg .btn.on,.fab.on,.dpc.sel,.crd i.on,.ddo.on,.fo.on,.dpn:hover,.lgb.on,.hd .btn.s.lgb.on,.obc .lgb.on{background:color-mix(in srgb,var(--pri) 66%,#000)}
+.chip.on{background:color-mix(in srgb,var(--pri) 66%,#000)!important}
 .tab.on,.btn.p,.seg .btn.on,.ddo.on,.fo.on{color:var(--onpri)}
 
 /* ===== v12: reduced motion (must stay last) =====
@@ -868,7 +878,7 @@ const V={
 today(){const hb=hab(day),d=day,c=calc(),dg=dayGoal(d),t=tot(d),bud=dg.k,left=Math.round(bud-t.k),pr=bud?Math.min(1,t.k/bud):(t.k?1:0),over=left<0,goal={cut:'Losing fat',maint:'Maintaining',bulk:'Building muscle'}[S.p.goal],nb='style="min-width:48px;flex:none"';
 return`<div class="dbg"><div><span class="dbg-k">${d==today()?'Logging today':'Logging'}</span><h2 style="margin:0">${d==today()?'Today':d}</h2><div class="cap">${new Date(d+'T00:00').toLocaleDateString(LOC,{weekday:'long',month:'long',day:'numeric'})}</div></div><div class="row" style="flex:none;gap:8.0px"><button class="btn s" ${nb} data-a="dback" aria-label="Previous day">‹</button><button class="btn s" ${nb} data-a="dnext" aria-label="Next day">›</button></div></div>
 <div class="bt-alt">${galmini()}</div><div class="bento">
-<div class="bt-L"><div class="card hero split bt-hero"><div><div class="ring"><svg viewBox="0 0 120 120"><defs><linearGradient id="rgf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:#C9CC9A"/><stop offset="1" style="stop-color:color-mix(in srgb,#A8404F 78%,#F3EAD9)"/></linearGradient></defs><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(243,234,217,.3)" stroke-width="10"/><circle cx="60" cy="60" r="52" fill="none" stroke="${over?'var(--warn)':'url(#rgf)'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="${326.7*(1-pr)}" transform="rotate(-90 60 60)"/></svg><b>${Math.abs(left)}<span class="mut" style="font:13px Montserrat">${over?'kcal over':'kcal left'}</span></b></div><p class="mut" style="text-align:center;margin:8px 0 0">${goal}</p>${dg.on&&dg.adj?`<p class="mut cap" style="text-align:center;margin:8px 0 0">${dg.adj>0?'+':'\u2212'}${n0(Math.abs(dg.adj))} <span>kcal vs base</span> \u00b7 ${dg.rem} <span>${dg.rem>1?'days left':'day left'}</span>${dg.cap?' \u00b7 <span>safety limit applied</span>':''}</p>`:''}
+<div class="bt-L"><div class="card hero split bt-hero"><div><div class="ring"><svg viewBox="0 0 120 120"><defs><linearGradient id="rgf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:#F4A6D0"/><stop offset="1" style="stop-color:color-mix(in srgb,#0593C6 78%,#FCFFFF)"/></linearGradient></defs><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(252,255,255,.3)" stroke-width="10"/><circle cx="60" cy="60" r="52" fill="none" stroke="${over?'var(--warn)':'url(#rgf)'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="${326.7*(1-pr)}" transform="rotate(-90 60 60)"/></svg><b>${Math.abs(left)}<span class="mut" style="font:13px Montserrat">${over?'kcal over':'kcal left'}</span></b></div><p class="mut" style="text-align:center;margin:8px 0 0">${goal}</p>${dg.on&&dg.adj?`<p class="mut cap" style="text-align:center;margin:8px 0 0">${dg.adj>0?'+':'\u2212'}${n0(Math.abs(dg.adj))} <span>kcal vs base</span> \u00b7 ${dg.rem} <span>${dg.rem>1?'days left':'day left'}</span>${dg.cap?' \u00b7 <span>safety limit applied</span>':''}</p>`:''}
 ${dg.on&&dg.carry?`<p class="mut cap" style="text-align:center;margin:4px 0 0">${dg.carry>0?'+':'\u2212'}${n0(Math.abs(dg.carry))} <span>kcal carried from last week</span></p>`:''}
 ${dg.on&&dg.left&&Math.abs(dg.left)>=25?`<p class="mut cap" style="text-align:center;margin:4px 0 0">${n0(Math.abs(dg.left))} <span>${dg.left>0?'kcal could not fit this week':'kcal over what the week can absorb'}</span></p>`:''}</div>
 <div><div class="stats"><div><span class="mut">Budget</span><b>${bud}</b></div><div><span class="mut">Eaten</span><b>${Math.round(t.k)}</b></div><div><span class="mut">Left</span><b>${left}</b></div></div><div class="hmac">${meter('Protein',t.p,dg.p,'g','')}${meter('Carbs',t.c,dg.c,'g','c')}${meter('Fat',t.f,dg.f,'g','f')}</div></div></div><div class="bt-pair">${hb[0]}${hb[1]}${hb[2]}</div></div>
@@ -906,7 +916,7 @@ weightView(){const ks=Object.keys(S.wt).sort(),wk={};ks.forEach(d=>{const x=new 
 const ws=Object.keys(wk).sort().reverse(),av=k=>wk[k].reduce((a,b)=>a+b,0)/wk[k].length;
 return`<div class="g"><div class="card"><h3>⚖️ Log weight</h3><div class="f">Date${dpk('wdt',wdt)}</div><label class="f">Weight (${S.p.wu})<input id="wv" type="number" step="0.1" value="${S.wt[wdt]||''}"></label><button class="btn p" data-a="wt">Save weight</button><p class="mut" style="margin:8px 0 0">Your most recent weight also updates your plan (BMR, calories and macros). Saving on an existing date replaces it.</p>
 <div class="wrap" style="margin-top:16px">${ks.slice(-10).reverse().map(d=>`<div class="li"><span>${d}</span><span style="display:flex;gap:8px;align-items:center"><b>${S.wt[d]}</b><button class="btn s" data-a="wed" data-d="${d}">Edit</button><button class="btn s t" data-a="wdel" data-d="${d}">Delete</button></span></div>`).join('')||'<p class="mut">No entries yet.</p>'}</div></div>
-<div class="card"><h3>📈 Weekly average</h3>${spark(ks)}${ws.slice(0,8).map((k,i)=>{const a=av(k),n=ws[i+1],dl=n?a-av(n):null;return`<div class="li"><span>Week of ${k}</span><span><b>${r1(a)}</b> ${dl==null?'':`<span class="chip" style="color:var(--olv-t)">${dl>0?'+':''}${r1(dl)}</span>`}</span></div>`}).join('')||'<p class="mut">Log a few days to see your average.</p>'}</div></div>`},
+<div class="card"><h3>📈 Weekly average</h3>${spark(ks)}${ws.slice(0,8).map((k,i)=>{const a=av(k),n=ws[i+1],dl=n?a-av(n):null;return`<div class="li"><span>Week of ${k}</span><span><b>${r1(a)}</b> ${dl==null?'':`<span class="chip" style="color:var(--olv-tx)">${dl>0?'+':''}${r1(dl)}</span>`}</span></div>`}).join('')||'<p class="mut">Log a few days to see your average.</p>'}</div></div>`},
 
 bodyView(){const F=[['neck','Neck',"Just below the Adam's apple, tape level all the way around, shoulders relaxed."],['chest','Chest',"Around the fullest part of the chest, under the armpits, after a normal breath out."],['ra','Right arm',"Thickest part of the upper arm, arm relaxed at your side."],['la','Left arm',"Thickest part of the upper arm, arm relaxed at your side."],['waist','Waist',"Narrowest part of the torso, usually just above the belly button, after breathing out."],['hips','Hips',"Widest part of the glutes, feet together, tape level."],['rt','Right thigh',"Thickest part of the thigh, just below the glutes, standing with weight even."],['lt','Left thigh',"Thickest part of the thigh, just below the glutes, standing with weight even."],['calf','Calves',"Thickest part of the calf, standing with weight even."]],ks=Object.keys(S.ms).sort(),l=ks[ks.length-1],pv=ks[ks.length-2],due=mdue(),ent=S.ms[mdt]||{};
 return`${due?`<div class="note">${l?'It has been a month since your last measurements. Time to log new ones.':'Add your first set of measurements to start tracking.'}</div>`:''}<div class="g"><div class="card"><h3>📏 ${S.ms[mdt]?'Edit entry':'New entry'} (cm)</h3><div class="f">Date${dpk('mdt',mdt)}</div><p class="mut" style="margin:0 0 16px">Measure in the morning, relaxed, with the tape snug but not squeezing, and use the same spots each month. Tap ⓘ for where to measure.</p><div class="row">${F.map(([k,n,t])=>`<div style="min-width:130px"><label class="f" style="margin-bottom:4px"><span style="display:flex;justify-content:space-between;align-items:center">${n}<button type="button" class="btn s" data-a="mtip" data-k="${k}" style="padding:0 8px;flex:none" aria-label="How to measure ${n}">ⓘ</button></span><input data-m="${k}" type="number" step="0.1" value="${ent[k]??''}"></label><p class="mut" id="tip-${k}" hidden style="margin:0 0 8px;font-size:12px">${t}</p></div>`).join('')}</div><button class="btn p" data-a="ms">Save measurements</button></div>
@@ -930,8 +940,8 @@ if(w.cur&&n>1&&A.p<c.P*.9)cu+=`<p class="mut" style="margin:16px 0 0">🥚 Prote
 const K=[['cal','Calories within 10% of the weekly budget'],['dir',g=='cut'?'In a calorie deficit':g=='bulk'?'In a calorie surplus':'Close to maintenance'],['pro','Protein at 90% or more of target'],['mac','Carbs and fat within 25% of target']];
 return`<h2>Weekly diary</h2><div class="row" style="flex-wrap:nowrap;margin-bottom:16px"><button class="btn s" style="flex:none" data-a="wkp" aria-label="Previous week">‹</button><h3 style="margin:0;text-align:center">${dn(ws)} – ${dn(w.dys[6])}</h3><button class="btn s" style="flex:none" data-a="wkx" aria-label="Next week">›</button></div>
 <div class="card"><h3 style="text-align:center;font-size:30px;font-style:italic">My weekly diary</h3><div class="wkw"><div class="wkg">${w.D.map(col).join('')}</div></div></div>
-<div class="g2"><div class="card hero"><h3>🍽️ Totals and averages</h3><div class="stats"><div><span class="mut">Total kcal</span><b>${n0(T.k)}</b></div><div><span class="mut">Avg per day</span><b>${n0(A.k)}</b></div><div><span class="mut">Days logged</span><b>${n}/7</b></div></div>${[['Protein',T.p,A.p,c.P],['Carbs',T.c,A.c,c.C],['Fat',T.f,A.f,c.F]].map(([l,t,a,q])=>`<div class="li" style="border-color:rgba(243,234,217,.2)"><span>${l}</span><span><b>${n0(t)} g</b> <span class="mut">avg ${n0(a)} / ${q} g</span></span></div>`).join('')}</div>
-<div class="card ${w.ok?'hero':''}"><h3>🎯 Weekly goal reached?</h3><div class="big" style="font-size:68px;font-style:italic;color:${w.ok?'inherit':'var(--olv-t)'}">${n?(w.ok?'Yes 🎉':'No'):'–'}</div><p class="mut" style="margin:0 0 8px">${n?(w.cur?'So far this week':'For the week')+', based on '+n+' logged day'+(n>1?'s':''):'No meals logged this week yet'}</p>${n?K.map(([k,t])=>`<div class="li" style="padding:8px 0;${w.ok?'border-color:rgba(243,234,217,.2)':''}"><span>${t}</span><span>${w.ch[k]?'✅':'⬜'}</span></div>`).join(''):''}</div></div>
+<div class="g2"><div class="card hero"><h3>🍽️ Totals and averages</h3><div class="stats"><div><span class="mut">Total kcal</span><b>${n0(T.k)}</b></div><div><span class="mut">Avg per day</span><b>${n0(A.k)}</b></div><div><span class="mut">Days logged</span><b>${n}/7</b></div></div>${[['Protein',T.p,A.p,c.P],['Carbs',T.c,A.c,c.C],['Fat',T.f,A.f,c.F]].map(([l,t,a,q])=>`<div class="li" style="border-color:rgba(252,255,255,.2)"><span>${l}</span><span><b>${n0(t)} g</b> <span class="mut">avg ${n0(a)} / ${q} g</span></span></div>`).join('')}</div>
+<div class="card ${w.ok?'hero':''}"><h3>🎯 Weekly goal reached?</h3><div class="big" style="font-size:68px;font-style:italic;color:${w.ok?'inherit':'var(--olv-t)'}">${n?(w.ok?'Yes 🎉':'No'):'–'}</div><p class="mut" style="margin:0 0 8px">${n?(w.cur?'So far this week':'For the week')+', based on '+n+' logged day'+(n>1?'s':''):'No meals logged this week yet'}</p>${n?K.map(([k,t])=>`<div class="li" style="padding:8px 0;${w.ok?'border-color:rgba(252,255,255,.2)':''}"><span>${t}</span><span>${w.ch[k]?'✅':'⬜'}</span></div>`).join(''):''}</div></div>
 <div class="g2"><div class="card"><h3>📊 Calories per day</h3>${wbars(w)}<p class="mut" style="margin:0;text-align:center">Dashed line = that day's budget</p></div><div class="card"><h3>🍩 Macro split</h3>${wdon(w)}</div></div>
 <div class="g2"><div class="card"><h3>🌟 How each day went</h3><div class="row" style="justify-content:space-between;flex-wrap:nowrap;gap:0">${w.dys.map((d,i)=>{const q=st(d);return`<div style="text-align:center;min-width:0"><div style="font-size:26px">${q?(q.ok?'🌟':q.lv==2?'🙂':'🌧️'):'·'}</div><div class="mut" style="font-size:11px">${DOW[i]}</div></div>`}).join('')}</div><div style="margin-top:16.0px">${meter('Avg protein',A.p,c.P,'g','')}${meter('Avg carbs',A.c,c.C,'g','c')}${meter('Avg fat',A.f,c.F,'g','f')}</div></div>
 ${cu?`<div class="card"><h3>🧭 Catch-up plan</h3>${cu}</div>`:''}</div>`},
