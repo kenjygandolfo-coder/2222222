@@ -13,12 +13,12 @@ body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Montserrat,sys
 h1,h2,h3{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;margin:0;letter-spacing:.02em}
 h1,h2{color:var(--olv-t)}h1{font-size:30px}h2{font-size:24px;margin-bottom:16px}h3{font-size:19px;margin-bottom:8.0px}
 header{display:flex;justify-content:space-between;align-items:center;max-width:1120px;margin:0 auto;padding:24px 24px 8.0px}
-nav{display:flex;gap:8.0px;overflow-x:auto;max-width:980px;margin:0 auto;padding:8.0px 24px 16px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;scrollbar-width:none}
+nav{display:flex;gap:4px;position:fixed;left:0;right:0;bottom:0;z-index:40;padding:4px 8px calc(4px + env(safe-area-inset-bottom,0px));scrollbar-width:none}
 .tab,.btn{font:inherit;font-weight:500;border:0;border-radius:999px;padding:8px 16px;cursor:pointer;white-space:nowrap;transition:all .25s;background:var(--card);color:var(--ink);box-shadow:var(--sh)}
 .tab:hover,.btn:hover{transform:translateY(-2px);box-shadow:var(--shh)}
 .tab.on,.btn.p{background:var(--pri);color:var(--onpri)}
 .btn.a{background:color-mix(in srgb,var(--acc) 90%,#000);color:#FCFFFF}.btn.s{padding:4px 16px;font-size:13px;box-shadow:none;background:var(--line)}
-main{max-width:1120px;margin:0 auto;padding:8px 24px 152px;animation:in .5s ease}
+main{max-width:1120px;margin:0 auto;padding:8px 24px calc(96px + env(safe-area-inset-bottom,0px));animation:in .5s ease}
 @keyframes in{from{opacity:0;transform:translateY(10px)}}
 .g{display:grid;gap:16.0px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
 .card{background:var(--card);border-radius:24px;padding:24px;box-shadow:var(--sh);transition:transform .3s,box-shadow .3s;margin-bottom:16.0px}
@@ -39,7 +39,7 @@ input:focus,select:focus,button:focus-visible{outline:0;border-color:var(--olv-t
 .ring circle{transition:stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1)}
 .note{background:color-mix(in srgb,var(--olv-t) 14%,var(--card));border-radius:16px;padding:16px 16.0px;margin-bottom:16.0px}
 .chip{display:inline-block;background:var(--line);border-radius:999px;padding:4px 16px;font-size:13px}
-#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--ink);color:var(--bg);padding:8px 24px;border-radius:999px;opacity:0;transition:all .35s;pointer-events:none;z-index:9}
+#toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--ink);color:var(--bg);padding:8px 24px;border-radius:999px;opacity:0;transition:all .35s;pointer-events:none;z-index:9}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8.0px 4px;border-bottom:1px solid var(--line)}th{color:var(--mut);font-weight:500;font-size:13px}
 .wrap{overflow-x:auto}
@@ -105,7 +105,7 @@ input[type=range]{accent-color:var(--olv-t);padding:0;border:0;background:none;b
 .how{margin-top:16.0px}.how>div{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:8px 0;border-bottom:1px solid var(--line)}.how>div:last-child{border:0}
 .how small{display:block;color:var(--mut);font-size:12px}.how b{font:600 22px 'Cormorant Garamond',Georgia,serif;white-space:nowrap}.how>div:last-child b{color:var(--olv-t)}
 @media(max-width:440px){.mac3{grid-template-columns:1fr}}
-.fabs{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;flex-direction:column;gap:16px}
+.fabs{position:fixed;right:16px;bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:45;display:flex;flex-direction:column;gap:16px}
 .fab{width:56px;height:56px;border-radius:50%;border:0;font-size:26px;line-height:1;cursor:pointer;background:var(--card);box-shadow:var(--shh);transition:transform .25s,background .25s;padding:0}
 .fab:hover{transform:scale(1.1)}.fab.on{background:var(--pri)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -118,15 +118,20 @@ h1{font-size:42px;font-style:italic;line-height:1}
 h2{font-size:38px;font-style:italic;line-height:1.05;margin-bottom:16px}
 h2::after{content:"";display:block;width:34px;height:3px;border-radius:3px;background:var(--gold);margin-top:8px}
 h3{font-size:23px}
-header{padding:32px 24px 16px}
-header h1{display:flex;align-items:center;gap:16px}
-header h1::before{content:"";width:30px;height:30px;border-radius:50% 50% 50% 6px;transform:rotate(-18deg);background:linear-gradient(135deg,var(--pri),var(--gold));box-shadow:0 8px 18px -6px var(--pri)}
-.hd{gap:16px;padding:8px 8.0px 8px 16px;border-radius:999px;background:color-mix(in srgb,var(--card) 70%,transparent);border:1px solid var(--line);backdrop-filter:blur(10px)}
-.sw{width:24px;height:24px}.hd .btn.s{background:transparent;padding:4px 8.0px;font-size:18px;line-height:1}
-nav{width:min(940px,calc(100% - 24px));max-width:none;margin:8px auto 16.0px;padding:8px;gap:4px;top:calc(8px + env(safe-area-inset-top,0px));border-radius:999px;background:color-mix(in srgb,var(--card) 78%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);border:1px solid var(--line);box-shadow:var(--shh)}
-.tab{background:transparent;box-shadow:none;padding:8px 16px;flex:1 0 auto;text-align:center;font-weight:600}
-.tab:hover{box-shadow:none;transform:none;background:color-mix(in srgb,var(--olv-t) 10%,transparent)}
-.tab.on,.tab.on:hover{background:linear-gradient(135deg,var(--pri),color-mix(in srgb,var(--pri) 62%,#000));box-shadow:0 8px 18px -8px var(--pri)}
+header{padding:8px 16px}
+header h1{display:flex;align-items:center;gap:8px;font-size:19px;font-style:normal}
+header h1::before{content:"";width:18px;height:18px;border-radius:50% 50% 50% 4px;transform:rotate(-18deg);background:linear-gradient(135deg,var(--pri),var(--gold));box-shadow:0 4px 10px -4px var(--pri)}
+.hd{gap:4px;padding:4px 4px 4px 8px;border-radius:999px;background:color-mix(in srgb,var(--card) 70%,transparent);border:1px solid var(--line);backdrop-filter:blur(10px)}
+.sw{width:24px;height:24px}.hd .btn.s{background:transparent;padding:4px 8px;font-size:14px;line-height:1}
+.hd .btn.s#th{font-size:16px;padding:4px 6px}
+nav{left:50%;right:auto;transform:translateX(-50%);width:min(620px,calc(100% - 16px));max-width:none;margin:0;gap:4px;border-radius:24px 24px 0 0;background:color-mix(in srgb,var(--card) 92%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);border:1px solid var(--line);border-bottom:0;box-shadow:0 -10px 30px -14px color-mix(in srgb,#000 30%,transparent)}
+.tab{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:transparent;box-shadow:none;padding:6px 4px;min-height:48px;flex:1 1 0;text-align:center;font-weight:600;color:var(--mut);border-radius:0 0 16px 16px}
+.tab .ti{font-size:20px;line-height:1}
+.tab .tl{font-size:11px;line-height:1.1;letter-spacing:.01em}
+.tab:hover{box-shadow:none;transform:none;background:color-mix(in srgb,var(--olv-t) 8%,transparent)}
+.tab.on,.tab.on:hover{background:color-mix(in srgb,var(--pri) 12%,transparent);box-shadow:none;color:var(--olv-tx);font-weight:700}
+.tab.on::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:28px;height:3px;border-radius:0 0 3px 3px;background:var(--pri)}
+.tab.on .ti{transform:scale(1.08)}
 .btn{border:1px solid color-mix(in srgb,var(--line) 70%,transparent);padding:8px 24px;font-weight:600}
 .btn.p{background:linear-gradient(135deg,var(--pri),color-mix(in srgb,var(--pri) 62%,#000));border-color:transparent;box-shadow:0 10px 22px -10px var(--pri)}
 .btn.a{background:linear-gradient(135deg,color-mix(in srgb,var(--acc) 90%,#000),color-mix(in srgb,var(--acc) 62%,#000));border-color:transparent}
@@ -221,7 +226,7 @@ body{font-variant-numeric:lining-nums}
 .crd .cur span{color:var(--olv-tx);font-weight:700}
 
 .lx.err{border-color:#D65A6A!important;box-shadow:0 0 0 3px rgba(214,90,106,.22)}
-.rt{position:fixed;left:16px;right:92px;max-width:380px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:30;background:color-mix(in srgb,var(--pri) 66%,#000);color:var(--onpri);border-radius:22px;padding:8px 16px 16px;box-shadow:var(--shh);display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:center;overflow:hidden}
+.rt{position:fixed;left:16px;right:92px;max-width:380px;bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:45;background:color-mix(in srgb,var(--pri) 66%,#000);color:var(--onpri);border-radius:22px;padding:8px 16px 16px;box-shadow:var(--shh);display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:center;overflow:hidden}
 .rt[hidden]{display:none}
 .rt .rtt{grid-row:1/3;font:600 34px/1 'Cormorant Garamond',Georgia,serif;min-width:70px;font-variant-numeric:tabular-nums}
 .rt .rtl{min-width:0;display:flex;flex-direction:column;line-height:1.25}
@@ -232,7 +237,7 @@ body{font-variant-numeric:lining-nums}
 .rt .rp{position:absolute;left:0;bottom:0;height:4px;background:var(--gold);transition:width .25s linear}
 .rt.done{background:color-mix(in srgb,var(--gold) 78%,#000);color:#FCFFFF;animation:rtp 1s ease-in-out infinite}.rt.done .rb{background:rgba(255,255,255,.18)}
 @keyframes rtp{0%,100%{box-shadow:var(--shh)}50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--gold) 45%,transparent)}}
-body.rtv #toast{bottom:calc(124px + env(safe-area-inset-bottom,0px))}
+body.rtv #toast{bottom:calc(180px + env(safe-area-inset-bottom,0px))}
 .al{border-left:4px solid var(--gold)}.al.high{border-left-color:#D65A6A}
 .al .it{padding:8.0px 0;border-top:1px solid color-mix(in srgb,var(--olv-t) 18%,transparent)}
 
@@ -247,7 +252,7 @@ h2::after{background:var(--olv-t)}
 .card,.tile{border-color:color-mix(in srgb,var(--olv-t) 22%,transparent)}
 .btn{border-color:color-mix(in srgb,var(--olv-t) 25%,transparent)}
 nav{border-color:color-mix(in srgb,var(--olv-t) 35%,transparent)}
-.tab{color:var(--olv-t)}.tab.on,.tab.on:hover{color:var(--onpri)}
+.tab{color:var(--mut)}.tab.on,.tab.on:hover{color:var(--olv-tx)}
 .hero,.phero,.rt{background:linear-gradient(150deg,var(--olv-s),color-mix(in srgb,var(--olv-s) 72%,#000));color:#FCFFFF}
 .hero .mut,.phero span{color:inherit}
 .hero::after{background:radial-gradient(circle,rgba(252,255,255,.18),transparent 70%)}
@@ -268,15 +273,15 @@ nav{border-color:color-mix(in srgb,var(--olv-t) 35%,transparent)}
 :root{--s1:8px;--s2:16px;--s3:24px;--s4:32px;--s6:48px}
 body{line-height:24px}
 .mut{line-height:20px}
-main{padding:8px 24px 152px}
-header{padding:24px 24px 8px}
-nav{width:min(1120px,calc(100% - 32px));padding:8px;margin:8px auto 24px}
+main{padding:8px 24px calc(96px + env(safe-area-inset-bottom,0px))}
+header{padding:8px 16px}
+nav{left:50%;right:auto;transform:translateX(-50%);width:min(620px,calc(100% - 16px));padding:4px 8px calc(4px + env(safe-area-inset-bottom,0px));margin:0}
 .card{padding:24px;margin-bottom:24px;border-radius:32px}
 .hero,.phero{padding:32px}
 .g,.g2{gap:24px}.g2{margin-top:24px}
 .tile{padding:16px}.note{padding:16px;margin-bottom:24px}
 .btn{min-height:40px;padding:8px 24px}.btn.s{min-height:32px;padding:4px 16px}
-.tab{min-height:40px;padding:8px 16px}
+.tab{min-height:48px;padding:6px 4px}
 input,.ddb{min-height:48px;padding:0 16px}.ddb{padding-right:48px}
 input[style*="padding"]{min-height:40px}
 .fab{width:56px;height:56px}.fab::after{right:72px}.wrow .wb{width:48px;height:48px}
@@ -286,7 +291,7 @@ input[style*="padding"]{min-height:40px}
 .ring{width:192px}.ring b{font-size:48px}
 .split{gap:32px}
 .rt{padding:8px 16px 16px}
-@media(max-width:560px){main{padding:8px 16px 152px}.card{padding:16px;border-radius:24px}.hero,.phero{padding:24px}.fab{width:48px;height:48px}.tab{padding:8px 16px}}
+@media(max-width:560px){main{padding:8px 16px calc(96px + env(safe-area-inset-bottom,0px))}.card{padding:16px;border-radius:24px}.hero,.phero{padding:24px}.fab{width:48px;height:48px}.tab{padding:6px 4px}}
 
 /* ===== Law of proximity: title 8 < inner blocks 16 < gap between cards 24 ===== */
 .card>h3:first-child{margin-bottom:8px}
@@ -416,7 +421,6 @@ h1,h2,h3,.big{text-wrap:balance}p{text-wrap:pretty}
 nav,.fab,#toast,.rt,.ddl,.dpl,.sov-p,.mdl .card{box-shadow:var(--shp)}
 .fab:hover{transform:translateY(-2px);box-shadow:var(--shp)}
 .fab.on{box-shadow:0 0 0 4px color-mix(in srgb,var(--pri) 20%,transparent),var(--shp)}
-.tab.on,.tab.on:hover{box-shadow:var(--shv)}
 .dpc.sel{box-shadow:var(--shv)}.hc.l3{box-shadow:none}
 .opt:hover{transform:translateY(-2px);box-shadow:var(--shh)}
 
@@ -466,7 +470,7 @@ p[style*="text-align:center"],[style*="text-align:center"]>p{margin-left:auto!im
    both below AA. These active surfaces use a darkened primary (color-mix --pri 66% #000):
    white label clears 6.87:1 and white at .78-.8 opacity clears ~4.85:1 on light --pri.
    (Matches index.html's v13 active-state treatment.) */
-.tab.on,.tab.on:hover,.btn.p,.btn.p:hover,.seg .btn.on,.fo.on,.ddo.on,.lgb.on,.hd .btn.s.lgb.on,.dpn:hover{background:color-mix(in srgb,var(--pri) 66%,#000)}
+.btn.p,.btn.p:hover,.seg .btn.on,.fo.on,.ddo.on,.lgb.on,.hd .btn.s.lgb.on,.dpn:hover{background:color-mix(in srgb,var(--pri) 66%,#000)}
 .chip.on{background:color-mix(in srgb,var(--pri) 66%,#000)!important}
 </style></head><body>
 <header><h1>Forma</h1><div class="hd"><button class="btn s lgb" data-lg="en" aria-label="English">EN</button><button class="btn s lgb" data-lg="es" aria-label="Español">ES</button><button class="btn s" id="th" aria-label="Toggle light or dark">🌗</button></div></header>
@@ -815,8 +819,8 @@ ACT.map(([v,n,d])=>`<button class="opt ${p.act==v?'on':''}" data-a="oact" data-v
 GL.map(([v,n,d,x])=>`<button class="opt ${p.goal==v?'on':''}" data-a="ogl" data-v="${v}" data-x="${x}"><b>${n}</b><span>${d}</span></button>${v=='maint'?MI():''}`).join(''),
 `<div class="card" style="margin-bottom:0"><div id="res"></div></div><p class="mut">You can change any of this later in Settings.</p>`];
 $('#obc').innerHTML=`<div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:16px"><button class="btn s lgb ${LANG=='en'?'on':''}" data-lg="en" style="flex:none">English</button><button class="btn s lgb ${LANG=='es'?'on':''}" data-lg="es" style="flex:none">Español</button></div><div class="pg"><i style="width:${(oi+1)/7*100}%"></i></div><h1>${T[oi]}</h1><div style="margin-top:16px">${B[oi]}</div><div class="row" style="margin-top:24px;flex-wrap:nowrap">${oi?'<button class="btn" data-a="obk">Back</button>':''}<button class="btn p" data-a="onx">${oi==6?'Start tracking':'Continue'}</button></div>`;if(oi==6)res()}
-let tab='today';const TABS=[['today','🏠 Today'],['foods','🥑 Foods'],['weight','⚖️ Weight'],['body','📏 Body'],['gym','🏋️ Gym']];
-function go(t){tab=t;$('#nav').innerHTML=TABS.map(([k,l])=>`<button class="tab ${k==t?'on':''}" data-t="${k}">${l}</button>`).join('');const m=$('#main');m.innerHTML=V[t]();m.classList.toggle('wide',t=='week');m.style.animation='none';m.offsetHeight;m.style.animation='';if(t=='plan')res();if(t=='gym')gres();if(t=='today')flist();if(t=='stats')rs();document.querySelectorAll('.fab').forEach(x=>x.classList.toggle('on',x.dataset.t==t));dd();sovr()}
+let tab='today';const TABS=[['today','🏠','Today'],['foods','🥑','Foods'],['weight','⚖️','Weight'],['body','📏','Body'],['gym','🏋️','Gym']];
+function go(t){tab=t;$('#nav').innerHTML=TABS.map(([k,ic,l])=>`<button class="tab ${k==t?'on':''}" data-t="${k}"${k==t?' aria-current="page"':''}><span class="ti" aria-hidden="true">${ic}</span><span class="tl">${l}</span></button>`).join('');const m=$('#main');m.innerHTML=V[t]();m.classList.toggle('wide',t=='week');m.style.animation='none';m.offsetHeight;m.style.animation='';if(t=='plan')res();if(t=='gym')gres();if(t=='today')flist();if(t=='stats')rs();document.querySelectorAll('.fab').forEach(x=>x.classList.toggle('on',x.dataset.t==t));dd();sovr()}
 document.addEventListener('input',e=>{const k=e.target.dataset.k;if(!k)return;if(k=='p.wu'||k=='p.hu'){const q=k=='p.wu'?'w':'h';unit(k.slice(2),e.target.value);const f=document.querySelector(`[data-k="p.${q}"]`);if(f)f.value=S.p[q];res();return}const[o,p]=k.split('.');let v=e.target.value;if(e.target.type=='number'||e.target.type=='range'||e.target.dataset.n)v=v===''?'':(parseFloat(v)||0);S[o][p]=v;save();if(o=='p')res();else gres()});
 document.addEventListener('change',e=>{if(e.target.id=='imp'){const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const o=JSON.parse(t);if(!o.p||!o.foods)throw 0;localStorage.setItem(K,t);location.reload()}catch(x){toast('That file is not a Forma backup')}});return}if(e.target.id=='wdt'){wdt=e.target.value||today();return go(tab)}if(e.target.id=='mdt'){mdt=e.target.value||today();return go(tab)}if(e.target.id=='wcl'){S.wcl=+e.target.value;save();return go(tab)}if(e.target.id=='gsz'){S.gs=Math.min(2000,Math.max(50,Math.round(parseFloat(e.target.value))||250));save();return go(tab)}if(e.target.id=='wgl'){S.wa[day]=Math.max(0,Math.floor(parseFloat(e.target.value))||0);save();return go(tab)}if(e.target.id=='fs'){const f=S.foods.find(x=>x.id==e.target.value);$('#ql').textContent=f.b=='g'?'Amount (grams)':'Amount (units)';$('#qty').value=f.b=='g'?100:1}});
 $('#th').onclick=()=>{const r=document.documentElement,d=r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches;S.mode=r.dataset.theme=d?'light':'dark';save()};
@@ -907,7 +911,7 @@ const D={
 "Close":"Cerrar","Failure. Every set of isolation and machine lifts":"Fallo. Todas las series de ejercicios aislados y de máquina","Top end of heavy compounds":"Extremo alto de los compuestos pesados","Stop timer":"Detener temporizador","Rest over, next set":"Descanso terminado, siguiente serie","Heavy compound · rest 3–4 min":"Compuesto pesado · descanso 3–4 min","Isolation lift · rest 2 min":"Ejercicio de aislamiento · descanso 2 min","Heavy compound":"Compuesto pesado","Isolation lift":"Ejercicio de aislamiento","RIR is required for every set.":"El RIR es obligatorio en cada serie.","⏱ Auto-start rest":"⏱ Descanso automático","⏱ Heavy 3:30":"⏱ Pesado 3:30","⏱ Isolation 2:00":"⏱ Aislamiento 2:00","Deload week: about half the sets, lighter weights, stop 3–4 reps short of failure.":"Semana de descarga: aproximadamente la mitad de las series, pesos más ligeros y detén cada serie 3–4 repeticiones antes del fallo.","Too close to failure for this target":"Demasiado cerca del fallo para este objetivo","Easier than planned":"Más fácil de lo planeado","Room to spare: add a rep or a little weight":"Te sobró margen: añade una repetición o un poco de peso","Push closer to failure on isolation lifts":"Acércate más al fallo en los ejercicios aislados","✅ On target":"✅ En el objetivo","Enter RIR (0–5) for every set":"Escribe el RIR (0–5) en cada serie","Workout saved · some sets were off the RIR target":"Entrenamiento guardado · algunas series se salieron del objetivo de RIR","📈 Strength progress":"📈 Progreso de fuerza","Squat":"Sentadilla","🏋️ Squat":"🏋️ Sentadilla","Deadlift":"Peso muerto","Estimated 1RM":"1RM estimado","No sessions logged yet. Log a workout with this lift to start your chart.":"Aún no hay sesiones. Registra un entrenamiento con este ejercicio para iniciar tu gráfico.","Log one more session to see the trend.":"Registra una sesión más para ver la tendencia.","Estimated 1RM per session from your best set, adjusted for the reps you had left (RIR). Deload sessions are left out.":"1RM estimado por sesión a partir de tu mejor serie, ajustado según las repeticiones que te quedaban (RIR). Las sesiones de descarga no se incluyen.","⚠️ Possible recovery issue":"⚠️ Posible problema de recuperación","👀 Strength is stalling":"👀 La fuerza se está estancando","Your numbers are trending down. Plan a deload week: about half the sets, weights around 10% lighter, and every set 3–4 reps from failure. If that feels like too much, drop 1 set from every exercise for the next two weeks.":"Tus números van a la baja. Planifica una semana de descarga: aproximadamente la mitad de las series, pesos alrededor de un 10 % más ligeros y cada serie a 3–4 repeticiones del fallo. Si es demasiado, quita 1 serie de cada ejercicio durante las próximas dos semanas.","Try cutting 1–2 sets from the stalled lifts next session, hit your RIR targets and protect your sleep. If it continues, take a deload.":"Prueba a quitar 1–2 series de los ejercicios estancados en la próxima sesión, cumple tus objetivos de RIR y cuida tu sueño. Si continúa, haz una descarga.","Your heavy lifts are being taken to failure, which adds fatigue.":"Estás llevando los ejercicios pesados al fallo, lo que añade fatiga.","Start deload week":"Iniciar semana de descarga","Dismiss":"Descartar","End deload":"Terminar descarga","🔄 Deload week":"🔄 Semana de descarga","Until":"Hasta","Half the sets, weights about 10% lighter, every set stopped 3–4 reps short of failure.":"La mitad de las series, pesos un 10 % más ligeros y cada serie detenida 3–4 repeticiones antes del fallo.","Open the Gym tab to see what to do.":"Abre la pestaña Gimnasio para ver qué hacer.","View":"Ver","Deload week started":"Semana de descarga iniciada","Deload ended":"Descarga terminada",
 "👟 Steps":"👟 Pasos","Target 8,000–10,000 steps/day":"Meta: 8.000–10.000 pasos al día","Not logged yet":"Aún sin registrar","Keep walking":"Sigue caminando","In the target range ✅":"En el rango objetivo ✅","Above target 🔥":"Por encima de la meta 🔥","Steps today":"Pasos de hoy","Total steps":"Pasos totales","Save":"Guardar","Last 7 days":"Últimos 7 días","Avg":"Prom.","Walking burns fat without taxing your muscle recovery or nervous system.":"Caminar quema grasa sin comprometer la recuperación muscular ni el sistema nervioso.","😴 Sleep & recovery":"😴 Sueño y recuperación","Target 7–9 hours of quality sleep":"Meta: 7–9 horas de sueño de calidad","Under-recovered ⚠️":"Recuperación insuficiente ⚠️","Almost there":"Casi en la meta","In the zone ✅":"En la zona ✅","Long sleep":"Sueño largo","Hours slept":"Horas dormidas","e.g. 7.5":"p. ej. 7,5","Stress today":"Estrés de hoy","1 = calm · 5 = very stressed":"1 = tranquilo · 5 = muy estresado","Low sleep or high stress: consider trimming volume or intensity today.":"Poco sueño o mucho estrés: considera reducir el volumen o la intensidad hoy.","Sleep and stress set how much training volume you can tolerate and how well you build muscle.":"El sueño y el estrés determinan cuánto volumen de entrenamiento toleras y qué tan bien ganas músculo.","💊 Creatine":"💊 Creatina","Mark as taken":"Marcar como tomada","Taken today ✅":"Tomada hoy ✅","Day streak":"Días seguidos","This week":"Esta semana","Creatine monohydrate, 3–5 g daily. Consistency matters more than timing.":"Monohidrato de creatina, 3–5 g al día. La constancia importa más que el horario.","Steps saved":"Pasos guardados","Steps added":"Pasos sumados","Enter your steps":"Ingresa tus pasos","Sleep saved":"Sueño guardado","Sleep cleared":"Sueño borrado","Enter hours between 0 and 24":"Ingresa horas entre 0 y 24","Creatine logged":"Creatina registrada","Creatine unmarked":"Creatina desmarcada",
 "Burgundy theme":"Tema vino","Olive theme":"Tema oliva","Cream theme":"Tema crema","Toggle light or dark":"Cambiar claro u oscuro","Language":"Idioma",
-"🏠 Today":"🏠 Hoy","🥑 Foods":"🥑 Alimentos","⚖️ Weight":"⚖️ Peso","📏 Body":"📏 Cuerpo","🏋️ Gym":"🏋️ Gimnasio","Week":"Semana","Stats":"Estadísticas","Settings":"Ajustes",
+"🏠 Today":"🏠 Hoy","🥑 Foods":"🥑 Alimentos","⚖️ Weight":"⚖️ Peso","📏 Body":"📏 Cuerpo","🏋️ Gym":"🏋️ Gimnasio","Body":"Cuerpo","Gym":"Gimnasio","Week":"Semana","Stats":"Estadísticas","Settings":"Ajustes",
 "Monthly measurements":"Medidas mensuales","Measure now":"Medir ahora","Tomorrow":"Mañana",
 "It has been a month since your last measurements. Ready to log new ones?":"Ha pasado un mes desde tus últimas medidas. ¿Listo para registrar nuevas?","Add your first set of body measurements so we can track your progress.":"Añade tu primer juego de medidas corporales para seguir tu progreso.",
 "Today":"Hoy","Losing fat":"Perdiendo grasa","Maintaining":"Manteniendo","Building muscle":"Ganando músculo","kcal over":"kcal de más","kcal left":"kcal restantes","Budget":"Presupuesto","Eaten":"Comido","Burned":"Quemado",
