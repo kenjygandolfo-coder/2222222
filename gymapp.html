@@ -17,8 +17,8 @@ input,textarea,select{caret-color:var(--olv-t)}
 /* The .wine cream-flip is LIGHT-MODE ONLY. In dark mode a .wine card must render
    like any normal dark card (the surface itself is wine-tinted in FEAT-002), so
    reset the surface and hand every local token back to the inherited dark value. */
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card.wine{background:var(--card);color:var(--ink);--ink:inherit;--mut:inherit;--line-ui:inherit;--line:inherit;--data-1:inherit;--data-2:inherit;--ok-fg:inherit;--err-fg:inherit;--warn-fg:inherit;--pri:inherit;--pri-hov:inherit;--pri-dk:inherit;--onpri:inherit}}
-:root[data-theme="dark"] .card.wine{background:var(--card);color:var(--ink);--ink:inherit;--mut:inherit;--line-ui:inherit;--line:inherit;--data-1:inherit;--data-2:inherit;--ok-fg:inherit;--err-fg:inherit;--warn-fg:inherit;--pri:inherit;--pri-hov:inherit;--pri-dk:inherit;--onpri:inherit}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card.wine{background:var(--card);color:var(--ink);--card:inherit;--ink:inherit;--mut:inherit;--line-ui:inherit;--line:inherit;--olv-t:inherit;--olv-tx:inherit;--data-1:inherit;--data-2:inherit;--ok-fg:inherit;--err-fg:inherit;--warn-fg:inherit;--pri:inherit;--pri-hov:inherit;--pri-dk:inherit;--onpri:inherit}}
+:root[data-theme="dark"] .card.wine{background:var(--card);color:var(--ink);--card:inherit;--ink:inherit;--mut:inherit;--line-ui:inherit;--line:inherit;--olv-t:inherit;--olv-tx:inherit;--data-1:inherit;--data-2:inherit;--ok-fg:inherit;--err-fg:inherit;--warn-fg:inherit;--pri:inherit;--pri-hov:inherit;--pri-dk:inherit;--onpri:inherit}
 /* likewise undo the wine-card button text/border flip in dark */
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card.wine .btn,:root:not([data-theme="light"]) .card.wine .btn.s,:root:not([data-theme="light"]) .card.wine .btn.a{color:var(--olv-t);border-color:var(--olv-t)}}
 :root[data-theme="dark"] .card.wine .btn,:root[data-theme="dark"] .card.wine .btn.s,:root[data-theme="dark"] .card.wine .btn.a{color:var(--olv-t);border-color:var(--olv-t)}
@@ -77,7 +77,7 @@ table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8.0px 4p
    text 10.81 - all >= WCAG thresholds. Scoped to LIGHT mode only (the dark resets
    below hand it back to the normal dark card, because FEAT-002 makes the whole
    dark theme wine and a cream card there would look wrong). */
-.card.wine{background:#5C1A22;color:#F3EAD9;--ink:#F3EAD9;--mut:#E3D6C2;--line-ui:#B88A92;--line:#B88A92;--data-1:#F3EAD9;--data-2:#A8AE78;--ok-fg:#72CC8D;--err-fg:#EB8C7E;--warn-fg:#CBA362;--pri:#F3EAD9;--pri-hov:#F3EAD9;--pri-dk:#F3EAD9;--onpri:#5C1A22}
+.card.wine{background:#5C1A22;color:#F3EAD9;--card:#5C1A22;--ink:#F3EAD9;--mut:#E3D6C2;--line-ui:#B88A92;--line:#B88A92;--olv-t:#F3EAD9;--olv-tx:#F3EAD9;--data-1:#F3EAD9;--data-2:#A8AE78;--ok-fg:#72CC8D;--err-fg:#EB8C7E;--warn-fg:#CBA362;--pri:#F3EAD9;--pri-hov:#F3EAD9;--pri-dk:#F3EAD9;--onpri:#5C1A22}
 /* olive-outline secondary/tertiary buttons would read olive-on-wine inside a wine
    card; flip their text/border to cream so they stay legible (>=4.5:1). */
 .card.wine .btn,.card.wine .btn.s,.card.wine .btn.a{color:var(--ink);border-color:var(--ink)}

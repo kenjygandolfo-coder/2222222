@@ -121,6 +121,14 @@ wineRow('mut',        '#E3D6C2', WINE_LIGHT, AA_TEXT);
 wineRow('border',     '#B88A92', WINE_LIGHT, AA_NON);
 wineRow('data-1',     '#F3EAD9', WINE_LIGHT, AA_NON);
 wineRow('data-2',     '#A8AE78', WINE_LIGHT, AA_NON);
+// olv-t is the olive accent that .big KPI numbers, .hst chip text, .crd .cur span
+// and the Water gauge number/arc-start all paint themselves with. The .card.wine
+// block repoints it to cream #F3EAD9 so these focal elements stay legible on wine.
+wineRow('olv-t',      '#F3EAD9', WINE_LIGHT, AA_TEXT);
+// .hst status chip: .card.wine also repoints --card to wine #5C1A22, so the chip
+// tint background is color-mix(olv-t 16%, card) = #743B3F; its cream text must clear
+// 4.5:1 against that actual painted background.
+wineRow('hst chip',   '#F3EAD9', '#743B3F', AA_TEXT);
 wineRow('ok-fg',      '#72CC8D', WINE_LIGHT, AA_TEXT);
 wineRow('err-fg',     '#EB8C7E', WINE_LIGHT, AA_TEXT);
 wineRow('warn-fg',    '#CBA362', WINE_LIGHT, AA_TEXT);
