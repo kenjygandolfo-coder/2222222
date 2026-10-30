@@ -129,6 +129,11 @@ wineRow('olv-t',      '#F3EAD9', WINE_LIGHT, AA_TEXT);
 // tint background is color-mix(olv-t 16%, card) = #743B3F; its cream text must clear
 // 4.5:1 against that actual painted background.
 wineRow('hst chip',   '#F3EAD9', '#743B3F', AA_TEXT);
+// .note.info heading: the local wine --card re-tints the note background to
+// color-mix(in srgb, var(--info) 12%, #5C1A22) = #5F2730 (--info is #748796). The
+// .card.wine block repoints --info-fg to cream #F3EAD9 so the Weekly plan spill
+// ("Could not fit this week") heading clears 4.5:1 on that wine-tinted ground.
+wineRow('info-fg',    '#F3EAD9', '#5F2730', AA_TEXT);
 wineRow('ok-fg',      '#72CC8D', WINE_LIGHT, AA_TEXT);
 wineRow('err-fg',     '#EB8C7E', WINE_LIGHT, AA_TEXT);
 wineRow('warn-fg',    '#CBA362', WINE_LIGHT, AA_TEXT);
