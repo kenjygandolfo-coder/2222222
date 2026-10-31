@@ -983,8 +983,39 @@ if(!Array.isArray(S.notes))S.notes=[];
    intentionally DEFERRED to keep Phase 3 scope tight. Streaks are derived from
    `log` by the pure habitStreaks() helper (see below), never stored. */
 if(!Array.isArray(S.habits))S.habits=[];
+/* Planner > Journal + daily mood (Phase 4). This is a DATE-KEYED MAP (like
+   S.wt/S.wa/S.ms), not an array: one entry per calendar day keyed by the shared
+   fmt()/today() format. Shape:
+     S.journal = {'YYYY-MM-DD': {mood: 1..5, text: string, updated: timestamp}, ...}
+   - mood is an integer 1(Awful)..5(Great), or 0 while a day has only text.
+   - text is PLAIN text (never Markdown/HTML; escaped with esc() on render).
+   - updated is Date.now() of the last save.
+   A day with no mood AND empty text is never persisted: saving a cleared entry
+   deletes its key (see the jsave/jdel handlers). Persisted via the shared save(). */
+if(!S.journal||typeof S.journal!='object'||Array.isArray(S.journal))S.journal={};
 const toast=m=>{const t=$('#toast');t.textContent=m;t.className='on';clearTimeout(toast.t);toast.t=setTimeout(()=>t.className='',2600)};
 const r1=n=>Math.round(n*10)/10;
+
+/* Pure, testable aggregation over a journal map {'YYYY-MM-DD':{mood,text,...}}.
+   moodSummary(journal, days=30) looks back over the last `days` CALENDAR days
+   ending today (today included) and returns:
+     {points:[{d:'YYYY-MM-DD', mood:number}] in ASCENDING date order (only days
+      that HAVE a mood 1..5), count:points.length, avg: mean mood rounded to one
+      decimal via r1() or null when count==0}.
+   Date stepping uses the same fmt()/new Date(y,m-1,d) local-midnight scheme as
+   the rest of the app so keys line up with today().
+   This body is MIRRORED VERBATIM in tools/journal-mood.test.mjs — keep the two
+   in sync (same discipline as habitStreaks()). */
+function moodSummary(journal,days=30){journal=journal||{};
+const end=today(),[ey,em,ed]=end.split('-').map(Number),points=[];
+for(let i=days-1;i>=0;i--){const dd=new Date(ey,em-1,ed-i),k=fmt(dd),e=journal[k];
+if(e&&e.mood>=1&&e.mood<=5)points.push({d:k,mood:e.mood})}
+const count=points.length,avg=count?r1(points.reduce((t,p)=>t+p.mood,0)/count):null;
+return{points,count,avg}}
+/* Counts of each mood level 1..5 within the same last-`days` window. Mirrored in
+   tools/journal-mood.test.mjs alongside moodSummary(). */
+function moodDistribution(journal,days=30){const s=moodSummary(journal,days),out={1:0,2:0,3:0,4:0,5:0};
+s.points.forEach(p=>{out[p.mood]++});return out}
 
 function calc(){const p=S.p,kg=p.wu=='lb'?p.w/2.20462:p.w,cm=p.hu=='in'?p.h*2.54:p.h;
 const bmr=p.sex=='m'?88.362+13.397*kg+4.799*cm-5.677*p.age:447.593+9.247*kg+3.098*cm-4.33*p.age;
@@ -1254,7 +1285,34 @@ editor=`<div class="card"><h3>${hedit=='new'?'New habit':'Edit habit'}</h3>
 return`<h2>Habits</h2>
 ${hedit==null?`<div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Habits</h3><button class="btn p" style="flex:none" data-a="hnew">New habit</button></div></div>`:''}
 ${editor}
-${hedit==null?(list.length?list.map(row).join(''):'<p class="mut">No habits yet</p>'):''}`}};
+${hedit==null?(list.length?list.map(row).join(''):'<p class="mut">No habits yet</p>'):''}`},
+
+journal(){
+const exists=!!S.journal[jdate];
+/* EDITOR for the selected day: date picker + mood selector + plain-text entry. */
+const faces=MOODS.map(([lv,lbl,em])=>`<button class="btn ${jdraft.mood==lv?'on':''}" data-a="jmood" data-v="${lv}" aria-label="${lbl}" aria-pressed="${jdraft.mood==lv?'true':'false'}" style="flex:1;min-width:0;flex-direction:column;gap:2px;padding:8px 4px"><span style="font-size:22px" aria-hidden="true">${em}</span><span style="font-size:11px">${lbl}</span></button>`).join('');
+const editor=`<div class="card"><div class="f">Date<div class="row" style="flex-wrap:nowrap;align-items:center;gap:8px">${dpk('jk_date',jdate)}</div></div>
+<div class="f" style="margin-top:8px">How are you feeling?</div>
+<div class="seg" style="gap:6px">${faces}</div>
+<label class="f" style="margin-top:12px">Journal entry<textarea id="jk_text" rows="4" placeholder="Write about your day…" aria-label="Journal entry">${esc(jdraft.text)}</textarea></label>
+<div class="row" style="margin-top:8px"><button class="btn p" data-a="jsave">Save entry</button>${exists?`<button class="btn t" data-a="jdel" data-d="${jdate}">Delete</button>`:''}</div></div>`;
+/* MOOD SUMMARY: hand-rolled SVG chart (or a muted hint when <2 days) + average. */
+const s=moodSummary(S.journal,30),chart=moodChart(S.journal);
+let summary;
+if(s.count>=2){const avgMeta=moodMeta(Math.round(s.avg));
+summary=`${chart}<div class="li"><span>Average mood</span><span style="flex:none;color:${moodColor(Math.round(s.avg))};font-weight:700">${s.avg}${avgMeta?' '+avgMeta[2]+' '+avgMeta[1]:''}</span></div>`;}
+else summary=`<p class="mut">Log more days to see your mood summary.</p>`;
+const summaryCard=`<div class="card"><h3 style="margin:0 0 4px">Mood summary</h3><p class="cap" style="margin:0 0 8px">Last 30 days</p>${summary}</div>`;
+/* HISTORY list, date DESCENDING. */
+const prev=t=>{t=(t||'').replace(/\s+/g,' ').trim();return t.length>120?t.slice(0,120)+'…':t};
+const keys=Object.keys(S.journal).sort().reverse();
+const row=k=>{const e=S.journal[k],mt=moodMeta(e.mood),p=prev(e.text);
+return`<div class="card" style="margin-bottom:8px"><div class="row" style="justify-content:space-between;gap:8px;align-items:flex-start"><b style="min-width:0;overflow-wrap:anywhere">${esc(fmtD(k))}</b>${mt?`<span class="chip" style="flex:none;color:${moodColor(e.mood)};font-weight:700"><span aria-hidden="true">${mt[2]}</span> ${mt[1]}</span>`:''}</div>${p?`<p class="mut" style="margin:4px 0 0;overflow-wrap:anywhere">${esc(p)}</p>`:''}<div class="row" style="margin-top:8px"><button class="btn s" style="flex:none" data-a="jedit" data-d="${k}">Edit</button><button class="btn s t" style="flex:none" data-a="jdel" data-d="${k}">Delete</button></div></div>`};
+return`<h2>Journal</h2>
+${editor}
+${summaryCard}
+<h3 style="margin:16px 0 8px">History</h3>
+${keys.length?keys.map(row).join(''):'<p class="mut">No entries yet.</p>'}`}};
 
 const E=(n,s,r,rir,k,alt=[],x='')=>({n,s,r,rir,k,alt,x}),H='H',I='I';
 const D3=[['Mon','Session A',[E('Hack squat',3,'6–8','2',H,['Pendulum squat','Smith squat']),E('Flat bench press',3,'6–8','2',H,['Machine chest press']),E('Lat pulldown',3,'8–10','1–0',I,['Neutral-grip pulldown']),E('Romanian deadlift',2,'6–8','2',H,['Hip thrust']),E('T-bar row',3,'8–10','1–0',I,['Seated cable row']),E('Lateral raise',3,'10–12','0 last set',I,['Cable lateral raise']),E('EZ-bar curl',2,'8–12','0',I,['Incline biceps curl']),E('Cable pushdown',2,'8–12','0',I,['Overhead triceps extension'])]],
@@ -2288,6 +2346,17 @@ let hedit=null,hdraft={name:'',icon:''};
    re-render keeps the user's input. Mirrors tcap()/ncap(). */
 function hcap(){if(hedit==null)return;const n=$('#hk_name'),i=$('#hk_icon');if(n)hdraft.name=n.value;if(i)hdraft.icon=i.value}
 
+/* ---- Planner > Journal + daily mood (Phase 4) ---- */
+/* Transient editor state. The journal is exactly one entry per day, so the
+   editor targets a SELECTED DATE (jdate, default today, changeable via dpk).
+   jdraft mirrors that day's stored entry while editing; it is not persisted
+   until Save. When jdate changes we reload the stored entry (see jload()). */
+let jdate=today(),jdraft={mood:0,text:''};
+function jload(k){const e=S.journal[k]||{};jdraft={mood:e.mood||0,text:e.text||''}}
+/* Capture the in-progress textarea into jdraft so a re-render (e.g. tapping a
+   mood face) keeps the user's typed text. Mirrors tcap()/ncap()/hcap(). */
+function jcap(){const t=$('#jk_text');if(t)jdraft.text=t.value}
+
 /* Hand-written vanilla-JS Markdown renderer. NO external libraries.
    SECURITY: the raw input is HTML-escaped FIRST via esc() (& < > "), so no
    user HTML can ever reach the DOM; Markdown transforms run only on the
@@ -2413,6 +2482,23 @@ function mdue(){const ks=Object.keys(S.ms).sort(),l=ks[ks.length-1];if(!l)return
 function mprompt(){if(!mdue()||S.mdis==today())return;$('#mdt2').textContent=Object.keys(S.ms).length?'It has been a month since your last measurements. Ready to log new ones?':'Add your first set of body measurements so we can track your progress.';$('#mdl').hidden=false;try{if(Notification.permission=='granted')new Notification('Forma',{body:'Time for your monthly measurements 📏'})}catch(e){}}
 function mchart(k){const pts=Object.keys(S.ms).sort().filter(d=>S.ms[d][k]!=null).map(d=>[d,S.ms[d][k]]);if(pts.length<2)return'<p class="mut">Add at least two entries with this area to see a chart.</p>';const v=pts.map(p=>p[1]),a=Math.min(...v),R=(Math.max(...v)-a)||1,xy=pts.map((p,i)=>[24+i/(pts.length-1)*252,26+(1-(p[1]-a)/R)*64]);
 return`<svg viewBox="0 0 300 130" style="width:100%"><polyline points="${xy.map(q=>q.join(',')).join(' ')}" fill="none" stroke="var(--olv-t)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${xy.map((q,i)=>`<circle cx="${q[0]}" cy="${q[1]}" r="4.5" fill="var(--card)" stroke="var(--olv-t)" stroke-width="2.5"><title>${pts[i][0]}: ${pts[i][1]} cm</title></circle><text x="${q[0]}" y="${q[1]-10}" text-anchor="middle" style="font:600 9px Montserrat,sans-serif;fill:var(--ink)">${pts[i][1]}</text>`).join('')}<text x="24" y="122" text-anchor="middle" style="font:500 8px Montserrat,sans-serif;fill:var(--mut)">${pts[0][0]}</text><text x="276" y="122" text-anchor="middle" style="font:500 8px Montserrat,sans-serif;fill:var(--mut)">${pts[pts.length-1][0]}</text></svg>`}
+/* Shared 5-level mood scale for the picker and the chart: [level, EnglishLabel, emoji].
+   The label strings are i18n keys (see D). Colors map each level to an EXISTING
+   state token so marks stay legible on the wine card in both themes: 1-2 err,
+   3 warn, 4-5 ok. No new color hexes are introduced. */
+const MOODS=[[1,'Awful','😣'],[2,'Bad','🙁'],[3,'Okay','😐'],[4,'Good','🙂'],[5,'Great','😄']];
+const moodMeta=m=>MOODS.find(x=>x[0]==m)||null;
+const moodColor=m=>m<=2?'var(--err-fg)':m==3?'var(--warn-fg)':'var(--ok-fg)';
+/* Hand-rolled inline SVG mood summary (NO libraries), mirroring spark()'s style:
+   a gradient-filled area + a dashed average line + a 3px round-capped polyline on
+   a FIXED 1..5 Y scale (so the chart is comparable over time). Plots only days
+   that have a mood, over the last 30 days. Returns '' when fewer than 2 points so
+   the caller can show the muted "Log more days…" message (same convention as
+   spark() returning '' / mchart() returning its muted <p>). All colors come from
+   tokens that remap correctly inside the wine .card. */
+function moodChart(journal){const s=moodSummary(journal,30),pts=s.points;if(pts.length<2)return'';
+const Y=m=>70-(m-1)/4*60,xy=pts.map((p,i)=>[i/(pts.length-1)*280+10,Y(p.mood)]),poly=xy.map(q=>q.join(',')).join(' '),l=xy[xy.length-1],av=s.avg;
+return`<svg viewBox="0 0 300 80" style="width:100%;margin-bottom:8.0px" role="img" aria-label="Mood over the last 30 days"><defs><linearGradient id="mgf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--data-1);stop-opacity:.24"/><stop offset="1" style="stop-color:var(--card);stop-opacity:.04"/></linearGradient></defs><polygon points="10,76 ${poly} 290,76" fill="url(#mgf)"/><line x1="10" x2="290" y1="${Y(av)}" y2="${Y(av)}" stroke="var(--olv-t)" stroke-width="1.5" stroke-dasharray="4 4" opacity=".75"/><polyline points="${poly}" fill="none" stroke="var(--data-1)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${l[0]}" cy="${l[1]}" r="5" fill="var(--olv-t)" stroke="var(--card)" stroke-width="2"/></svg>`}
 const wkStart=d=>{const x=new Date(d+'T00:00');x.setDate(x.getDate()-(x.getDay()+6)%7);return fmt(x)};let wk0=wkStart(today());
 const wkDays=ws=>[...Array(7)].map((_,i)=>{const x=new Date(ws+'T00:00');x.setDate(x.getDate()+i);return fmt(x)});
 /* ---- Weekly catch-up ------------------------------------------------------
@@ -2618,7 +2704,7 @@ const SECTIONS=[
 ['health','Health',ICO.heart,[['today','Today'],['week','Week'],['tracking','Tracking'],['gym','Gym'],['stats','Stats']]],
 ['finance','Finance',ICO.wallet,null],
 ['study','Study',ICO.book,null],
-['planner','Planner',ICO.list,[['tasks','Tasks'],['notes','Notes'],['habits','Habits']]],
+['planner','Planner',ICO.list,[['tasks','Tasks'],['notes','Notes'],['habits','Habits'],['journal','Journal']]],
 ['profile','Profile',ICO.person,null]];
 const SECMAP=Object.fromEntries(SECTIONS.map(s=>[s[0],{label:s[1],icon:s[2],subs:s[3]}]));
 /* provisional 'Coming soon' copy: [EnglishLine] (translated to ES via the i18n map) */
@@ -2643,7 +2729,7 @@ if(sec=='profile'){legacy='plan';body=V.plan()}
 else if(sec=='health'){
 if(foodsMode){legacy='foods';body=V.foods()}
 else{const sub=subOf.health||'today';legacy=sub;const vk={today:'today',week:'week',tracking:'tracking',gym:'gym',stats:'stats'}[sub]||'today';body=subRow(info.subs,sub)+V[vk]()}}
-else if(sec=='planner'){const sub=subOf.planner||'tasks';legacy=sub;body=subRow(info.subs,sub)+(sub=='notes'?V.notes():sub=='habits'?V.habits():V.tasks())}
+else if(sec=='planner'){const sub=subOf.planner||'tasks';legacy=sub;body=subRow(info.subs,sub)+(sub=='notes'?V.notes():sub=='habits'?V.habits():sub=='journal'?V.journal():V.tasks())}
 else{/* provisional */const line=SOON[sec]||'';body=`<div class="cs"><div class="csi" aria-hidden="true">${info.icon}</div><h2>${info.label}</h2><div class="cst">Coming soon</div><p>${line}</p></div>`}
 tab=legacy;
 m.innerHTML=body;m.classList.toggle('wide',legacy=='week');m.style.animation='none';m.offsetHeight;m.style.animation='';
@@ -2666,7 +2752,7 @@ const hs=['today','week','tracking','gym','stats'];if(hs.includes(t)){foodsMode=
 if(t=='tasks'){return goSection('planner')}
 return goSection(t)}
 document.addEventListener('input',e=>{const k=e.target.dataset.k;if(!k)return;if(k=='p.wu'||k=='p.hu'){const q=k=='p.wu'?'w':'h';unit(k.slice(2),e.target.value);const f=document.querySelector(`[data-k="p.${q}"]`);if(f)f.value=S.p[q];res();return}const[o,p]=k.split('.');let v=e.target.value;if(e.target.type=='number'||e.target.type=='range'||e.target.dataset.n)v=v===''?'':(parseFloat(v)||0);S[o][p]=v;save();if(o=='p')res();else gres()});
-document.addEventListener('change',e=>{if(e.target.id=='imp'){const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const o=JSON.parse(t);if(!o.p||!o.foods)throw 0;localStorage.setItem(K,t);location.reload()}catch(x){toast('That file is not a Forma backup')}});return}if(e.target.id=='wdt'){wdt=e.target.value||today();return go(tab)}if(e.target.id=='mdt'){mdt=e.target.value||today();return go(tab)}if(e.target.id=='tk_due'){tcap();tdraft.due=e.target.value||'';render();return}if(e.target.id=='tk_remind'){tdraft.remind=e.target.value||'';return}
+document.addEventListener('change',e=>{if(e.target.id=='imp'){const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const o=JSON.parse(t);if(!o.p||!o.foods)throw 0;localStorage.setItem(K,t);location.reload()}catch(x){toast('That file is not a Forma backup')}});return}if(e.target.id=='wdt'){wdt=e.target.value||today();return go(tab)}if(e.target.id=='mdt'){mdt=e.target.value||today();return go(tab)}if(e.target.id=='tk_due'){tcap();tdraft.due=e.target.value||'';render();return}if(e.target.id=='tk_remind'){tdraft.remind=e.target.value||'';return}if(e.target.id=='jk_date'){jcap();const nk=e.target.value||today();if(nk==jdate){render();return}jdate=nk;jload(jdate);render();return}
 const ta=e.target.dataset&&e.target.dataset.a;
 if(ta=='ttog'){const t=S.tasks.find(x=>x.id==+e.target.dataset.id);if(t){t.done=!t.done;save();render()}return}
 if(ta=='tstog'){const t=S.tasks.find(x=>x.id==+e.target.dataset.id);if(t&&t.subtasks&&t.subtasks[+e.target.dataset.i]){t.subtasks[+e.target.dataset.i].done=!t.subtasks[+e.target.dataset.i].done;save();render()}return}
@@ -2889,6 +2975,10 @@ else if(a=='hedit'){const h=S.habits.find(x=>x.id==+b.dataset.id);if(!h)return;h
 else if(a=='hcancel'){hedit=null;render();return}
 else if(a=='hsave'){hcap();const name=(hdraft.name||'').trim();if(!name)return toast('Add a name');const icon=(hdraft.icon||'').trim();if(hedit=='new')S.habits.push({id:S.nid++,name,icon,created:Date.now(),log:{}});else{const h=S.habits.find(x=>x.id==hedit);if(h){h.name=name;h.icon=icon}}hedit=null;save();render();toast('Habit saved');return}
 else if(a=='hdel'){S.habits=S.habits.filter(x=>x.id!=+b.dataset.id);hedit=null;save();render();toast('Habit deleted');return}
+else if(a=='jmood'){jcap();jdraft.mood=+b.dataset.v;render();return}
+else if(a=='jsave'){jcap();const mood=jdraft.mood||0,text=(jdraft.text||'').trim();if(!mood&&!text){const had=!!S.journal[jdate];delete S.journal[jdate];jdraft={mood:0,text:''};save();render();if(had)toast('Entry deleted');return}S.journal[jdate]={mood,text,updated:Date.now()};jdraft={mood,text};save();render();toast('Entry saved');return}
+else if(a=='jedit'){jdate=b.dataset.d;jload(jdate);scrollTo(0,0);render();return}
+else if(a=='jdel'){const k=b.dataset.d;delete S.journal[k];if(k==jdate){jdraft={mood:0,text:''}}save();render();toast('Entry deleted');return}
 else return;save();if(['gsw','gpick','sgd','sgday','sgunit','sginc','sgmic','sgeq','sgmx','sgmj','sgwarm','sgprog','gmv','gaddclose','sgo','greconf','sgcancel','gcfgtab','gcal','gcalclose','gcalc','gcalcclose','gcalcgo','glogedit'].includes(a)&&$('#gout')){const y=scrollY;$('#gout').classList.add('q');gview();scrollTo(0,y);return}go(tab)});
 function ap(){const r=document.documentElement;if(r.dataset.th)delete r.dataset.th;if(S.th){delete S.th;save()}if(S.mode)r.dataset.theme=S.mode}ap();thSync();
 let LANG='en',LOC='en-US',DOW='MTWTFSS',DWK='MON TUE WED THU FRI SAT SUN';
@@ -2901,6 +2991,7 @@ const D={
 "Health":"Salud","Finance":"Finanzas","Study":"Estudios","Planner":"Planner","Profile":"Perfil","Coming soon":"Próximamente","Track your finances and control spending.":"Medir tus finanzas y controlar gastos.","Manage everything academic.":"Gestionar todo lo académico.","Tasks, notes, reminders and a habit routine.":"Tareas, notas, recordatorios y rutina de hábitos.",
 "Tasks":"Tareas","New task":"Nueva tarea","Edit task":"Editar tarea","Title":"Título","Description":"Descripción","Priority":"Prioridad","Low":"Baja","Medium":"Media","High":"Alta","Due date":"Fecha límite","Reminder":"Recordatorio","Subtasks":"Subtareas","Add subtask":"Agregar subtarea","Completed":"Completadas","Pending":"Pendientes","No tasks yet":"Aún no hay tareas","Save task":"Guardar tarea","Task saved":"Tarea guardada","Task deleted":"Tarea eliminada","Add a title":"Agrega un título","What needs doing?":"¿Qué hay que hacer?","New subtask":"Nueva subtarea","Subtask":"Subtarea","Pick a date above to set a due date (optional).":"Elige una fecha arriba para poner una fecha límite (opcional).","Toggle subtask":"Alternar subtarea","Toggle task complete":"Alternar tarea completada","Remove subtask":"Quitar subtarea","Reminder date and time":"Fecha y hora del recordatorio","Clear date":"Quitar fecha","No due date":"Sin fecha límite",
 "Habits":"Hábitos","New habit":"Nuevo hábito","Edit habit":"Editar hábito","Habit name":"Nombre del hábito","Icon":"Icono","Done today":"Hecho hoy","Mark done":"Marcar hecho","Streak":"Racha","Best":"Mejor","Current streak":"Racha actual","Best streak":"Mejor racha","Current streak · Best streak":"Racha actual · Mejor racha","No habits yet":"Aún no hay hábitos","Save habit":"Guardar hábito","Habit saved":"Hábito guardado","Habit deleted":"Hábito eliminado","Toggle habit for today":"Alternar hábito de hoy","Mark day":"Marcar día","Add a name":"Agrega un nombre",
+"Journal":"Diario","Mood":"Estado de ánimo","How are you feeling?":"¿Cómo te sientes?","Great":"Muy bien","Good":"Bien","Okay":"Normal","Bad":"Mal","Awful":"Muy mal","Journal entry":"Entrada de diario","Write about your day…":"Escribe sobre tu día…","Mood summary":"Resumen de ánimo","Average mood":"Ánimo medio","Last 30 days":"Últimos 30 días","Save entry":"Guardar entrada","Entry saved":"Entrada guardada","Log more days to see your mood summary.":"Registra más días para ver tu resumen de ánimo.",
 "🏠 Today":"🏠 Hoy","🥑 Foods":"🥑 Alimentos","⚖️ Weight":"⚖️ Peso","📏 Body":"📏 Cuerpo","📊 Tracking":"📊 Seguimiento","Tracking":"Seguimiento","📏 Measurements":"📏 Medidas","🏋️ Gym":"🏋️ Gimnasio","Gym":"Gimnasio","Week":"Semana","Stats":"Estadísticas","Settings":"Ajustes","Set up your plan":"Configura tu plan","Reconfigure plan":"Reconfigurar plan","Reconfigure":"Reconfigurar","Config plan":"Configurar plan","Config routine":"Configurar rutina","Reset config settings":"Restablecer configuración","This resets your plan and routine settings to default. Your workout history and calibrations are kept. Continue?":"Esto restablece tu plan y rutina a los valores por defecto. Tu historial de entrenamientos y tus calibraciones se conservan. ¿Continuar?","Config reset":"Configuración restablecida","🏋️ How do you train?":"🏋️ ¿Cómo entrenas?","Days per week":"Días por semana","Time per session":"Tiempo por sesión","3 days":"3 días","4 days":"4 días","5 days":"5 días","Full body, 6 key movement patterns — Mon / Wed / Fri.":"Cuerpo completo, 6 patrones clave — Lun / Mié / Vie.","Upper / Lower, two hits per muscle — the system\u2019s main structure.":"Torso / Pierna, dos estímulos por músculo — la estructura principal del sistema.","PHAT: 2 strength days + 3 hypertrophy days.":"PHAT: 2 días de fuerza + 3 de hipertrofia.","Create my routine":"Crear mi rutina","Save and rebuild":"Guardar y reconstruir","Cancel":"Cancelar","This session will be":"Esta sesión será","short — compounds only":"corta — solo compuestos","long — everything + accessories":"larga — todo + accesorios","standard — the full session":"estándar — la sesión completa","Under ~55 min keeps only the heavy compounds (the lifts you progress). Over ~85 min adds the optional accessories. In between runs the full session.":"Menos de ~55 min deja solo los compuestos pesados (los que progresas). Más de ~85 min añade los accesorios opcionales. En medio corre la sesión completa.","days/week":"días/sem","min/session":"min/sesión","short · compounds only":"corta · solo compuestos","standard · full session":"estándar · sesión completa","long · + accessories":"larga · + accesorios","Which days?":"¿Qué días?","days chosen":"días elegidos","keep a rest day between sessions":"deja un día de descanso entre sesiones","Mon":"Lun","Tue":"Mar","Wed":"Mié","Thu":"Jue","Fri":"Vie","Sat":"Sáb","Sun":"Dom","Full body, 6 key movement patterns. One rest day between sessions.":"Cuerpo completo, 6 patrones clave. Un día de descanso entre sesiones.","Pick exactly":"Elige exactamente","training days":"días de entrenamiento","Full body needs a rest day between sessions":"Cuerpo completo necesita un día de descanso entre sesiones","RIR is required for every set. Tap Rest after a set for the recommended timer.":"El RIR es obligatorio en cada serie. Toca Descansar tras una serie para el cronómetro recomendado.","rest":"descanso","Routine ready":"Rutina lista","Enter minutes between 20 and 150":"Escribe minutos entre 20 y 150","🧮 1RM calculator":"🧮 Calculadora 1RM","One-rep max calculator":"Calculadora de una repetición máxima","Estimate your one-rep max (1RM) for any lift — the most you could lift for a single rep — from a weight and the reps you did. Uses the Epley formula.":"Calcula tu repetición máxima (1RM) para cualquier levantamiento — el peso máximo que puedes levantar en una sola repetición — a partir de un peso y las reps que hiciste. Usa la fórmula de Epley.","Weight lifted":"Peso levantado","Reps":"Repeticiones","Calculate one-rep max":"Calcular una repetición máxima","Estimated 1RM":"1RM estimado","Weight":"Peso","Use":"Uso","High reps — the estimate is rough":"Muchas reps — la estimación es aproximada","Past 12 reps the estimate drifts":"Tras 12 reps la estimación pierde precisión","1 rep max":"máximo 1 rep","2 reps":"2 reps","~4 reps · heavy strength":"~4 reps · fuerza pesada","~6 reps · strength":"~6 reps · fuerza","~8 reps · strength–hypertrophy":"~8 reps · fuerza–hipertrofia","~10 reps · hypertrophy":"~10 reps · hipertrofia","~12 reps · hypertrophy":"~12 reps · hipertrofia","~14 reps":"~14 reps","~16 reps · endurance":"~16 reps · resistencia","~18 reps":"~18 reps","~20 reps · endurance":"~20 reps · resistencia","🏋️ Log maxes":"🏋️ Registrar pesos","Log your maxes":"Registrar tus pesos","One-off calibration":"Calibración única","Weight (kg)":"Peso (kg)","Reps to failure":"Reps al fallo","Save":"Guardar","Compound":"Compuesto","Isolation":"Aislado","‹ Back to plan":"‹ Volver al plan","Target working set":"Serie objetivo","reps":"reps","1RM ≈":"1RM ≈","work set":"serie de trabajo","from your max":"desde tu máximo","high reps, rough estimate":"muchas reps, estimación aproximada","estimate drifts past 12 reps":"la estimación pierde precisión tras 12 reps","Enter the weight you lifted":"Escribe el peso que levantaste","Enter reps between 1 and 40":"Escribe reps entre 1 y 40","Check the weight and reps":"Revisa el peso y las reps","Saved · 1RM ≈":"Guardado · 1RM ≈","For each lift, enter a weight and the reps you can do":"Para cada ejercicio, escribe un peso y las reps que logras","to failure":"al fallo"," (RIR 0) — any rep count, e.g. 6 heavy or 20 light. This is just to estimate your strength; your daily sessions still keep heavy compounds 1–2 reps from failure.":" (RIR 0) — cualquier número de reps, p. ej. 6 pesadas o 20 ligeras. Es solo para estimar tu fuerza; tus sesiones diarias mantienen los compuestos pesados a 1–2 reps del fallo.","exercise":"ejercicio","exercises":"ejercicios",
 "Monthly measurements":"Medidas mensuales","Measure now":"Medir ahora","Tomorrow":"Mañana",
 "It has been a month since your last measurements. Ready to log new ones?":"Ha pasado un mes desde tus últimas medidas. ¿Listo para registrar nuevas?","Add your first set of body measurements so we can track your progress.":"Añade tu primer juego de medidas corporales para seguir tu progreso.",
