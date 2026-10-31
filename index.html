@@ -107,6 +107,26 @@ input:focus,select:focus,button:focus-visible{outline:0;border-color:var(--olv-t
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{flex:1;min-width:90px}
 .bt-wk .row>.btn{white-space:normal;min-width:0;line-height:1.2;height:auto;min-height:44px;display:flex;align-items:center;justify-content:center;text-align:center}
 .seg{display:flex;gap:8.0px;margin-bottom:16px}.seg .btn{flex:1;box-shadow:none;background:var(--bg)}.seg .btn.on{background:var(--pri);color:var(--onpri)}
+/* Rendered-Markdown preview (.md) on the wine .card surface. Tokens reused
+   (no new colors): text = var(--ink) (cream #F3EAD9 in both themes); it sits on
+   the card bg #5C1A22 (light) / #2F181B (dark) — contrast ~9.8:1 light and
+   ~12.5:1 dark (AAA). Links = var(--ink) underlined (same cream, same ratios).
+   Code surface = color-mix(in srgb,var(--ink) 12%,var(--card)): a slightly
+   lightened wine derived from existing tokens, keeping cream text well above
+   4.5:1 (~8:1 light, ~10:1 dark). Blockquote border = var(--ink) at 45%, text =
+   var(--mut) (#E3D6C2 light, ~7:1). No palette tokens were added or changed. */
+.md{line-height:1.55;overflow-wrap:anywhere;word-break:break-word}
+.md h1,.md h2,.md h3,.md h4,.md h5,.md h6{color:var(--ink);margin:16px 0 8px;line-height:1.25;font-family:'Cormorant Garamond',Georgia,serif}
+.md h1{font-size:28px}.md h2{font-size:23px}.md h3{font-size:20px}.md h4{font-size:17px}.md h5{font-size:15px}.md h6{font-size:14px}
+.md p{margin:8px 0;color:var(--ink)}
+.md strong{font-weight:700;color:var(--ink)}.md em{font-style:italic}
+.md a{color:var(--ink);text-decoration:underline}
+.md ul,.md ol{margin:8px 0;padding-left:22px}.md li{margin:4px 0}
+.md code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92em;background:color-mix(in srgb,var(--ink) 12%,var(--card));color:var(--ink);padding:1px 5px;border-radius:5px}
+.md pre{background:color-mix(in srgb,var(--ink) 12%,var(--card));border-radius:10px;padding:12px;overflow:auto;margin:10px 0}
+.md pre code{background:none;padding:0;border-radius:0;display:block;white-space:pre}
+.md blockquote{margin:10px 0;padding:4px 0 4px 14px;border-left:3px solid color-mix(in srgb,var(--ink) 45%,transparent);color:var(--mut)}
+.md>:first-child{margin-top:0}.md>:last-child{margin-bottom:0}
 .big{color:var(--olv-t);font:600 44px 'Cormorant Garamond',Georgia,serif;line-height:1}.mut{color:var(--mut);font-size:13px}
 .bar{height:10px;border-radius:9px;background:var(--line);overflow:hidden;margin:4px 0 16px}
 .bar i{display:block;height:100%;border-radius:9px;background:var(--pri);transition:width .7s cubic-bezier(.2,.8,.2,1)}
@@ -926,6 +946,13 @@ if(S.wplan){const w=S.wplan;if(w.fin)(S.wfin??={})[w.fin]={ws:w.ws,k:w.k,p:w.p,c
    reminder is stored and displayed only — there is no backend/push, so no real
    alarm fires (out of scope for an offline static PWA). */
 if(!Array.isArray(S.tasks))S.tasks=[];
+/* Planner > Notes (Phase 2). Note shape:
+   {id, title, body, created, updated}. `body` holds raw Markdown TEXT (never
+   HTML) — it is rendered on demand by mdToHtml(), which escapes first then
+   applies a documented Markdown subset. IDs come from the shared S.nid++
+   counter (same as tasks/foods). Empty titles are allowed (shown as
+   "(Untitled)"), mirroring MyBrain. */
+if(!Array.isArray(S.notes))S.notes=[];
 const toast=m=>{const t=$('#toast');t.textContent=m;t.className='on';clearTimeout(toast.t);toast.t=setTimeout(()=>t.className='',2600)};
 const r1=n=>Math.round(n*10)/10;
 
@@ -1155,7 +1182,24 @@ ${editor}
 <h3 style="margin:16px 0 8px">Pending</h3>
 ${pending.length?pending.map(row).join(''):'<p class="mut">No tasks yet</p>'}
 <h3 style="margin:16px 0 8px">Completed</h3>
-${done.length?done.map(row).join(''):'<p class="mut">No tasks yet</p>'}`}};
+${done.length?done.map(row).join(''):'<p class="mut">No tasks yet</p>'}`},
+
+notes(){
+const nlist=S.notes.slice().sort((a,b)=>(b.updated||0)-(a.updated||0));
+const prev=b=>{const t=mdStrip(b||'');return t.length>120?t.slice(0,120)+'…':t};
+const row=n=>`<div class="card" style="margin-bottom:8px"><div class="row" style="justify-content:space-between;gap:8px;align-items:flex-start"><b style="min-width:0;overflow-wrap:anywhere">${n.title&&n.title.trim()?esc(n.title):'(Untitled)'}</b></div>${prev(n.body)?`<p class="mut" style="margin:4px 0 0;overflow-wrap:anywhere">${esc(prev(n.body))}</p>`:''}<p class="cap" style="margin:6px 0 0">Updated ${esc(fmtD(fmt(new Date(n.updated||n.created||Date.now()))))}</p><div class="row" style="margin-top:8px"><button class="btn s" style="flex:none" data-a="nedit" data-id="${n.id}">Edit</button><button class="btn s t" style="flex:none" data-a="ndel" data-id="${n.id}">Delete</button></div></div>`;
+let editor='';
+if(nedit!=null){const d=ndraft;
+editor=`<div class="card"><h3>${nedit=='new'?'New note':'Edit note'}</h3>
+<label class="f">Title<input id="nk_title" value="${esc(d.title)}" placeholder="(Untitled)"></label>
+<div class="f" style="margin-top:8px">Note</div>
+<div class="seg">${['edit','preview'].map(m=>`<button class="btn ${d.mode==m?'on':''}" data-a="nmode" data-v="${m}">${m=='edit'?'Edit':'Preview'}</button>`).join('')}</div>
+${d.mode=='preview'?`<div class="md">${mdToHtml(d.body||'')}</div>`:`<label class="f"><textarea id="nk_body" rows="12" placeholder="Write in Markdown…" aria-label="Note">${esc(d.body)}</textarea></label><p class="cap" style="margin:-8px 0 8px">Markdown supported</p>`}
+<div class="row" style="margin-top:16px"><button class="btn p" data-a="nsave">Save note</button><button class="btn t" data-a="ncancel">Cancel</button>${nedit!='new'?`<button class="btn t" data-a="ndel" data-id="${nedit}">Delete</button>`:''}</div></div>`;}
+return`<h2>Notes</h2>
+${nedit==null?`<div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Notes</h3><button class="btn p" style="flex:none" data-a="nnew">New note</button></div></div>`:''}
+${editor}
+${nedit==null?(nlist.length?nlist.map(row).join(''):'<p class="mut">No notes yet</p>'):''}`}};
 
 const E=(n,s,r,rir,k,alt=[],x='')=>({n,s,r,rir,k,alt,x}),H='H',I='I';
 const D3=[['Mon','Session A',[E('Hack squat',3,'6–8','2',H,['Pendulum squat','Smith squat']),E('Flat bench press',3,'6–8','2',H,['Machine chest press']),E('Lat pulldown',3,'8–10','1–0',I,['Neutral-grip pulldown']),E('Romanian deadlift',2,'6–8','2',H,['Hip thrust']),E('T-bar row',3,'8–10','1–0',I,['Seated cable row']),E('Lateral raise',3,'10–12','0 last set',I,['Cable lateral raise']),E('EZ-bar curl',2,'8–12','0',I,['Incline biceps curl']),E('Cable pushdown',2,'8–12','0',I,['Overhead triceps extension'])]],
@@ -2173,6 +2217,92 @@ const PCL={low:'ok',med:'warn',high:'err'},PLBL={low:'Low',med:'Medium',high:'Hi
 function tcap(){if(tedit==null)return;const g=id=>{const el=$('#'+id);return el?el.value:''};
 tdraft.title=g('tk_title');tdraft.desc=g('tk_desc');tdraft.remind=g('tk_remind');tdraft.newsub=g('tk_newsub');
 tdraft.subtasks.forEach((s,i)=>{const el=$('#tk_sub'+i);if(el)s.t=el.value})}
+
+/* ---- Planner > Notes (Phase 2) ---- */
+/* Transient editor state for the open note (not persisted until Save). */
+let nedit=null,ndraft={title:'',body:'',mode:'edit'};
+/* Capture whatever is currently typed in the open note editor into ndraft so a
+   re-render (toggling Edit/Preview) keeps the user's input. Mirrors tcap(). */
+function ncap(){if(nedit==null)return;const t=$('#nk_title'),b=$('#nk_body');if(t)ndraft.title=t.value;if(b)ndraft.body=b.value}
+
+/* Hand-written vanilla-JS Markdown renderer. NO external libraries.
+   SECURITY: the raw input is HTML-escaped FIRST via esc() (& < > "), so no
+   user HTML can ever reach the DOM; Markdown transforms run only on the
+   already-escaped text. Links are sanitized to http/https/mailto only
+   (others render as plain text), and allowed anchors get target=_blank
+   rel="noopener noreferrer" with an attribute-escaped href.
+   SUPPORTED SUBSET:
+     - ATX headers  # .. ######        -> <h1>..<h6>
+     - fenced code  ``` ... ```         -> <pre><code> (raw, no inner markdown)
+     - blockquote   > text              -> <blockquote>
+     - unordered    - item / * item     -> <ul><li>
+     - ordered      1. item             -> <ol><li>
+     - paragraphs   blank-line separated -> <p>
+     - inline: bold, italic (asterisk or underscore), inline code, links
+   Inline code contents are escaped and NOT re-parsed by inline rules. */
+function mdInline(s){
+  /* s is already HTML-escaped. Protect inline code spans first, then apply
+     bold/italic/links to the rest (code spans never see further rules). */
+  const codes=[];
+  s=s.replace(/`([^`]+)`/g,(m,c)=>{codes.push('<code>'+c+'</code>');return '\u0000'+(codes.length-1)+'\u0000'});
+  s=s.replace(/\[([^\]]*)\]\(([^)\s]+)\)/g,(m,txt,url)=>{
+    const raw=url.replace(/&amp;/g,'&').trim(),lc=raw.toLowerCase();
+    if(/^(https?:|mailto:)/.test(lc)){
+      const href=raw.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+      return `<a href="${href}" target="_blank" rel="noopener noreferrer">${txt}</a>`;
+    }
+    return txt; /* neutralize javascript:/data:/etc — keep the visible label only */
+  });
+  s=s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  s=s.replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?=[^*\w]|$)/g,'$1<em>$2</em>');
+  s=s.replace(/(^|[^_\w])_([^_\s][^_]*?)_(?=[^_\w]|$)/g,'$1<em>$2</em>');
+  s=s.replace(/\u0000(\d+)\u0000/g,(m,i)=>codes[+i]);
+  return s;
+}
+function mdToHtml(src){
+  const esc0=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const lines=esc0(src==null?'':src).replace(/\r\n?/g,'\n').split('\n');
+  const out=[];let i=0;
+  const flushUL=buf=>{if(buf.length){out.push('<ul>'+buf.map(x=>'<li>'+mdInline(x)+'</li>').join('')+'</ul>');buf.length=0}};
+  const flushOL=buf=>{if(buf.length){out.push('<ol>'+buf.map(x=>'<li>'+mdInline(x)+'</li>').join('')+'</ol>');buf.length=0}};
+  const ul=[],ol=[],para=[];
+  const flushP=()=>{if(para.length){out.push('<p>'+mdInline(para.join(' '))+'</p>');para.length=0}};
+  const bq=[];
+  const flushBQ=()=>{if(bq.length){out.push('<blockquote>'+mdInline(bq.join(' '))+'</blockquote>');bq.length=0}};
+  const flushAll=()=>{flushUL(ul);flushOL(ol);flushBQ();flushP()};
+  while(i<lines.length){
+    const ln=lines[i];
+    if(/^```/.test(ln.trim())){
+      flushAll();const code=[];i++;
+      while(i<lines.length&&!/^```/.test(lines[i].trim())){code.push(lines[i]);i++}
+      i++; /* skip closing fence */
+      out.push('<pre><code>'+code.join('\n')+'</code></pre>');
+      continue;
+    }
+    const h=ln.match(/^(#{1,6})\s+(.*)$/);
+    if(h){flushAll();const lv=h[1].length;out.push('<h'+lv+'>'+mdInline(h[2].trim())+'</h'+lv+'>');i++;continue}
+    if(/^\s*&gt;\s?/.test(ln)){flushUL(ul);flushOL(ol);flushP();bq.push(ln.replace(/^\s*&gt;\s?/,''));i++;continue}
+    const um=ln.match(/^\s*[-*]\s+(.*)$/);
+    if(um){flushOL(ol);flushBQ();flushP();ul.push(um[1]);i++;continue}
+    const om=ln.match(/^\s*\d+\.\s+(.*)$/);
+    if(om){flushUL(ul);flushBQ();flushP();ol.push(om[1]);i++;continue}
+    if(ln.trim()===''){flushAll();i++;continue}
+    flushUL(ul);flushOL(ol);flushBQ();para.push(ln.trim());i++;
+  }
+  flushAll();
+  return out.join('\n');
+}
+/* Plain-text preview: strip common Markdown syntax for list/card previews. */
+function mdStrip(src){
+  return String(src==null?'':src)
+    .replace(/```[\s\S]*?```/g,' ')
+    .replace(/`([^`]*)`/g,'$1')
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g,'$1')
+    .replace(/[#>*_~`]/g,'')
+    .replace(/^\s*[-]\s+/gm,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
 const ffm=(v,x)=>`<label class="f">Name<input id="${x}n" value="${esc(v.name||'')}" placeholder="e.g. Greek yogurt"></label><label class="f">Values are per<select id="${x}b"><option value="g" ${v.b!='u'?'selected':''}>100 g</option><option value="u" ${v.b=='u'?'selected':''}>1 unit</option></select></label><div class="row"><label class="f">Category<select id="${x}c">${S.cats.map(c=>`<option ${c==v.cat?'selected':''}>${esc(c)}</option>`).join('')}</select></label><label class="f">Or new category<input id="${x}nc" placeholder="e.g. Supplements"></label></div><div class="row"><label class="f">Kcal<input id="${x}k" type="number" value="${v.k??''}"></label><label class="f">Protein g<input id="${x}p" type="number" value="${v.p??''}"></label></div><div class="row"><label class="f">Carbs g<input id="${x}ch" type="number" value="${v.c??''}"></label><label class="f">Fat g<input id="${x}f" type="number" value="${v.f??''}"></label></div>`;
 const rff=x=>{const g=i=>$('#'+x+i).value;return{name:g('n').trim(),b:g('b'),cat:g('nc').trim()||g('c'),kk:g('k'),k:+g('k')||0,p:+g('p')||0,c:+g('ch')||0,f:+g('f')||0}};
 const rd=()=>{if($('#ln'))Object.assign(nf,rff('l'))};
@@ -2425,7 +2555,7 @@ const SECTIONS=[
 ['health','Health',ICO.heart,[['today','Today'],['week','Week'],['tracking','Tracking'],['gym','Gym'],['stats','Stats']]],
 ['finance','Finance',ICO.wallet,null],
 ['study','Study',ICO.book,null],
-['planner','Planner',ICO.list,[['tasks','Tasks']]],
+['planner','Planner',ICO.list,[['tasks','Tasks'],['notes','Notes']]],
 ['profile','Profile',ICO.person,null]];
 const SECMAP=Object.fromEntries(SECTIONS.map(s=>[s[0],{label:s[1],icon:s[2],subs:s[3]}]));
 /* provisional 'Coming soon' copy: [EnglishLine] (translated to ES via the i18n map) */
@@ -2450,7 +2580,7 @@ if(sec=='profile'){legacy='plan';body=V.plan()}
 else if(sec=='health'){
 if(foodsMode){legacy='foods';body=V.foods()}
 else{const sub=subOf.health||'today';legacy=sub;const vk={today:'today',week:'week',tracking:'tracking',gym:'gym',stats:'stats'}[sub]||'today';body=subRow(info.subs,sub)+V[vk]()}}
-else if(sec=='planner'){const sub=subOf.planner||'tasks';legacy=sub;body=subRow(info.subs,sub)+V.tasks()}
+else if(sec=='planner'){const sub=subOf.planner||'tasks';legacy=sub;body=subRow(info.subs,sub)+(sub=='notes'?V.notes():V.tasks())}
 else{/* provisional */const line=SOON[sec]||'';body=`<div class="cs"><div class="csi" aria-hidden="true">${info.icon}</div><h2>${info.label}</h2><div class="cst">Coming soon</div><p>${line}</p></div>`}
 tab=legacy;
 m.innerHTML=body;m.classList.toggle('wide',legacy=='week');m.style.animation='none';m.offsetHeight;m.style.animation='';
@@ -2683,10 +2813,17 @@ else if(a=='tsubadd'){tcap();const nv=(tdraft.newsub||'').trim();if(nv){tdraft.s
 else if(a=='tsubdel'){tcap();tdraft.subtasks.splice(+b.dataset.i,1);render();return}
 else if(a=='tsave'){tcap();const title=(tdraft.title||'').trim();if(!title)return toast('Add a title');const subs=tdraft.subtasks.map(s=>({t:(s.t||'').trim(),done:!!s.done})).filter(s=>s.t);const fields={title,desc:(tdraft.desc||'').trim(),prio:tdraft.prio||'med',due:tdraft.due||'',remind:tdraft.remind||'',subtasks:subs};if(tedit=='new')S.tasks.push({id:S.nid++,...fields,done:false,created:Date.now()});else{const t=S.tasks.find(x=>x.id==tedit);if(t)Object.assign(t,fields)}tedit=null;save();render();toast('Task saved');return}
 else if(a=='tdel'){S.tasks=S.tasks.filter(x=>x.id!=+b.dataset.id);save();render();toast('Task deleted');return}
+else if(a=='nnew'){ndraft={title:'',body:'',mode:'edit'};nedit='new';render();return}
+else if(a=='nedit'){const n=S.notes.find(x=>x.id==+b.dataset.id);if(!n)return;ndraft={title:n.title||'',body:n.body||'',mode:'edit'};nedit=n.id;scrollTo(0,0);render();return}
+else if(a=='ncancel'){nedit=null;render();return}
+else if(a=='nmode'){ncap();ndraft.mode=b.dataset.v;render();return}
+else if(a=='nsave'){ncap();const title=(ndraft.title||'').trim(),bodyv=ndraft.body||'';if(nedit=='new')S.notes.push({id:S.nid++,title,body:bodyv,created:Date.now(),updated:Date.now()});else{const n=S.notes.find(x=>x.id==nedit);if(n){n.title=title;n.body=bodyv;n.updated=Date.now()}}nedit=null;save();render();toast('Note saved');return}
+else if(a=='ndel'){S.notes=S.notes.filter(x=>x.id!=+b.dataset.id);nedit=null;save();render();toast('Note deleted');return}
 else return;save();if(['gsw','gpick','sgd','sgday','sgunit','sginc','sgmic','sgeq','sgmx','sgmj','sgwarm','sgprog','gmv','gaddclose','sgo','greconf','sgcancel','gcfgtab','gcal','gcalclose','gcalc','gcalcclose','gcalcgo','glogedit'].includes(a)&&$('#gout')){const y=scrollY;$('#gout').classList.add('q');gview();scrollTo(0,y);return}go(tab)});
 function ap(){const r=document.documentElement;if(r.dataset.th)delete r.dataset.th;if(S.th){delete S.th;save()}if(S.mode)r.dataset.theme=S.mode}ap();thSync();
 let LANG='en',LOC='en-US',DOW='MTWTFSS',DWK='MON TUE WED THU FRI SAT SUN';
 const D={
+"Notes":"Notas","New note":"Nueva nota","Edit note":"Editar nota","Note":"Nota","Write in Markdown…":"Escribe en Markdown…","Preview":"Vista previa","Markdown supported":"Markdown admitido","No notes yet":"Aún no hay notas","Save note":"Guardar nota","Note saved":"Nota guardada","Note deleted":"Nota eliminada","(Untitled)":"(Sin título)","Updated":"Modificado",
 "Close":"Cerrar","Failure. Every set of isolation and machine lifts":"Fallo. Todas las series de ejercicios aislados y de máquina","Top end of heavy compounds":"Extremo alto de los compuestos pesados","Stop timer":"Detener temporizador","Rest over, next set":"Descanso terminado, siguiente serie","Heavy compound · rest 3–4 min":"Compuesto pesado · descanso 3–4 min","Isolation lift · rest 2 min":"Ejercicio de aislamiento · descanso 2 min","Heavy compound":"Compuesto pesado","Isolation lift":"Ejercicio de aislamiento","RIR is required for every set.":"El RIR es obligatorio en cada serie.","⏱ Auto-start rest":"⏱ Descanso automático","⏱ Heavy 3:30":"⏱ Pesado 3:30","⏱ Isolation 2:00":"⏱ Aislamiento 2:00","Deload week: about half the sets, lighter weights, stop 3–4 reps short of failure.":"Semana de descarga: aproximadamente la mitad de las series, pesos más ligeros y detén cada serie 3–4 repeticiones antes del fallo.","Too close to failure for this target":"Demasiado cerca del fallo para este objetivo","Easier than planned":"Más fácil de lo planeado","Room to spare: add a rep or a little weight":"Te sobró margen: añade una repetición o un poco de peso","Push closer to failure on isolation lifts":"Acércate más al fallo en los ejercicios aislados","✅ On target":"✅ En el objetivo","Enter RIR (0–5) for every set":"Escribe el RIR (0–5) en cada serie","Workout saved · some sets were off the RIR target":"Entrenamiento guardado · algunas series se salieron del objetivo de RIR","📈 Strength progress":"📈 Progreso de fuerza","Squat":"Sentadilla","🏋️ Squat":"🏋️ Sentadilla","Deadlift":"Peso muerto","Estimated 1RM":"1RM estimado","No sessions logged yet. Log a workout with this lift to start your chart.":"Aún no hay sesiones. Registra un entrenamiento con este ejercicio para iniciar tu gráfico.","Log one more session to see the trend.":"Registra una sesión más para ver la tendencia.","Estimated 1RM per session from your best set, adjusted for the reps you had left (RIR). Deload sessions are left out.":"1RM estimado por sesión a partir de tu mejor serie, ajustado según las repeticiones que te quedaban (RIR). Las sesiones de descarga no se incluyen.","⚠️ Possible recovery issue":"⚠️ Posible problema de recuperación","👀 Strength is stalling":"👀 La fuerza se está estancando","Your numbers are trending down. Plan a deload week: about half the sets, weights around 10% lighter, and every set 3–4 reps from failure. If that feels like too much, drop 1 set from every exercise for the next two weeks.":"Tus números van a la baja. Planifica una semana de descarga: aproximadamente la mitad de las series, pesos alrededor de un 10 % más ligeros y cada serie a 3–4 repeticiones del fallo. Si es demasiado, quita 1 serie de cada ejercicio durante las próximas dos semanas.","Try cutting 1–2 sets from the stalled lifts next session, hit your RIR targets and protect your sleep. If it continues, take a deload.":"Prueba a quitar 1–2 series de los ejercicios estancados en la próxima sesión, cumple tus objetivos de RIR y cuida tu sueño. Si continúa, haz una descarga.","Your heavy lifts are being taken to failure, which adds fatigue.":"Estás llevando los ejercicios pesados al fallo, lo que añade fatiga.","Start deload week":"Iniciar semana de descarga","Dismiss":"Descartar","End deload":"Terminar descarga","🔄 Deload week":"🔄 Semana de descarga","Until":"Hasta","Half the sets, weights about 10% lighter, every set stopped 3–4 reps short of failure.":"La mitad de las series, pesos un 10 % más ligeros y cada serie detenida 3–4 repeticiones antes del fallo.","Open the Gym tab to see what to do.":"Abre la pestaña Gimnasio para ver qué hacer.","View":"Ver","Deload week started":"Semana de descarga iniciada","Deload ended":"Descarga terminada","Edit":"Editar","Saved workout \u2014 tap Edit to change it.":"Entrenamiento guardado \u2014 toca Editar para cambiarlo.","Progression rep goal":"Meta de reps para progresar","hit this many reps to earn the next weight jump":"logra estas reps para ganar el siguiente salto de peso","Progression rep goal fixed at 3 per mini-set":"Meta de reps para progresar fija en 3 por mini-serie","Priming reps":"Reps de activación (pre-agotamiento)",
 "bar only":"solo la barra","Smith / resistance profile":"Barra Smith / máquina","Bar weight (lb)":"Peso de la barra (lb)","weight":"peso",
 "👟 Steps":"👟 Pasos","Target 8,000–10,000 steps/day":"Meta: 8.000–10.000 pasos al día","Not logged yet":"Aún sin registrar","Keep walking":"Sigue caminando","In the target range ✅":"En el rango objetivo ✅","Above target 🔥":"Por encima de la meta 🔥","Steps today":"Pasos de hoy","Total steps":"Pasos totales","Save":"Guardar","Last 7 days":"Últimos 7 días","Avg":"Prom.","Walking burns fat without taxing your muscle recovery or nervous system.":"Caminar quema grasa sin comprometer la recuperación muscular ni el sistema nervioso.","😴 Sleep & recovery":"😴 Sueño y recuperación","Target 7–9 hours of quality sleep":"Meta: 7–9 horas de sueño de calidad","Under-recovered ⚠️":"Recuperación insuficiente ⚠️","Almost there":"Casi en la meta","In the zone ✅":"En la zona ✅","Long sleep":"Sueño largo","Hours slept":"Horas dormidas","e.g. 7.5":"p. ej. 7,5","Stress today":"Estrés de hoy","1 = calm · 5 = very stressed":"1 = tranquilo · 5 = muy estresado","Low sleep or high stress: consider trimming volume or intensity today.":"Poco sueño o mucho estrés: considera reducir el volumen o la intensidad hoy.","Sleep and stress set how much training volume you can tolerate and how well you build muscle.":"El sueño y el estrés determinan cuánto volumen de entrenamiento toleras y qué tan bien ganas músculo.","💊 Creatine":"💊 Creatina","Mark as taken":"Marcar como tomada","Taken today ✅":"Tomada hoy ✅","Day streak":"Días seguidos","This week":"Esta semana","Creatine monohydrate, 3–5 g daily. Consistency matters more than timing.":"Monohidrato de creatina, 3–5 g al día. La constancia importa más que el horario.","Steps saved":"Pasos guardados","Steps added":"Pasos sumados","Enter your steps":"Ingresa tus pasos","Sleep saved":"Sueño guardado","Sleep cleared":"Sueño borrado","Enter hours between 0 and 24":"Ingresa horas entre 0 y 24","Creatine logged":"Creatina registrada","Creatine unmarked":"Creatina desmarcada",
