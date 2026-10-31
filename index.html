@@ -921,6 +921,11 @@ if(S.ex!==undefined||S.exl!==undefined){delete S.ex;delete S.exl;save()}
 /* Migration: a single S.wplan became S.wfin, a record of every closed day, so
    that closing one day stops erasing the earlier ones. */
 if(S.wplan){const w=S.wplan;if(w.fin)(S.wfin??={})[w.fin]={ws:w.ws,k:w.k,p:w.p,c:w.c,f:w.f,cap:w.cap,left:w.left,rem:w.rem};delete S.wplan;save()}
+/* Planner > Tasks (Phase 1). Task shape:
+   {id, title, desc, prio:'low'|'med'|'high', due:'YYYY-MM-DD'|'', remind:datetime-local|'', done, subtasks:[{t,done}], created}.
+   reminder is stored and displayed only — there is no backend/push, so no real
+   alarm fires (out of scope for an offline static PWA). */
+if(!Array.isArray(S.tasks))S.tasks=[];
 const toast=m=>{const t=$('#toast');t.textContent=m;t.className='on';clearTimeout(toast.t);toast.t=setTimeout(()=>t.className='',2600)};
 const r1=n=>Math.round(n*10)/10;
 
@@ -1122,7 +1127,35 @@ ${cu?`<div class="card"><h3>🧭 Catch-up plan</h3>${cu}</div>`:''}</div>`},
 
 stats(){return`<h2>Your progress</h2><div id="sc"></div>`},
 
-gym(){return`<h2>Gym planner</h2><div id="gout"></div>`}};
+gym(){return`<h2>Gym planner</h2><div id="gout"></div>`},
+
+tasks(){
+const pchip=p=>`<span class="chip" style="font-weight:600;color:var(${PFG[p]})">${PLBL[p]}</span>`;
+const subRows=t=>t.subtasks&&t.subtasks.length?`<div class="tsubs">${t.subtasks.map((s,i)=>`<label class="tsub"><input type="checkbox" data-a="tstog" data-id="${t.id}" data-i="${i}" ${s.done?'checked':''} aria-label="Toggle subtask"><span${s.done?' style="text-decoration:line-through;color:var(--mut)"':''}>${esc(s.t)}</span></label>`).join('')}</div>`:'';
+const meta=t=>{const b=[];if(t.due)b.push(`<span class="chip">\uD83D\uDCC5 ${esc(fmtD(t.due))}</span>`);if(t.remind)b.push(`<span class="chip">\u23F0 ${esc(t.remind.replace('T',' '))}</span>`);const n=t.subtasks?t.subtasks.length:0;if(n)b.push(`<span class="chip">\u2713 ${t.subtasks.filter(s=>s.done).length}/${n}</span>`);return b.length?`<div class="chips" style="margin:8px 0 0">${b.join('')}</div>`:''};
+const row=t=>`<div class="card" style="margin-bottom:8px"><div class="li" style="border:0;padding:0;align-items:flex-start"><label style="flex:none;padding-top:2px"><input type="checkbox" data-a="ttog" data-id="${t.id}" ${t.done?'checked':''} aria-label="Toggle task complete"></label><div style="flex:1;min-width:0"><div class="row" style="justify-content:space-between;gap:8px"><b style="${t.done?'text-decoration:line-through;color:var(--mut)':''}">${esc(t.title)}</b>${pchip(t.prio)}</div>${t.desc?`<p class="mut" style="margin:4px 0 0">${esc(t.desc)}</p>`:''}${meta(t)}${subRows(t)}<div class="row" style="margin-top:8px"><button class="btn s" style="flex:none" data-a="tedit" data-id="${t.id}">Edit</button><button class="btn s t" style="flex:none" data-a="tdel" data-id="${t.id}">Delete</button></div></div></div></div>`;
+const pending=S.tasks.filter(t=>!t.done).sort((a,b)=>{if(PORD[a.prio]!=PORD[b.prio])return PORD[a.prio]-PORD[b.prio];if(!!a.due!=!!b.due)return a.due?-1:1;if(a.due&&b.due&&a.due!=b.due)return a.due<b.due?-1:1;return a.created-b.created});
+const done=S.tasks.filter(t=>t.done).sort((a,b)=>b.created-a.created);
+let editor='';
+if(tedit!=null){const d=tdraft;
+editor=`<div class="card"><h3>${tedit=='new'?'New task':'Edit task'}</h3>
+<label class="f">Title<input id="tk_title" value="${esc(d.title)}" placeholder="What needs doing?"></label>
+<label class="f">Description<textarea id="tk_desc" rows="2">${esc(d.desc)}</textarea></label>
+<div class="f" style="margin-top:8px">Priority</div><div class="seg">${['low','med','high'].map(p=>`<button class="btn ${d.prio==p?'on':''}" data-a="tprio" data-v="${p}">${PLBL[p]}</button>`).join('')}</div>
+<div class="f">Due date<div class="row" style="flex-wrap:nowrap;align-items:center;gap:8px">${dpk('tk_due',d.due||today())}${d.due?'<button class="btn s t" style="flex:none" data-a="tdueclr">Clear date</button>':'<span class="chip" style="color:var(--mut)">No due date</span>'}</div></div>
+${d.due?'':'<p class="cap" style="margin:-8px 0 8px">Pick a date above to set a due date (optional).</p>'}
+<label class="f">Reminder<input id="tk_remind" type="datetime-local" value="${esc(d.remind)}" aria-label="Reminder date and time"></label>
+<div class="f" style="margin-top:8px">Subtasks</div>
+${d.subtasks.map((s,i)=>`<div class="row" style="flex-wrap:nowrap;margin-bottom:8px"><input id="tk_sub${i}" value="${esc(s.t)}" placeholder="Subtask"><button class="btn s t" style="flex:none" data-a="tsubdel" data-i="${i}" aria-label="Remove subtask">\u2715</button></div>`).join('')}
+<div class="row" style="flex-wrap:nowrap"><input id="tk_newsub" value="${esc(d.newsub)}" placeholder="New subtask"><button class="btn s" style="flex:none" data-a="tsubadd">Add subtask</button></div>
+<div class="row" style="margin-top:16px"><button class="btn p" data-a="tsave">Save task</button><button class="btn t" data-a="tcancel">Cancel</button></div></div>`;}
+return`<h2>Tasks</h2>
+${tedit==null?`<div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Tasks</h3><button class="btn p" style="flex:none" data-a="tnew">New task</button></div></div>`:''}
+${editor}
+<h3 style="margin:16px 0 8px">Pending</h3>
+${pending.length?pending.map(row).join(''):'<p class="mut">No tasks yet</p>'}
+<h3 style="margin:16px 0 8px">Completed</h3>
+${done.length?done.map(row).join(''):'<p class="mut">No tasks yet</p>'}`}};
 
 const E=(n,s,r,rir,k,alt=[],x='')=>({n,s,r,rir,k,alt,x}),H='H',I='I';
 const D3=[['Mon','Session A',[E('Hack squat',3,'6–8','2',H,['Pendulum squat','Smith squat']),E('Flat bench press',3,'6–8','2',H,['Machine chest press']),E('Lat pulldown',3,'8–10','1–0',I,['Neutral-grip pulldown']),E('Romanian deadlift',2,'6–8','2',H,['Hip thrust']),E('T-bar row',3,'8–10','1–0',I,['Seated cable row']),E('Lateral raise',3,'10–12','0 last set',I,['Cable lateral raise']),E('EZ-bar curl',2,'8–12','0',I,['Incline biceps curl']),E('Cable pushdown',2,'8–12','0',I,['Overhead triceps extension'])]],
@@ -2130,6 +2163,16 @@ const b=w.firstChild,l=w.lastChild;b.onclick=e=>{e.stopPropagation();const op=!w
 l.onclick=e=>{const t=e.target.closest('.ddo');if(!t)return;e.stopPropagation();s.selectedIndex=+t.dataset.i;b.firstChild.textContent=t.textContent;l.querySelectorAll('.ddo').forEach(x=>x.classList.toggle('on',x==t));w.classList.remove('open');s.dispatchEvent(new Event('input',{bubbles:true}));s.dispatchEvent(new Event('change',{bubbles:true}))}})}
 document.addEventListener('click',closeDD);document.addEventListener('keydown',e=>{if(e.key=='Escape')closeDD()});
 let ef=null,lm='pick',nf={},dqv='';
+/* Planner > Tasks editor state (session only). tedit: null=closed, 'new'=creating,
+   or a task id=editing. tdraft holds transient editor fields so add/remove subtask
+   re-renders do not lose typed text (capture-then-rerender, like the food editor). */
+let tedit=null,tdraft={title:'',desc:'',prio:'med',due:'',remind:'',subtasks:[],newsub:''};
+const PCL={low:'ok',med:'warn',high:'err'},PLBL={low:'Low',med:'Medium',high:'High'},PFG={low:'--ok-fg',med:'--warn-fg',high:'--err-fg'},PORD={high:0,med:1,low:2};
+/* Capture whatever is currently typed in the open task editor into tdraft so a
+   re-render (add/remove subtask, change priority) keeps the user's input. */
+function tcap(){if(tedit==null)return;const g=id=>{const el=$('#'+id);return el?el.value:''};
+tdraft.title=g('tk_title');tdraft.desc=g('tk_desc');tdraft.remind=g('tk_remind');tdraft.newsub=g('tk_newsub');
+tdraft.subtasks.forEach((s,i)=>{const el=$('#tk_sub'+i);if(el)s.t=el.value})}
 const ffm=(v,x)=>`<label class="f">Name<input id="${x}n" value="${esc(v.name||'')}" placeholder="e.g. Greek yogurt"></label><label class="f">Values are per<select id="${x}b"><option value="g" ${v.b!='u'?'selected':''}>100 g</option><option value="u" ${v.b=='u'?'selected':''}>1 unit</option></select></label><div class="row"><label class="f">Category<select id="${x}c">${S.cats.map(c=>`<option ${c==v.cat?'selected':''}>${esc(c)}</option>`).join('')}</select></label><label class="f">Or new category<input id="${x}nc" placeholder="e.g. Supplements"></label></div><div class="row"><label class="f">Kcal<input id="${x}k" type="number" value="${v.k??''}"></label><label class="f">Protein g<input id="${x}p" type="number" value="${v.p??''}"></label></div><div class="row"><label class="f">Carbs g<input id="${x}ch" type="number" value="${v.c??''}"></label><label class="f">Fat g<input id="${x}f" type="number" value="${v.f??''}"></label></div>`;
 const rff=x=>{const g=i=>$('#'+x+i).value;return{name:g('n').trim(),b:g('b'),cat:g('nc').trim()||g('c'),kk:g('k'),k:+g('k')||0,p:+g('p')||0,c:+g('ch')||0,f:+g('f')||0}};
 const rd=()=>{if($('#ln'))Object.assign(nf,rff('l'))};
@@ -2382,7 +2425,7 @@ const SECTIONS=[
 ['health','Health',ICO.heart,[['today','Today'],['week','Week'],['tracking','Tracking'],['gym','Gym'],['stats','Stats']]],
 ['finance','Finance',ICO.wallet,null],
 ['study','Study',ICO.book,null],
-['planner','Planner',ICO.list,null],
+['planner','Planner',ICO.list,[['tasks','Tasks']]],
 ['profile','Profile',ICO.person,null]];
 const SECMAP=Object.fromEntries(SECTIONS.map(s=>[s[0],{label:s[1],icon:s[2],subs:s[3]}]));
 /* provisional 'Coming soon' copy: [EnglishLine] (translated to ES via the i18n map) */
@@ -2407,6 +2450,7 @@ if(sec=='profile'){legacy='plan';body=V.plan()}
 else if(sec=='health'){
 if(foodsMode){legacy='foods';body=V.foods()}
 else{const sub=subOf.health||'today';legacy=sub;const vk={today:'today',week:'week',tracking:'tracking',gym:'gym',stats:'stats'}[sub]||'today';body=subRow(info.subs,sub)+V[vk]()}}
+else if(sec=='planner'){const sub=subOf.planner||'tasks';legacy=sub;body=subRow(info.subs,sub)+V.tasks()}
 else{/* provisional */const line=SOON[sec]||'';body=`<div class="cs"><div class="csi" aria-hidden="true">${info.icon}</div><h2>${info.label}</h2><div class="cst">Coming soon</div><p>${line}</p></div>`}
 tab=legacy;
 m.innerHTML=body;m.classList.toggle('wide',legacy=='week');m.style.animation='none';m.offsetHeight;m.style.animation='';
@@ -2415,16 +2459,24 @@ dd();sovr()}
 /* set active section, remember its subtab, re-render + redraw bottom bar */
 function goSection(k){if(!SECMAP[k])k='health';foodsMode=false;sec=k;S.sec=k;save();navBar();render()}
 /* switch the Salud subtab */
-function goSub(k){foodsMode=false;subOf.health=k;S.subOf=subOf;save();render()}
+function goSub(k){foodsMode=false;subOf[sec]=k;S.subOf=subOf;save();render()}
 /* Compatibility wrapper: map a legacy view key to (section, subtab). Keeps every
    existing caller (go(tab), go('today'), the My-foods/back data-t handlers, obr finish)
    working on top of the two-level router. */
 function go(t){if(t=='plan'){return goSection('profile')}
 if(t=='foods'){foodsMode=true;sec='health';S.sec='health';save();navBar();render();return}
 const hs=['today','week','tracking','gym','stats'];if(hs.includes(t)){foodsMode=false;sec='health';subOf.health=t;S.sec='health';S.subOf=subOf;save();navBar();render();return}
+/* On the planner view the `tab` global becomes 'tasks' (a subtab key, not a section).
+   Planner-view button handlers must `return` before the terminal `go(tab)` fallthrough;
+   none reach here today. Guard it so an accidental go('tasks') routes to the planner
+   section instead of silently bouncing to Health via goSection's unknown-key fallback. */
+if(t=='tasks'){return goSection('planner')}
 return goSection(t)}
 document.addEventListener('input',e=>{const k=e.target.dataset.k;if(!k)return;if(k=='p.wu'||k=='p.hu'){const q=k=='p.wu'?'w':'h';unit(k.slice(2),e.target.value);const f=document.querySelector(`[data-k="p.${q}"]`);if(f)f.value=S.p[q];res();return}const[o,p]=k.split('.');let v=e.target.value;if(e.target.type=='number'||e.target.type=='range'||e.target.dataset.n)v=v===''?'':(parseFloat(v)||0);S[o][p]=v;save();if(o=='p')res();else gres()});
-document.addEventListener('change',e=>{if(e.target.id=='imp'){const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const o=JSON.parse(t);if(!o.p||!o.foods)throw 0;localStorage.setItem(K,t);location.reload()}catch(x){toast('That file is not a Forma backup')}});return}if(e.target.id=='wdt'){wdt=e.target.value||today();return go(tab)}if(e.target.id=='mdt'){mdt=e.target.value||today();return go(tab)}if(e.target.id=='wcl'){S.wcl=+e.target.value;save();return go(tab)}if(e.target.id=='gsz'){S.gs=Math.min(2000,Math.max(50,Math.round(parseFloat(e.target.value))||250));save();return go(tab)}if(e.target.id=='wgl'){S.wa[day]=Math.max(0,Math.floor(parseFloat(e.target.value))||0);save();return go(tab)}if(e.target.id=='fs'){const f=S.foods.find(x=>x.id==e.target.value);$('#ql').textContent=f.b=='g'?'Amount (grams)':'Amount (units)';$('#qty').value=f.b=='g'?100:1}});
+document.addEventListener('change',e=>{if(e.target.id=='imp'){const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const o=JSON.parse(t);if(!o.p||!o.foods)throw 0;localStorage.setItem(K,t);location.reload()}catch(x){toast('That file is not a Forma backup')}});return}if(e.target.id=='wdt'){wdt=e.target.value||today();return go(tab)}if(e.target.id=='mdt'){mdt=e.target.value||today();return go(tab)}if(e.target.id=='tk_due'){tcap();tdraft.due=e.target.value||'';render();return}if(e.target.id=='tk_remind'){tdraft.remind=e.target.value||'';return}
+const ta=e.target.dataset&&e.target.dataset.a;
+if(ta=='ttog'){const t=S.tasks.find(x=>x.id==+e.target.dataset.id);if(t){t.done=!t.done;save();render()}return}
+if(ta=='tstog'){const t=S.tasks.find(x=>x.id==+e.target.dataset.id);if(t&&t.subtasks&&t.subtasks[+e.target.dataset.i]){t.subtasks[+e.target.dataset.i].done=!t.subtasks[+e.target.dataset.i].done;save();render()}return}if(e.target.id=='wcl'){S.wcl=+e.target.value;save();return go(tab)}if(e.target.id=='gsz'){S.gs=Math.min(2000,Math.max(50,Math.round(parseFloat(e.target.value))||250));save();return go(tab)}if(e.target.id=='wgl'){S.wa[day]=Math.max(0,Math.floor(parseFloat(e.target.value))||0);save();return go(tab)}if(e.target.id=='fs'){const f=S.foods.find(x=>x.id==e.target.value);$('#ql').textContent=f.b=='g'?'Amount (grams)':'Amount (units)';$('#qty').value=f.b=='g'?100:1}});
 function thDark(){const r=document.documentElement;return r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches}
 function thSync(){const d=thDark();document.documentElement.classList.toggle('dark-theme',d);
 document.querySelectorAll('.thb').forEach(b=>{b.textContent=d?'\u{1F319}':'\u2600\uFE0F';
@@ -2622,6 +2674,15 @@ else if(a=='npset'){const raw=v('npv'),hh=parseFloat(raw),nn=(S.nap??={});if(raw
 else if(a=='slst'){const s=(S.str??={}),x=+b.dataset.v;if(s[day]==x)delete s[day];else s[day]=x}
 else if(a=='crtog'){const c=(S.cre??={});if(c[day])delete c[day];else c[day]=1;toast(c[day]?'Creatine logged':'Creatine unmarked')}
 else if(a=='wkp'||a=='wkx'){const x=new Date(wk0+'T00:00');x.setDate(x.getDate()+(a=='wkx'?7:-7));wk0=fmt(x)}
+else if(a=='tnew'){tdraft={title:'',desc:'',prio:'med',due:'',remind:'',subtasks:[],newsub:''};tedit='new';save();render();return}
+else if(a=='tedit'){const t=S.tasks.find(x=>x.id==+b.dataset.id);if(!t)return;tdraft={title:t.title,desc:t.desc||'',prio:t.prio||'med',due:t.due||'',remind:t.remind||'',subtasks:(t.subtasks||[]).map(s=>({t:s.t,done:s.done})),newsub:''};tedit=t.id;scrollTo(0,0);render();return}
+else if(a=='tcancel'){tedit=null;render();return}
+else if(a=='tprio'){tcap();tdraft.prio=b.dataset.v;render();return}
+else if(a=='tdueclr'){tcap();tdraft.due='';render();return}
+else if(a=='tsubadd'){tcap();const nv=(tdraft.newsub||'').trim();if(nv){tdraft.subtasks.push({t:nv,done:false});tdraft.newsub=''}render();return}
+else if(a=='tsubdel'){tcap();tdraft.subtasks.splice(+b.dataset.i,1);render();return}
+else if(a=='tsave'){tcap();const title=(tdraft.title||'').trim();if(!title)return toast('Add a title');const subs=tdraft.subtasks.map(s=>({t:(s.t||'').trim(),done:!!s.done})).filter(s=>s.t);const fields={title,desc:(tdraft.desc||'').trim(),prio:tdraft.prio||'med',due:tdraft.due||'',remind:tdraft.remind||'',subtasks:subs};if(tedit=='new')S.tasks.push({id:S.nid++,...fields,done:false,created:Date.now()});else{const t=S.tasks.find(x=>x.id==tedit);if(t)Object.assign(t,fields)}tedit=null;save();render();toast('Task saved');return}
+else if(a=='tdel'){S.tasks=S.tasks.filter(x=>x.id!=+b.dataset.id);save();render();toast('Task deleted');return}
 else return;save();if(['gsw','gpick','sgd','sgday','sgunit','sginc','sgmic','sgeq','sgmx','sgmj','sgwarm','sgprog','gmv','gaddclose','sgo','greconf','sgcancel','gcfgtab','gcal','gcalclose','gcalc','gcalcclose','gcalcgo','glogedit'].includes(a)&&$('#gout')){const y=scrollY;$('#gout').classList.add('q');gview();scrollTo(0,y);return}go(tab)});
 function ap(){const r=document.documentElement;if(r.dataset.th)delete r.dataset.th;if(S.th){delete S.th;save()}if(S.mode)r.dataset.theme=S.mode}ap();thSync();
 let LANG='en',LOC='en-US',DOW='MTWTFSS',DWK='MON TUE WED THU FRI SAT SUN';
@@ -2631,6 +2692,7 @@ const D={
 "👟 Steps":"👟 Pasos","Target 8,000–10,000 steps/day":"Meta: 8.000–10.000 pasos al día","Not logged yet":"Aún sin registrar","Keep walking":"Sigue caminando","In the target range ✅":"En el rango objetivo ✅","Above target 🔥":"Por encima de la meta 🔥","Steps today":"Pasos de hoy","Total steps":"Pasos totales","Save":"Guardar","Last 7 days":"Últimos 7 días","Avg":"Prom.","Walking burns fat without taxing your muscle recovery or nervous system.":"Caminar quema grasa sin comprometer la recuperación muscular ni el sistema nervioso.","😴 Sleep & recovery":"😴 Sueño y recuperación","Target 7–9 hours of quality sleep":"Meta: 7–9 horas de sueño de calidad","Under-recovered ⚠️":"Recuperación insuficiente ⚠️","Almost there":"Casi en la meta","In the zone ✅":"En la zona ✅","Long sleep":"Sueño largo","Hours slept":"Horas dormidas","e.g. 7.5":"p. ej. 7,5","Stress today":"Estrés de hoy","1 = calm · 5 = very stressed":"1 = tranquilo · 5 = muy estresado","Low sleep or high stress: consider trimming volume or intensity today.":"Poco sueño o mucho estrés: considera reducir el volumen o la intensidad hoy.","Sleep and stress set how much training volume you can tolerate and how well you build muscle.":"El sueño y el estrés determinan cuánto volumen de entrenamiento toleras y qué tan bien ganas músculo.","💊 Creatine":"💊 Creatina","Mark as taken":"Marcar como tomada","Taken today ✅":"Tomada hoy ✅","Day streak":"Días seguidos","This week":"Esta semana","Creatine monohydrate, 3–5 g daily. Consistency matters more than timing.":"Monohidrato de creatina, 3–5 g al día. La constancia importa más que el horario.","Steps saved":"Pasos guardados","Steps added":"Pasos sumados","Enter your steps":"Ingresa tus pasos","Sleep saved":"Sueño guardado","Sleep cleared":"Sueño borrado","Enter hours between 0 and 24":"Ingresa horas entre 0 y 24","Creatine logged":"Creatina registrada","Creatine unmarked":"Creatina desmarcada",
 "Burgundy theme":"Tema vino","Olive theme":"Tema oliva","Cream theme":"Tema crema","Toggle light or dark":"Cambiar claro u oscuro","Language":"Idioma",
 "Health":"Salud","Finance":"Finanzas","Study":"Estudios","Planner":"Planner","Profile":"Perfil","Coming soon":"Próximamente","Track your finances and control spending.":"Medir tus finanzas y controlar gastos.","Manage everything academic.":"Gestionar todo lo académico.","Tasks, notes, reminders and a habit routine.":"Tareas, notas, recordatorios y rutina de hábitos.",
+"Tasks":"Tareas","New task":"Nueva tarea","Edit task":"Editar tarea","Title":"Título","Description":"Descripción","Priority":"Prioridad","Low":"Baja","Medium":"Media","High":"Alta","Due date":"Fecha límite","Reminder":"Recordatorio","Subtasks":"Subtareas","Add subtask":"Agregar subtarea","Completed":"Completadas","Pending":"Pendientes","No tasks yet":"Aún no hay tareas","Save task":"Guardar tarea","Task saved":"Tarea guardada","Task deleted":"Tarea eliminada","Add a title":"Agrega un título","What needs doing?":"¿Qué hay que hacer?","New subtask":"Nueva subtarea","Subtask":"Subtarea","Pick a date above to set a due date (optional).":"Elige una fecha arriba para poner una fecha límite (opcional).","Toggle subtask":"Alternar subtarea","Toggle task complete":"Alternar tarea completada","Remove subtask":"Quitar subtarea","Reminder date and time":"Fecha y hora del recordatorio","Clear date":"Quitar fecha","No due date":"Sin fecha límite",
 "🏠 Today":"🏠 Hoy","🥑 Foods":"🥑 Alimentos","⚖️ Weight":"⚖️ Peso","📏 Body":"📏 Cuerpo","📊 Tracking":"📊 Seguimiento","Tracking":"Seguimiento","📏 Measurements":"📏 Medidas","🏋️ Gym":"🏋️ Gimnasio","Gym":"Gimnasio","Week":"Semana","Stats":"Estadísticas","Settings":"Ajustes","Set up your plan":"Configura tu plan","Reconfigure plan":"Reconfigurar plan","Reconfigure":"Reconfigurar","Config plan":"Configurar plan","Config routine":"Configurar rutina","Reset config settings":"Restablecer configuración","This resets your plan and routine settings to default. Your workout history and calibrations are kept. Continue?":"Esto restablece tu plan y rutina a los valores por defecto. Tu historial de entrenamientos y tus calibraciones se conservan. ¿Continuar?","Config reset":"Configuración restablecida","🏋️ How do you train?":"🏋️ ¿Cómo entrenas?","Days per week":"Días por semana","Time per session":"Tiempo por sesión","3 days":"3 días","4 days":"4 días","5 days":"5 días","Full body, 6 key movement patterns — Mon / Wed / Fri.":"Cuerpo completo, 6 patrones clave — Lun / Mié / Vie.","Upper / Lower, two hits per muscle — the system\u2019s main structure.":"Torso / Pierna, dos estímulos por músculo — la estructura principal del sistema.","PHAT: 2 strength days + 3 hypertrophy days.":"PHAT: 2 días de fuerza + 3 de hipertrofia.","Create my routine":"Crear mi rutina","Save and rebuild":"Guardar y reconstruir","Cancel":"Cancelar","This session will be":"Esta sesión será","short — compounds only":"corta — solo compuestos","long — everything + accessories":"larga — todo + accesorios","standard — the full session":"estándar — la sesión completa","Under ~55 min keeps only the heavy compounds (the lifts you progress). Over ~85 min adds the optional accessories. In between runs the full session.":"Menos de ~55 min deja solo los compuestos pesados (los que progresas). Más de ~85 min añade los accesorios opcionales. En medio corre la sesión completa.","days/week":"días/sem","min/session":"min/sesión","short · compounds only":"corta · solo compuestos","standard · full session":"estándar · sesión completa","long · + accessories":"larga · + accesorios","Which days?":"¿Qué días?","days chosen":"días elegidos","keep a rest day between sessions":"deja un día de descanso entre sesiones","Mon":"Lun","Tue":"Mar","Wed":"Mié","Thu":"Jue","Fri":"Vie","Sat":"Sáb","Sun":"Dom","Full body, 6 key movement patterns. One rest day between sessions.":"Cuerpo completo, 6 patrones clave. Un día de descanso entre sesiones.","Pick exactly":"Elige exactamente","training days":"días de entrenamiento","Full body needs a rest day between sessions":"Cuerpo completo necesita un día de descanso entre sesiones","RIR is required for every set. Tap Rest after a set for the recommended timer.":"El RIR es obligatorio en cada serie. Toca Descansar tras una serie para el cronómetro recomendado.","rest":"descanso","Routine ready":"Rutina lista","Enter minutes between 20 and 150":"Escribe minutos entre 20 y 150","🧮 1RM calculator":"🧮 Calculadora 1RM","One-rep max calculator":"Calculadora de una repetición máxima","Estimate your one-rep max (1RM) for any lift — the most you could lift for a single rep — from a weight and the reps you did. Uses the Epley formula.":"Calcula tu repetición máxima (1RM) para cualquier levantamiento — el peso máximo que puedes levantar en una sola repetición — a partir de un peso y las reps que hiciste. Usa la fórmula de Epley.","Weight lifted":"Peso levantado","Reps":"Repeticiones","Calculate one-rep max":"Calcular una repetición máxima","Estimated 1RM":"1RM estimado","Weight":"Peso","Use":"Uso","High reps — the estimate is rough":"Muchas reps — la estimación es aproximada","Past 12 reps the estimate drifts":"Tras 12 reps la estimación pierde precisión","1 rep max":"máximo 1 rep","2 reps":"2 reps","~4 reps · heavy strength":"~4 reps · fuerza pesada","~6 reps · strength":"~6 reps · fuerza","~8 reps · strength–hypertrophy":"~8 reps · fuerza–hipertrofia","~10 reps · hypertrophy":"~10 reps · hipertrofia","~12 reps · hypertrophy":"~12 reps · hipertrofia","~14 reps":"~14 reps","~16 reps · endurance":"~16 reps · resistencia","~18 reps":"~18 reps","~20 reps · endurance":"~20 reps · resistencia","🏋️ Log maxes":"🏋️ Registrar pesos","Log your maxes":"Registrar tus pesos","One-off calibration":"Calibración única","Weight (kg)":"Peso (kg)","Reps to failure":"Reps al fallo","Save":"Guardar","Compound":"Compuesto","Isolation":"Aislado","‹ Back to plan":"‹ Volver al plan","Target working set":"Serie objetivo","reps":"reps","1RM ≈":"1RM ≈","work set":"serie de trabajo","from your max":"desde tu máximo","high reps, rough estimate":"muchas reps, estimación aproximada","estimate drifts past 12 reps":"la estimación pierde precisión tras 12 reps","Enter the weight you lifted":"Escribe el peso que levantaste","Enter reps between 1 and 40":"Escribe reps entre 1 y 40","Check the weight and reps":"Revisa el peso y las reps","Saved · 1RM ≈":"Guardado · 1RM ≈","For each lift, enter a weight and the reps you can do":"Para cada ejercicio, escribe un peso y las reps que logras","to failure":"al fallo"," (RIR 0) — any rep count, e.g. 6 heavy or 20 light. This is just to estimate your strength; your daily sessions still keep heavy compounds 1–2 reps from failure.":" (RIR 0) — cualquier número de reps, p. ej. 6 pesadas o 20 ligeras. Es solo para estimar tu fuerza; tus sesiones diarias mantienen los compuestos pesados a 1–2 reps del fallo.","exercise":"ejercicio","exercises":"ejercicios",
 "Monthly measurements":"Medidas mensuales","Measure now":"Medir ahora","Tomorrow":"Mañana",
 "It has been a month since your last measurements. Ready to log new ones?":"Ha pasado un mes desde tus últimas medidas. ¿Listo para registrar nuevas?","Add your first set of body measurements so we can track your progress.":"Añade tu primer juego de medidas corporales para seguir tu progreso.",
