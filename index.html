@@ -105,6 +105,7 @@ main{max-width:1120px;margin:0 auto;padding:8px 24px 177px;animation:in .5s ease
 input,select{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:8px 16px;width:100%;transition:border .2s,box-shadow .2s}
 input:focus,select:focus,button:focus-visible{outline:0;border-color:var(--olv-t);box-shadow:0 0 0 3px color-mix(in srgb,var(--olv-t) 30%,transparent)}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{flex:1;min-width:90px}
+.bt-wk .row>.btn{white-space:normal;min-width:0;line-height:1.2;height:auto;min-height:44px;display:flex;align-items:center;justify-content:center;text-align:center}
 .seg{display:flex;gap:8.0px;margin-bottom:16px}.seg .btn{flex:1;box-shadow:none;background:var(--bg)}.seg .btn.on{background:var(--pri);color:var(--onpri)}
 .big{color:var(--olv-t);font:600 44px 'Cormorant Garamond',Georgia,serif;line-height:1}.mut{color:var(--mut);font-size:13px}
 .bar{height:10px;border-radius:9px;background:var(--line);overflow:hidden;margin:4px 0 16px}
@@ -409,7 +410,7 @@ nav{width:min(480px,calc(100% - 32px));max-width:480px;padding:5px 6px;margin:0;
 input,.ddb{min-height:48px;padding:0 16px}.ddb{padding-right:48px}
 input[style*="padding"]{min-height:40px}
 .wrow .wb{width:48px;height:48px}
-nav .tab{min-height:44px}
+nav .tab{min-height:44px;padding-top:4px;padding-bottom:4px;overflow:visible}
 .dpn{width:32px;height:32px}.drops i{width:16px;height:16px}.lg .hc{width:16px;height:16px}
 .bar{height:8px}.pbar{height:8px}.mbs{height:128px}.fl{max-height:192px}.ddl{max-height:256px}.wkd{min-height:304px}
 #toast{min-height:40px;padding:8px 24px;display:flex;align-items:center}
