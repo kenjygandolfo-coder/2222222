@@ -1367,6 +1367,42 @@ ${bmedit==null?`<div class="card"><div class="row" style="justify-content:space-
 ${editor}
 ${bmedit==null?(list.length?list.map(row).join(''):'<p class="mut">No bookmarks yet</p>'):''}`},
 
+dashboard(){
+/* Planner Dashboard (Phase 6): a day-at-a-glance summary over the data built in
+   Phases 1-5. All blocks reuse existing pure helpers and existing handlers:
+   'View all' buttons carry data-sub so the click handler navigates for free, and
+   habit checkboxes carry data-a="htog" so the change handler toggles+persists.
+   No new JS handlers, no new color tokens. All user text is esc()'d. */
+const tk=today();
+/* TASKS: triage via the pure dashboardTasks() helper; reuse the priority chip. */
+const dt=dashboardTasks(S.tasks,tk);
+const pchip=p=>`<span class="chip" style="font-weight:600;color:var(${PFG[p]})">${PLBL[p]}</span>`;
+const trow=(t,col)=>`<div class="li"><span style="min-width:0;overflow-wrap:anywhere">${esc(t.title)}${t.due?`<span class="cap" style="display:block;color:var(${col})">${esc(fmtD(t.due))}</span>`:''}</span>${pchip(t.prio)}</div>`;
+let tasksBody;
+if(!dt.pendingCount)tasksBody='<p class="mut">No pending tasks</p>';
+else{let b=`<p class="cap" style="margin:0 0 8px">${dt.pendingCount} <span>Pending tasks</span></p>`;
+if(dt.overdue.length)b+=`<div class="cap" style="color:var(--err-fg);font-weight:700;margin:8px 0 4px">Overdue</div>`+dt.overdue.map(t=>trow(t,'--err-fg')).join('');
+if(dt.dueToday.length)b+=`<div class="cap" style="color:var(--warn-fg);font-weight:700;margin:8px 0 4px">Due today</div>`+dt.dueToday.map(t=>trow(t,'--warn-fg')).join('');
+if(dt.upcoming.length)b+=`<div class="cap" style="color:var(--mut);font-weight:700;margin:8px 0 4px">Upcoming</div>`+dt.upcoming.slice(0,3).map(t=>trow(t,'--mut')).join('');
+tasksBody=b}
+const tasksCard=`<div class="card"><div class="row" style="justify-content:space-between;align-items:center"><h3 style="margin:0">Tasks</h3><button class="btn s" style="flex:none" data-sub="tasks">View all</button></div>${tasksBody}</div>`;
+/* HABITS: list habits NOT done today, each a native checkbox wired to htog. */
+const total=S.habits.length,doneToday=S.habits.filter(h=>h.log[tk]).length,notDone=S.habits.slice().filter(h=>!h.log[tk]).sort((a,b)=>a.created-b.created);
+let habitsBody;
+if(!total)habitsBody='<p class="mut">No habits yet</p>';
+else if(!notDone.length)habitsBody=`<p class="cap" style="margin:0 0 8px">${doneToday}/${total}</p><p class="mut">All done for today</p>`;
+else habitsBody=`<p class="cap" style="margin:0 0 8px">${doneToday}/${total}</p>`+notDone.map(h=>`<label class="li" style="cursor:pointer"><span style="min-width:0;overflow-wrap:anywhere">${esc(h.icon&&h.icon.trim()?h.icon:'✅')} ${esc(h.name)}</span><input type="checkbox" data-a="htog" data-id="${h.id}" aria-label="Toggle habit for today" style="width:auto;flex:none"></label>`).join('');
+const habitsCard=`<div class="card"><div class="row" style="justify-content:space-between;align-items:center"><h3 style="margin:0">Habits today</h3><button class="btn s" style="flex:none" data-sub="habits">View all</button></div>${habitsBody}</div>`;
+/* EVENTS: next three upcoming, mirroring the calendar row's date · time format. */
+const evs=upcomingEvents(S.events,tk).slice(0,3);
+const eventsBody=evs.length?evs.map(ev=>`<div class="li"><span style="min-width:0;overflow-wrap:anywhere">${esc(ev.title)}<span class="cap" style="display:block">${esc(fmtD(ev.date))}${ev.time?' · '+esc(ev.time):''}</span></span></div>`).join(''):'<p class="mut">No upcoming events</p>';
+const eventsCard=`<div class="card"><div class="row" style="justify-content:space-between;align-items:center"><h3 style="margin:0">Upcoming events</h3><button class="btn s" style="flex:none" data-sub="calendar">View all</button></div>${eventsBody}</div>`;
+/* MOOD: today's logged mood (emoji+label+color) or a CTA to log it. */
+const jm=S.journal[tk],mt=jm&&jm.mood?moodMeta(jm.mood):null;
+const moodBody=mt?`<div class="li"><span>Today's mood</span><span style="flex:none;color:${moodColor(jm.mood)};font-weight:700"><span aria-hidden="true">${mt[2]}</span> ${mt[1]}</span></div>`:`<p class="mut" style="margin:0 0 8px">How are you feeling?</p><button class="btn p" data-sub="journal">Log mood</button>`;
+const moodCard=`<div class="card"><h3 style="margin:0 0 8px">Mood</h3>${moodBody}</div>`;
+return`<h2>Dashboard</h2><p class="cap" style="margin:-4px 0 12px"><span>Today</span> · ${esc(fmtD(tk))}</p>${tasksCard}${habitsCard}${eventsCard}${moodCard}`},
+
 calendar(){
 /* Upcoming events (today or later), sorted ascending by date then time. */
 const list=upcomingEvents(S.events,today());
@@ -2475,6 +2511,27 @@ function upcomingEvents(events,todayKey){return(events||[]).filter(e=>e&&e.date&
    (most recent first). Does not mutate the input. Mirrored verbatim into
    tools/calendar-group.test.mjs. */
 function pastEvents(events,todayKey){return(events||[]).filter(e=>e&&e.date&&e.date<todayKey).slice().sort((a,b)=>a.date>b.date?-1:a.date<b.date?1:(a.time||'')>(b.time||'')?-1:(a.time||'')<(b.time||'')?1:0)}
+/* PURE task-triage helper for the Planner Dashboard (Phase 6). Given the tasks
+   array and a today key ('YYYY-MM-DD'), returns a triage of the PENDING tasks
+   (!done), with completed tasks always excluded:
+     { pendingCount, overdue:[...], dueToday:[...], upcoming:[...] }
+   where:
+     - pendingCount = number of pending (!done) tasks.
+     - overdue  = pending tasks with a due date strictly before today
+       (t.due && t.due<todayKey), sorted by due ASCENDING then created ASCENDING.
+     - dueToday = pending tasks with t.due==todayKey, sorted by created ASCENDING.
+     - upcoming = the remaining pending tasks (no due date, or due>todayKey),
+       sorted by PORD priority (high>med>low) then dated-before-undated then due
+       ASCENDING then created ASCENDING, mirroring V.tasks()'s pending order.
+   PORD={high:0,med:1,low:2} is inlined here so the mirror in the test stays
+   self-contained. Does not mutate the input (uses .slice()); null/undefined/empty
+   input yields {pendingCount:0, overdue:[], dueToday:[], upcoming:[]}. Mirrored
+   VERBATIM into tools/dashboard-tasks.test.mjs - keep the two in sync. */
+function dashboardTasks(tasks,todayKey){const PORD={high:0,med:1,low:2};const pending=(tasks||[]).slice().filter(t=>t&&!t.done);
+const overdue=pending.filter(t=>t.due&&t.due<todayKey).sort((a,b)=>a.due<b.due?-1:a.due>b.due?1:a.created-b.created);
+const dueToday=pending.filter(t=>t.due==todayKey).sort((a,b)=>a.created-b.created);
+const upcoming=pending.filter(t=>!t.due||t.due>todayKey).sort((a,b)=>{if(PORD[a.prio]!=PORD[b.prio])return PORD[a.prio]-PORD[b.prio];if(!!a.due!=!!b.due)return a.due?-1:1;if(a.due&&b.due&&a.due!=b.due)return a.due<b.due?-1:1;return a.created-b.created});
+return{pendingCount:pending.length,overdue,dueToday,upcoming}}
 
 /* ---- Planner > Journal + daily mood (Phase 4) ---- */
 /* Transient editor state. The journal is exactly one entry per day, so the
@@ -2834,7 +2891,7 @@ const SECTIONS=[
 ['health','Health',ICO.heart,[['today','Today'],['week','Week'],['tracking','Tracking'],['gym','Gym'],['stats','Stats']]],
 ['finance','Finance',ICO.wallet,null],
 ['study','Study',ICO.book,null],
-['planner','Planner',ICO.list,[['tasks','Tasks'],['notes','Notes'],['habits','Habits'],['journal','Journal'],['bookmarks','Bookmarks'],['calendar','Calendar']]],
+['planner','Planner',ICO.list,[['dashboard','Dashboard'],['tasks','Tasks'],['notes','Notes'],['habits','Habits'],['journal','Journal'],['bookmarks','Bookmarks'],['calendar','Calendar']]],
 ['profile','Profile',ICO.person,null]];
 const SECMAP=Object.fromEntries(SECTIONS.map(s=>[s[0],{label:s[1],icon:s[2],subs:s[3]}]));
 /* provisional 'Coming soon' copy: [EnglishLine] (translated to ES via the i18n map) */
@@ -2859,7 +2916,7 @@ if(sec=='profile'){legacy='plan';body=V.plan()}
 else if(sec=='health'){
 if(foodsMode){legacy='foods';body=V.foods()}
 else{const sub=subOf.health||'today';legacy=sub;const vk={today:'today',week:'week',tracking:'tracking',gym:'gym',stats:'stats'}[sub]||'today';body=subRow(info.subs,sub)+V[vk]()}}
-else if(sec=='planner'){const sub=subOf.planner||'tasks';legacy=sub;body=subRow(info.subs,sub)+(sub=='notes'?V.notes():sub=='habits'?V.habits():sub=='journal'?V.journal():sub=='bookmarks'?V.bookmarks():sub=='calendar'?V.calendar():V.tasks())}
+else if(sec=='planner'){const sub=subOf.planner||'dashboard';legacy=sub;body=subRow(info.subs,sub)+(sub=='dashboard'?V.dashboard():sub=='notes'?V.notes():sub=='habits'?V.habits():sub=='journal'?V.journal():sub=='bookmarks'?V.bookmarks():sub=='calendar'?V.calendar():V.tasks())}
 else{/* provisional */const line=SOON[sec]||'';body=`<div class="cs"><div class="csi" aria-hidden="true">${info.icon}</div><h2>${info.label}</h2><div class="cst">Coming soon</div><p>${line}</p></div>`}
 tab=legacy;
 m.innerHTML=body;m.classList.toggle('wide',legacy=='week');m.style.animation='none';m.offsetHeight;m.style.animation='';
@@ -3134,6 +3191,7 @@ const D={
 "Journal":"Diario","Mood":"Estado de ánimo","How are you feeling?":"¿Cómo te sientes?","Great":"Muy bien","Good":"Bien","Okay":"Normal","Bad":"Mal","Awful":"Muy mal","Journal entry":"Entrada de diario","Write about your day…":"Escribe sobre tu día…","Mood summary":"Resumen de ánimo","Average mood":"Ánimo medio","Last 30 days":"Últimos 30 días","Save entry":"Guardar entrada","Entry saved":"Entrada guardada","Log more days to see your mood summary.":"Registra más días para ver tu resumen de ánimo.",
 "Bookmarks":"Marcadores","New bookmark":"Nuevo marcador","Edit bookmark":"Editar marcador","URL":"URL","Open":"Abrir","Tag":"Etiqueta","No bookmarks yet":"Aún no hay marcadores","Save bookmark":"Guardar marcador","Bookmark saved":"Marcador guardado","Bookmark deleted":"Marcador eliminado","Enter a valid URL":"Escribe una URL válida",
 "Calendar":"Calendario","Events":"Eventos","New event":"Nuevo evento","Edit event":"Editar evento","Event title":"Título del evento","Time":"Hora","No events yet":"Aún no hay eventos","Upcoming":"Próximos","Past":"Pasados","Save event":"Guardar evento","Event saved":"Evento guardado","Event deleted":"Evento eliminado",
+"Dashboard":"Panel","Pending tasks":"Tareas pendientes","Due today":"Vence hoy","Overdue":"Vencidas","No pending tasks":"Sin tareas pendientes","Habits today":"Hábitos de hoy","All done for today":"Todo hecho por hoy","Upcoming events":"Próximos eventos","No upcoming events":"Sin eventos próximos","Today's mood":"Ánimo de hoy","View all":"Ver todo","Log mood":"Registrar ánimo",
 "🏠 Today":"🏠 Hoy","🥑 Foods":"🥑 Alimentos","⚖️ Weight":"⚖️ Peso","📏 Body":"📏 Cuerpo","📊 Tracking":"📊 Seguimiento","Tracking":"Seguimiento","📏 Measurements":"📏 Medidas","🏋️ Gym":"🏋️ Gimnasio","Gym":"Gimnasio","Week":"Semana","Stats":"Estadísticas","Settings":"Ajustes","Set up your plan":"Configura tu plan","Reconfigure plan":"Reconfigurar plan","Reconfigure":"Reconfigurar","Config plan":"Configurar plan","Config routine":"Configurar rutina","Reset config settings":"Restablecer configuración","This resets your plan and routine settings to default. Your workout history and calibrations are kept. Continue?":"Esto restablece tu plan y rutina a los valores por defecto. Tu historial de entrenamientos y tus calibraciones se conservan. ¿Continuar?","Config reset":"Configuración restablecida","🏋️ How do you train?":"🏋️ ¿Cómo entrenas?","Days per week":"Días por semana","Time per session":"Tiempo por sesión","3 days":"3 días","4 days":"4 días","5 days":"5 días","Full body, 6 key movement patterns — Mon / Wed / Fri.":"Cuerpo completo, 6 patrones clave — Lun / Mié / Vie.","Upper / Lower, two hits per muscle — the system\u2019s main structure.":"Torso / Pierna, dos estímulos por músculo — la estructura principal del sistema.","PHAT: 2 strength days + 3 hypertrophy days.":"PHAT: 2 días de fuerza + 3 de hipertrofia.","Create my routine":"Crear mi rutina","Save and rebuild":"Guardar y reconstruir","Cancel":"Cancelar","This session will be":"Esta sesión será","short — compounds only":"corta — solo compuestos","long — everything + accessories":"larga — todo + accesorios","standard — the full session":"estándar — la sesión completa","Under ~55 min keeps only the heavy compounds (the lifts you progress). Over ~85 min adds the optional accessories. In between runs the full session.":"Menos de ~55 min deja solo los compuestos pesados (los que progresas). Más de ~85 min añade los accesorios opcionales. En medio corre la sesión completa.","days/week":"días/sem","min/session":"min/sesión","short · compounds only":"corta · solo compuestos","standard · full session":"estándar · sesión completa","long · + accessories":"larga · + accesorios","Which days?":"¿Qué días?","days chosen":"días elegidos","keep a rest day between sessions":"deja un día de descanso entre sesiones","Mon":"Lun","Tue":"Mar","Wed":"Mié","Thu":"Jue","Fri":"Vie","Sat":"Sáb","Sun":"Dom","Full body, 6 key movement patterns. One rest day between sessions.":"Cuerpo completo, 6 patrones clave. Un día de descanso entre sesiones.","Pick exactly":"Elige exactamente","training days":"días de entrenamiento","Full body needs a rest day between sessions":"Cuerpo completo necesita un día de descanso entre sesiones","RIR is required for every set. Tap Rest after a set for the recommended timer.":"El RIR es obligatorio en cada serie. Toca Descansar tras una serie para el cronómetro recomendado.","rest":"descanso","Routine ready":"Rutina lista","Enter minutes between 20 and 150":"Escribe minutos entre 20 y 150","🧮 1RM calculator":"🧮 Calculadora 1RM","One-rep max calculator":"Calculadora de una repetición máxima","Estimate your one-rep max (1RM) for any lift — the most you could lift for a single rep — from a weight and the reps you did. Uses the Epley formula.":"Calcula tu repetición máxima (1RM) para cualquier levantamiento — el peso máximo que puedes levantar en una sola repetición — a partir de un peso y las reps que hiciste. Usa la fórmula de Epley.","Weight lifted":"Peso levantado","Reps":"Repeticiones","Calculate one-rep max":"Calcular una repetición máxima","Estimated 1RM":"1RM estimado","Weight":"Peso","Use":"Uso","High reps — the estimate is rough":"Muchas reps — la estimación es aproximada","Past 12 reps the estimate drifts":"Tras 12 reps la estimación pierde precisión","1 rep max":"máximo 1 rep","2 reps":"2 reps","~4 reps · heavy strength":"~4 reps · fuerza pesada","~6 reps · strength":"~6 reps · fuerza","~8 reps · strength–hypertrophy":"~8 reps · fuerza–hipertrofia","~10 reps · hypertrophy":"~10 reps · hipertrofia","~12 reps · hypertrophy":"~12 reps · hipertrofia","~14 reps":"~14 reps","~16 reps · endurance":"~16 reps · resistencia","~18 reps":"~18 reps","~20 reps · endurance":"~20 reps · resistencia","🏋️ Log maxes":"🏋️ Registrar pesos","Log your maxes":"Registrar tus pesos","One-off calibration":"Calibración única","Weight (kg)":"Peso (kg)","Reps to failure":"Reps al fallo","Save":"Guardar","Compound":"Compuesto","Isolation":"Aislado","‹ Back to plan":"‹ Volver al plan","Target working set":"Serie objetivo","reps":"reps","1RM ≈":"1RM ≈","work set":"serie de trabajo","from your max":"desde tu máximo","high reps, rough estimate":"muchas reps, estimación aproximada","estimate drifts past 12 reps":"la estimación pierde precisión tras 12 reps","Enter the weight you lifted":"Escribe el peso que levantaste","Enter reps between 1 and 40":"Escribe reps entre 1 y 40","Check the weight and reps":"Revisa el peso y las reps","Saved · 1RM ≈":"Guardado · 1RM ≈","For each lift, enter a weight and the reps you can do":"Para cada ejercicio, escribe un peso y las reps que logras","to failure":"al fallo"," (RIR 0) — any rep count, e.g. 6 heavy or 20 light. This is just to estimate your strength; your daily sessions still keep heavy compounds 1–2 reps from failure.":" (RIR 0) — cualquier número de reps, p. ej. 6 pesadas o 20 ligeras. Es solo para estimar tu fuerza; tus sesiones diarias mantienen los compuestos pesados a 1–2 reps del fallo.","exercise":"ejercicio","exercises":"ejercicios",
 "Monthly measurements":"Medidas mensuales","Measure now":"Medir ahora","Tomorrow":"Mañana",
 "It has been a month since your last measurements. Ready to log new ones?":"Ha pasado un mes desde tus últimas medidas. ¿Listo para registrar nuevas?","Add your first set of body measurements so we can track your progress.":"Añade tu primer juego de medidas corporales para seguir tu progreso.",
