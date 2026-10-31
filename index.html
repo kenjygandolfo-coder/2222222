@@ -43,6 +43,23 @@ input,textarea,select{caret-color:var(--olv-t)}
    dark value. The two dark blocks are kept byte-for-byte in sync. */
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card:not(.hero):not(.bt-hero):not(.phero){background:var(--card);color:var(--ink);--card:inherit;--ink:inherit;--mut:inherit;--line-ui:inherit;--line:inherit;--olv-t:inherit;--olv-tx:inherit;--data-1:inherit;--data-2:inherit;--ok-fg:inherit;--err-fg:inherit;--warn-fg:inherit;--info-fg:inherit;--pri:inherit;--pri-hov:inherit;--pri-dk:inherit;--onpri:inherit}}
 :root[data-theme="dark"] .card:not(.hero):not(.bt-hero):not(.phero){background:var(--card);color:var(--ink);--card:inherit;--ink:inherit;--mut:inherit;--line-ui:inherit;--line:inherit;--olv-t:inherit;--olv-tx:inherit;--data-1:inherit;--data-2:inherit;--ok-fg:inherit;--err-fg:inherit;--warn-fg:inherit;--info-fg:inherit;--pri:inherit;--pri-hov:inherit;--pri-dk:inherit;--onpri:inherit}
+/* FEAT-002 two-level nav in DARK: the floating bar is OLIVE ~92% opaque with a soft
+   cream border; the active section oval + active subtab chip flip to a CREAM fill with
+   WINE text (#5C1A22 on #F3EAD9 = 10.81:1). Both dark selectors kept in sync. */
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) nav{background:color-mix(in srgb,var(--olv-s) 92%,transparent);border-color:color-mix(in srgb,#F3EAD9 34%,transparent)}
+:root:not([data-theme="light"]) .tab{color:var(--ink)}
+:root:not([data-theme="light"]) .tab.on,:root:not([data-theme="light"]) .tab.on:hover,:root:not([data-theme="light"]) .tab.on:focus-visible{background:#F3EAD9;color:#5C1A22}
+:root:not([data-theme="light"]) .subtabs{background:linear-gradient(var(--bg) 70%,transparent)}
+:root:not([data-theme="light"]) .subtabs .stb{color:var(--ink);border-color:color-mix(in srgb,#F3EAD9 22%,transparent);background:color-mix(in srgb,var(--olv-s) 40%,transparent)}
+:root:not([data-theme="light"]) .subtabs .stb.on{background:#F3EAD9;color:#5C1A22;border-color:transparent}
+:root:not([data-theme="light"]) .cs .csi,:root:not([data-theme="light"]) .cs .cst{color:var(--olv-t)}}
+:root[data-theme="dark"] nav{background:color-mix(in srgb,var(--olv-s) 92%,transparent);border-color:color-mix(in srgb,#F3EAD9 34%,transparent)}
+:root[data-theme="dark"] .tab{color:var(--ink)}
+:root[data-theme="dark"] .tab.on,:root[data-theme="dark"] .tab.on:hover,:root[data-theme="dark"] .tab.on:focus-visible{background:#F3EAD9;color:#5C1A22}
+:root[data-theme="dark"] .subtabs{background:linear-gradient(var(--bg) 70%,transparent)}
+:root[data-theme="dark"] .subtabs .stb{color:var(--ink);border-color:color-mix(in srgb,#F3EAD9 22%,transparent);background:color-mix(in srgb,var(--olv-s) 40%,transparent)}
+:root[data-theme="dark"] .subtabs .stb.on{background:#F3EAD9;color:#5C1A22;border-color:transparent}
+:root[data-theme="dark"] .cs .csi,:root[data-theme="dark"] .cs .cst{color:var(--olv-t)}
 /* likewise undo the wine-card button text/border flip in dark (and keep :not(.p) so the
    dark cream-fill wine-text primary button below still wins on specificity) */
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card:not(.hero):not(.bt-hero):not(.phero) .btn:not(.p),:root:not([data-theme="light"]) .card:not(.hero):not(.bt-hero):not(.phero) .btn.s,:root:not([data-theme="light"]) .card:not(.hero):not(.bt-hero):not(.phero) .btn.a{color:var(--olv-t);border-color:var(--olv-t)}}
@@ -63,7 +80,7 @@ input,textarea,select{caret-color:var(--olv-t)}
    is only 2.77:1 against the card, so for coherence with the light .wine cards the
    DARK primary button becomes a solid cream fill with wine text (#5C1A22 on
    #F3EAD9 = 10.81:1). Scoped to .btn.p ONLY (NOT global --pri) so tabs (.tab.on),
-   segment on-states (.seg .btn.on), fabs (.fab.on), the accent button (.btn.a) and
+   segment on-states (.seg .btn.on), the accent button (.btn.a) and
    data fills (which read --data-1) are untouched. Both dark selectors carry an
    identical rule. */
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.p{background:#F3EAD9;color:#5C1A22;box-shadow:0 10px 22px -10px rgba(0,0,0,.6)}}
@@ -73,7 +90,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Montserrat,sys
 h1,h2,h3{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;margin:0;letter-spacing:.02em}
 h1,h2{color:var(--olv-t)}h1{font-size:30px}h2{font-size:24px;margin-bottom:16px}h3{font-size:19px;margin-bottom:8.0px}
 header{display:flex;justify-content:space-between;align-items:center;max-width:1120px;margin:0 auto;padding:24px 24px 8.0px}
-nav{display:flex;gap:4px;position:fixed;left:0;right:0;bottom:0;z-index:40;padding:4px 8px calc(4px + env(safe-area-inset-bottom,0px));scrollbar-width:none}
+nav{display:flex;gap:4px;position:fixed;left:0;right:0;bottom:0;z-index:40;padding:4px 8px;scrollbar-width:none}
 .tab,.btn{font:inherit;font-weight:500;border:0;border-radius:999px;padding:8px 16px;cursor:pointer;white-space:nowrap;transition:all .25s;background:var(--card);color:var(--ink);box-shadow:var(--sh)}
 .tab:hover,.btn:hover{transform:translateY(-2px);box-shadow:var(--shh)}
 .tab.on,.btn.p{background:var(--pri);color:var(--onpri)}
@@ -189,9 +206,6 @@ input[type=checkbox]{-webkit-appearance:checkbox;appearance:checkbox;accent-colo
 .how{margin-top:16.0px}.how>div{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:8px 0;border-bottom:1px solid var(--line)}.how>div:last-child{border:0}
 .how small{display:block;color:var(--mut);font-size:12px}.how b{font:600 22px 'Cormorant Garamond',Georgia,serif;white-space:nowrap}.how>div:last-child b{color:var(--olv-t)}
 @media(max-width:440px){.mac3{grid-template-columns:1fr}}
-.fabs{position:fixed;right:16px;bottom:calc(97px + env(safe-area-inset-bottom,0px));z-index:45;display:flex;flex-direction:column;gap:16px}
-.fab{width:56px;height:56px;border-radius:50%;border:0;font-size:26px;line-height:1;cursor:pointer;background:var(--card);box-shadow:var(--shh);transition:transform .25s,background .25s;padding:0}
-.fab:hover{transform:scale(1.1)}.fab.on{background:var(--pri)}
 
 /* ===== Forma v2 redesign ===== */
 *{scrollbar-width:thin;scrollbar-color:var(--line) transparent}
@@ -210,19 +224,19 @@ header h1::before{content:"";width:18px;height:18px;border-radius:50% 50% 50% 4p
 .lgw{display:flex;gap:4px;align-items:center}
 .hd .btn.s{background:transparent;padding:4px 0;font-size:14px;line-height:1;width:40px;min-width:40px;text-align:center;display:grid;place-items:center}
 .hd .btn.s.thb{font-size:16px;padding:4px 0}
-nav{left:50%;right:auto;transform:translateX(-50%);width:min(560px,calc(100% - 16px));max-width:none;margin:0;gap:4px;bottom:calc(25px + env(safe-area-inset-bottom,0px));height:54px;border-radius:24px;background:color-mix(in srgb,var(--card) 92%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);border:1px solid var(--line);box-shadow:0 10px 30px -14px color-mix(in srgb,#000 30%,transparent)}
-.tab{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:transparent;box-shadow:none;padding:6px 4px;min-height:48px;flex:1 1 0;text-align:center;font-weight:600;color:var(--mut);border-radius:0 0 16px 16px}
-.tab .ti{font-size:20px;line-height:1}
-.tab .tl{font-size:11px;line-height:1.1;letter-spacing:.01em}
+nav{left:50%;right:auto;transform:translateX(-50%);width:min(480px,calc(100% - 32px));max-width:480px;margin:0;gap:4px;padding:5px 6px;bottom:calc(25px + env(safe-area-inset-bottom,0px));height:54px;border-radius:27px;background:color-mix(in srgb,var(--card) 90%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);border:1px solid var(--line);box-shadow:0 10px 30px -14px color-mix(in srgb,#000 30%,transparent)}
+.tab{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:transparent;box-shadow:none;padding:4px 2px;min-height:44px;flex:1 1 0;min-width:0;text-align:center;font-weight:600;color:var(--mut);border-radius:999px;overflow:hidden}
+.tab .ti{width:22px;height:22px;display:block;line-height:0}
+.tab .ti svg{width:22px;height:22px;display:block;stroke:currentColor;fill:none}
+.tab .tl{font-size:12px;line-height:1.05;letter-spacing:.01em;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tab:hover{box-shadow:none;transform:none;background:color-mix(in srgb,var(--olv-t) 8%,transparent)}
-.tab.on{background:color-mix(in srgb,var(--pri) 12%,transparent);box-shadow:none;color:var(--olv-tx);font-weight:700}
-.tab.on:hover,.tab.on:focus-visible{background:color-mix(in srgb,var(--pri) 18%,transparent);box-shadow:none;color:var(--olv-tx);font-weight:700}
-.tab.on::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:28px;height:3px;border-radius:0 0 3px 3px;background:var(--pri)}
-.tab.on .ti{transform:scale(1.08)}
+.tab.on{background:var(--pri);box-shadow:none;color:var(--onpri);font-weight:700}
+.tab.on:hover,.tab.on:focus-visible{background:var(--pri);box-shadow:none;color:var(--onpri);font-weight:700}
+.tab.on .ti{transform:scale(1.04)}
 .btn{border:1px solid color-mix(in srgb,var(--line) 70%,transparent);padding:8px 24px;font-weight:600}
 .btn.p{background:linear-gradient(135deg,var(--pri),var(--pri-hov));border-color:transparent;box-shadow:0 10px 22px -10px var(--pri)}
 .btn.a{background:linear-gradient(135deg,var(--acc),color-mix(in srgb,var(--acc) 62%,#000));border-color:transparent}
-.btn:active,.tab:active,.fab:active{transform:scale(.95)}
+.btn:active,.tab:active{transform:scale(.95)}
 .card{border:1px solid color-mix(in srgb,var(--line) 75%,transparent);border-radius:24px;padding:24px;box-shadow:0 1px 0 rgba(255,255,255,.12) inset,0 14px 34px -16px rgba(42,42,28,.28)}
 @keyframes rise{from{opacity:0;transform:translateY(18px) scale(.985)}}
 .card,.tile,.note,.phero,main>h2{animation:rise .55s cubic-bezier(.2,.8,.2,1) backwards}
@@ -248,19 +262,13 @@ input,.ddb{border-radius:16px;padding:16px 16px;background:color-mix(in srgb,var
 .phero{border-radius:24px;position:relative;overflow:hidden;background:linear-gradient(150deg,var(--pri),var(--pri-dk))}.pbig{font-size:76px;font-style:italic}
 .mac3>div{border-radius:22px;background:color-mix(in srgb,var(--bg) 65%,var(--card))}
 .drops{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:16.0px 0 4px}.drops i{width:15px;height:15px;border-radius:0 50% 50% 50%;transform:rotate(45deg);background:var(--line);transition:.35s}.drops i.on{background:linear-gradient(135deg,var(--gold),var(--acc));box-shadow:0 4px 10px -3px var(--acc)}
-.fabs{right:18px;gap:16px}
-.fab{position:relative;width:60px;height:60px;font-size:24px;display:grid;place-items:center;background:color-mix(in srgb,var(--card) 82%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--line)}
-.fab:hover{transform:translateY(-3px) rotate(-6deg) scale(1.08)}
-.fab.on{background:linear-gradient(135deg,var(--pri),var(--pri-hov));box-shadow:0 0 0 5px color-mix(in srgb,var(--olv-t) 22%,transparent),var(--shh)}
-.fab::after{content:attr(aria-label);position:absolute;right:72px;top:50%;transform:translate(8px,-50%);background:var(--ink);color:var(--bg);font:600 12px Montserrat,sans-serif;padding:8px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:.2s;white-space:nowrap}
-.fab:hover::after{opacity:1;transform:translate(0,-50%)}
 #toast{padding:16px 24.0px;font-weight:500;box-shadow:var(--shh)}#toast::before{content:"✦";color:var(--gold);margin-right:8px}
 .ob{background:radial-gradient(800px 500px at 100% 0,color-mix(in srgb,var(--olv-t) 22%,transparent),transparent 60%),radial-gradient(600px 500px at 0 100%,color-mix(in srgb,var(--gold) 20%,transparent),transparent 60%),var(--bg)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .ob{background:radial-gradient(800px 500px at 100% 0,color-mix(in srgb,var(--n5) 12%,transparent),transparent 60%),var(--bg)}}
 :root[data-theme="dark"] .ob{background:radial-gradient(800px 500px at 100% 0,color-mix(in srgb,var(--n5) 12%,transparent),transparent 60%),var(--bg)}
 .obc h1{font-size:50px;line-height:1.05}.pg{height:8px}.pg i{background:linear-gradient(90deg,var(--gold),var(--data-1))}
 .opt{border:1.5px solid var(--line);border-radius:24px;padding:16px 24px}.opt.on{border-color:var(--olv-t);box-shadow:0 0 0 5px color-mix(in srgb,var(--olv-t) 16%,transparent)}
-@media(max-width:560px){h1{font-size:34px}h2{font-size:32px}.card{padding:24px;border-radius:24px}.hero{padding:20.0px}.tab{padding:8px 16px}.fab{width:60px;height:60px}}
+@media(max-width:560px){h1{font-size:34px}h2{font-size:32px}.card{padding:24px;border-radius:24px}.hero{padding:20.0px}.tab{padding:4px 2px}}
 .wat{display:flex;flex-direction:column;justify-content:center;gap:16px}.wat h3{margin:0}
 .wrow{display:flex;align-items:center;justify-content:center;gap:16px}
 .wrow .wb{width:46px;height:46px;padding:0;border-radius:50%;font-size:24px;line-height:1;flex:none;display:grid;place-items:center;background:color-mix(in srgb,var(--bg) 65%,var(--card))}
@@ -357,7 +365,18 @@ h2::after{background:var(--olv-t)}
 .card,.tile{border-color:color-mix(in srgb,var(--olv-t) 22%,transparent)}
 .btn{border-color:color-mix(in srgb,var(--olv-t) 25%,transparent)}
 nav{border-color:color-mix(in srgb,var(--olv-t) 35%,transparent)}
-.tab{color:var(--mut)}.tab.on,.tab.on:hover{color:var(--olv-tx)}
+.tab{color:var(--olv-t)}.tab.on,.tab.on:hover{color:var(--onpri)}
+.subtabs{position:sticky;top:0;z-index:8;display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding:8px 0 12px;margin:0 0 8px;background:linear-gradient(var(--bg) 70%,transparent)}
+.subtabs::-webkit-scrollbar{display:none}
+.subtabs .stb{flex:none;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 18px;border:1px solid color-mix(in srgb,var(--olv-t) 25%,transparent);border-radius:999px;background:color-mix(in srgb,var(--card) 70%,transparent);color:var(--olv-t);font:inherit;font-size:14px;font-weight:600;white-space:nowrap;cursor:pointer;box-shadow:none;transition:background .2s,color .2s}
+.subtabs .stb:hover{background:color-mix(in srgb,var(--olv-t) 10%,var(--card))}
+.subtabs .stb.on{background:var(--pri);color:var(--onpri);border-color:transparent;font-weight:700}
+.cs{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;min-height:50vh;padding:24px}
+.cs .csi{width:64px;height:64px;color:var(--olv-t)}
+.cs .csi svg{width:64px;height:64px;stroke:currentColor;fill:none;stroke-width:1.6}
+.cs h2{margin:0}.cs h2::after{display:none}
+.cs .cst{font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:13px;color:var(--pri)}
+.cs p{margin:0;max-width:340px;color:var(--mut)}
 .hero,.phero,.rt{background:linear-gradient(150deg,var(--olv-s),color-mix(in srgb,var(--olv-s) 72%,#000));color:#F3EAD9}
 .hero .mut,.phero span{color:inherit}
 .hero::after{background:radial-gradient(circle,rgba(243,234,217,.18),transparent 70%)}
@@ -380,7 +399,7 @@ body{line-height:24px}
 .mut{line-height:20px}
 main{padding:8px 24px calc(121px + env(safe-area-inset-bottom,0px))}
 header{padding:8px 16px}
-nav{width:min(560px,calc(100% - 16px));padding:4px 8px;margin:0;box-sizing:border-box}
+nav{width:min(480px,calc(100% - 32px));max-width:480px;padding:5px 6px;margin:0;box-sizing:border-box}
 .card{padding:24px;margin-bottom:24px;border-radius:24px}
 .hero,.phero{padding:20px}
 .g,.g2{gap:24px}.g2{margin-top:24px}
@@ -389,7 +408,7 @@ nav{width:min(560px,calc(100% - 16px));padding:4px 8px;margin:0;box-sizing:borde
 .tab{min-height:48px;padding:6px 4px}
 input,.ddb{min-height:48px;padding:0 16px}.ddb{padding-right:48px}
 input[style*="padding"]{min-height:40px}
-.fab{width:60px;height:60px}.fab::after{right:72px}.wrow .wb{width:48px;height:48px}
+.wrow .wb{width:48px;height:48px}
 nav .tab{min-height:44px}
 .dpn{width:32px;height:32px}.drops i{width:16px;height:16px}.lg .hc{width:16px;height:16px}
 .bar{height:8px}.pbar{height:8px}.mbs{height:128px}.fl{max-height:192px}.ddl{max-height:256px}.wkd{min-height:304px}
@@ -397,7 +416,7 @@ nav .tab{min-height:44px}
 .ring{width:192px}.ring b{font-size:48px}
 .split{gap:32px}
 .rt{padding:8px 16px 16px}
-@media(max-width:560px){main{padding:8px 16px calc(121px + env(safe-area-inset-bottom,0px))}.card{padding:16px;border-radius:24px}.hero,.phero{padding:20px}.fab{width:60px;height:60px}.tab{padding:6px 4px}}
+@media(max-width:560px){main{padding:8px 16px calc(121px + env(safe-area-inset-bottom,0px))}.card{padding:16px;border-radius:24px}.hero,.phero{padding:20px}.tab{padding:4px 2px}}
 
 /* ===== Law of proximity: title 8 < inner blocks 16 < gap between cards 24 ===== */
 .card>h3:first-child{margin-bottom:8px}
@@ -525,9 +544,7 @@ h1,h2,h3,.big{text-wrap:balance}p{text-wrap:pretty}
 .card{box-shadow:inset 0 1px 0 var(--edge),var(--sh)}
 .card:hover{transform:none;box-shadow:inset 0 1px 0 var(--edge),var(--sh)}
 .tile:hover{transform:none;box-shadow:var(--sh)}.mac3>div:hover{transform:none;box-shadow:none}
-nav,.fab,#toast,.rt,.ddl,.dpl,.sov-p,.mdl .card{box-shadow:var(--shp)}
-.fab:hover{transform:translateY(-2px);box-shadow:var(--shp)}
-.fab.on{box-shadow:0 0 0 4px color-mix(in srgb,var(--pri) 20%,transparent),var(--shp)}
+nav,#toast,.rt,.ddl,.dpl,.sov-p,.mdl .card{box-shadow:var(--shp)}
 .dpc.sel{box-shadow:var(--shv)}.hc.l3{box-shadow:none}
 .opt:hover{transform:translateY(-2px);box-shadow:var(--shh)}
 
@@ -536,7 +553,7 @@ nav,.fab,#toast,.rt,.ddl,.dpl,.sov-p,.mdl .card{box-shadow:var(--shp)}
 .btn:hover{background:color-mix(in srgb,var(--olv-t) 8%,transparent);box-shadow:var(--shh);transform:translateY(-1px)}
 .btn.p{background:linear-gradient(135deg,var(--pri),var(--pri-hov));color:var(--onpri);border-color:transparent;box-shadow:var(--shv)}
 .btn.p:hover,.btn.p:focus-visible{background:linear-gradient(135deg,var(--pri-hov),var(--pri-dk));box-shadow:var(--shvh)}
-.seg .btn.on:hover,.seg .btn.on:focus-visible,.fab.on:hover,.fab.on:focus-visible{background:linear-gradient(135deg,var(--pri-hov),var(--pri-dk))}
+.seg .btn.on:hover,.seg .btn.on:focus-visible{background:linear-gradient(135deg,var(--pri-hov),var(--pri-dk))}
 .btn.t{background:transparent;border-color:transparent;box-shadow:none;padding-left:16px;padding-right:16px}
 .btn.t:hover{background:color-mix(in srgb,var(--olv-t) 8%,transparent);box-shadow:none;transform:none}
 .seg .btn,.hq .btn{background:transparent}
@@ -570,7 +587,7 @@ nav,.fab,#toast,.rt,.ddl,.dpl,.sov-p,.mdl .card{box-shadow:var(--shp)}
 .tile span{color:#E3D6C2}
 .tile::before{background:linear-gradient(90deg,#A8AE78,transparent)}
 /* press: inverse scale (declared last so it wins over hover) */
-:is(.btn,.tab,.fab,.chip,.opt,.fo,.ddo,.dpc,.dpn,.hc):active{transform:scale(.98)}
+:is(.btn,.tab,.chip,.opt,.fo,.ddo,.dpc,.dpn,.hc):active{transform:scale(.98)}
 .btn:active{box-shadow:none}.btn.p:active{box-shadow:var(--shv)}
 
 /* ===== v6: touch targets >= 44x44 (phones / coarse pointers) ===== */
@@ -655,9 +672,9 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
 
 /* ===== v10: motion system - inertia curve, calibrated durations, staggered entry ===== */
 :root{--ease:cubic-bezier(.2,.8,.2,1);--t-micro:180ms;--t-press:100ms;--t-data:360ms;--t-panel:300ms;--stagger:60ms}
-.btn,.tab,.chip,button.chip,.fo,.ddo,.ftog,.ddb,.wkn,.opt,.hc,.dpc,.crb,.fab{transition-duration:var(--t-micro);transition-timing-function:var(--ease)}
+.btn,.tab,.subtabs .stb,.chip,button.chip,.fo,.ddo,.ftog,.ddb,.wkn,.opt,.hc,.dpc,.crb{transition-duration:var(--t-micro);transition-timing-function:var(--ease)}
 .card{transition:transform var(--t-micro) var(--ease),box-shadow var(--t-micro) var(--ease)}
-:is(.btn,.tab,.fab,.chip,.opt,.fo,.ddo,.dpc,.dpn,.hc):active{transition-duration:var(--t-press)}
+:is(.btn,.tab,.chip,.opt,.fo,.ddo,.dpc,.dpn,.hc):active{transition-duration:var(--t-press)}
 /* data components: long enough for the eye to register the delta */
 .bar i,.pbar i{transition:width var(--t-data) var(--ease)}
 .hb i{transition:height var(--t-data) var(--ease)}
@@ -811,9 +828,9 @@ border:1px solid color-mix(in srgb,var(--olv-t) 32%,transparent)}
 color:var(--ink);margin-bottom:0;font-size:var(--fs-body)}
 
 /* ===== v13: selected / active states are solid wine, not a wine-to-black gradient ===== */
-.btn.p,.seg .btn.on,.fab.on,.dpc.sel,.ddo.on,.fo.on,.dpn:hover,.lgb.on,.hd .btn.s.lgb.on,.obc .lgb.on{background:var(--pri)}
+.btn.p,.seg .btn.on,.dpc.sel,.ddo.on,.fo.on,.dpn:hover,.lgb.on,.hd .btn.s.lgb.on,.obc .lgb.on{background:var(--pri)}
 /* hover/press lower L while holding H/S (no mix-with-black) */
-.btn.p:hover,.btn.p:focus-visible,.seg .btn.on:hover,.seg .btn.on:focus-visible,.fab.on:hover,.fab.on:focus-visible{background:var(--pri-hov)}
+.btn.p:hover,.btn.p:focus-visible,.seg .btn.on:hover,.seg .btn.on:focus-visible{background:var(--pri-hov)}
 .crd i.on{background:var(--data-1)}
 .chip.on{background:var(--pri)!important}
 /* the gradient's dark end was doing contrast work for the label; dark mode --pri is a
@@ -872,12 +889,12 @@ input,.ddb,.ftog,.card{border-color:var(--line-ui)}
 /* ===== v12: reduced motion (must stay last) =====
    Kills entry travel and every hover/press displacement, keeps colour feedback.
    Deliberately NOT a blanket `*{transform:none}` - transform is load-bearing for the
-   dropdown chevrons, the water-drop glyphs, the toast centering and the FAB tooltips. */
+   dropdown chevrons, the water-drop glyphs and the toast centering. */
 @media(prefers-reduced-motion:reduce){
 *{animation-duration:1ms!important;animation-delay:0ms!important;animation-iteration-count:1!important;
 transition-duration:1ms!important;transition-delay:0ms!important;scroll-behavior:auto!important}
 .card,.tile,.note,.phero,main,main>h2,#gout .card,.rt.done{animation:none!important}
-:is(.card,.tile,.btn,.tab,.fab,.ddb,.ftog,.chip,button.chip,.opt,.wkn,.fo,.ddo,.dpc,.hc,.crb,.dpn):is(:hover,:active,:focus-visible){transform:none!important}
+:is(.card,.tile,.btn,.tab,.subtabs .stb,.ddb,.ftog,.chip,button.chip,.opt,.wkn,.fo,.ddo,.dpc,.hc,.crb,.dpn):is(:hover,:active,:focus-visible){transform:none!important}
 }
 </style></head><body>
 <header><h1>Forma</h1><div class="hd"><div class="lgw"><button class="btn s lgb" data-lg="en" aria-label="English">EN</button><button class="btn s lgb" data-lg="es" aria-label="Español">ES</button></div><button class="btn s thb" data-a="theme" aria-label="Toggle light or dark">🌗</button></div></header>
@@ -886,7 +903,6 @@ transition-duration:1ms!important;transition-delay:0ms!important;scroll-behavior
 <div class="mdl" id="cpy" hidden><div class="card"><div style="font-size:40px">📋</div><h3 id="cpyt">Copy session</h3><p class="mut" id="cpyb"></p><div class="f" style="text-align:left"><span>Copy to</span><div class="chips" id="cpysel" style="margin:4px 0 0"></div></div><p class="cap" style="margin:0 0 8px">This overwrites the chosen session completely — same exercises, order, equipment and tags. It affects your routine; experts only.</p><div class="row" style="flex-wrap:nowrap"><button class="btn p" data-a="cpyyes">Copy</button><button class="btn t" data-a="cpyno">Cancel</button></div></div></div>
 <div class="sov" id="sov"><button class="sov-b" data-a="sclose" aria-label="Close" tabindex="-1"></button><aside class="sov-p" role="dialog" aria-modal="true" aria-labelledby="sovt" tabindex="-1"><div class="sov-h"><h3 id="sovt">How your goal is calculated</h3><button class="btn s" data-a="sclose" aria-label="Close">✕</button></div><div id="sovc"></div></aside></div>
 <div class="ob" id="ob" hidden><div class="obc" id="obc"></div></div>
-<div class="fabs"><button class="fab" data-t="week" aria-label="Week" title="Week">📅</button><button class="fab" data-t="stats" aria-label="Stats" title="Stats">📊</button><button class="fab" data-t="plan" aria-label="Settings" title="Settings">⚙️</button></div>
 <div class="rt" id="rt" hidden><div class="rtt" id="rtt">0:00</div><div class="rtl"><b id="rtn"></b><span id="rtk"></span></div><div class="rbs"><button class="rb" data-a="rta" data-v="-30">−30s</button><button class="rb" data-a="rta" data-v="30">+30s</button><button class="rb" data-a="rtx" aria-label="Stop timer">✕</button></div><div class="rp" id="rtp"></div></div>
 <script>
 const K='forma1',$=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -2348,8 +2364,64 @@ ACT.map(([v,n,d])=>`<button class="opt ${p.act==v?'on':''}" data-a="oact" data-v
 GL.map(([v,n,d,x])=>`<button class="opt ${p.goal==v?'on':''}" data-a="ogl" data-v="${v}" data-x="${x}"><b>${n}</b><span>${d}</span></button>${v=='maint'?MI():''}`).join(''),
 `<div class="card" style="margin-bottom:0"><div id="res"></div></div><p class="mut">You can change any of this later in Settings.</p>`];
 $('#obc').innerHTML=`<div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:24px"><button class="btn s lgb ${LANG=='en'?'on':''}" data-lg="en" style="flex:none">English</button><button class="btn s lgb ${LANG=='es'?'on':''}" data-lg="es" style="flex:none">Español</button><button class="btn s thb" data-a="theme" style="flex:none" aria-label="Toggle light or dark">🌗</button></div><div class="pg"><i style="width:${(oi+1)/7*100}%"></i></div><h1>${T[oi]}</h1><div style="margin-top:16px">${B[oi]}</div><div class="row" style="margin-top:24px;flex-wrap:nowrap">${oi?'<button class="btn" data-a="obk">Back</button>':''}<button class="btn p" data-a="onx">${oi==6?'Start tracking':'Continue'}</button></div>`;if(oi==6)res();whlInit();thSync()}
-let tab='today',trk='weight';const TABS=[['today','🏠','Today'],['tracking','📊','Tracking'],['gym','🏋️','Gym']];
-function go(t){tab=t;$('#nav').innerHTML=TABS.map(([k,ic,l])=>`<button class="tab ${k==t?'on':''}" data-t="${k}"${k==t?' aria-current="page"':''}><span class="ti" aria-hidden="true">${ic}</span><span class="tl">${l}</span></button>`).join('');const m=$('#main');m.innerHTML=V[t]();m.classList.toggle('wide',t=='week');m.style.animation='none';m.offsetHeight;m.style.animation='';if(t=='plan')res();if(t=='gym')gres();if(t=='today')flist();if(t=='stats')rs();document.querySelectorAll('.fab').forEach(x=>x.classList.toggle('on',x.dataset.t==t));dd();sovr()}
+let trk='weight';
+/* ===== FEAT-002 two-level navigation =====
+   Bottom bar = 5 SECTIONS (line-SVG icon + always-visible label). Only Salud/health
+   is a real multi-subtab section; Perfil renders the former Plan settings; the other
+   three are 'Próximamente' placeholders. Icons use stroke:currentColor so they inherit
+   the active (cream/wine) or inactive (olive/ink) text colour. */
+const ICO={
+heart:'<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.4-7 10-7 10Z"/></svg>',
+wallet:'<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H17v3"/><rect x="3" y="7" width="18" height="12" rx="2.5"/><path d="M16 12.5h2"/></svg>',
+book:'<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 0 4 20.5Z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5A1.5 1.5 0 0 1 20 20.5Z"/></svg>',
+list:'<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5l1.6 1.6L9 5"/><path d="M4 16.5l1.6 1.6L9 13"/><path d="M12.5 7h7.5"/><path d="M12.5 17h7.5"/></svg>',
+person:'<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg>'};
+/* section key -> {label, icon, subs:[[subKey, EnglishLabel]], view:fn for single-screen} */
+const SECTIONS=[
+['health','Health',ICO.heart,[['today','Today'],['week','Week'],['tracking','Tracking'],['gym','Gym'],['stats','Stats']]],
+['finance','Finance',ICO.wallet,null],
+['study','Study',ICO.book,null],
+['planner','Planner',ICO.list,null],
+['profile','Profile',ICO.person,null]];
+const SECMAP=Object.fromEntries(SECTIONS.map(s=>[s[0],{label:s[1],icon:s[2],subs:s[3]}]));
+/* provisional 'Coming soon' copy: [EnglishLine] (translated to ES via the i18n map) */
+const SOON={finance:'Track your finances and control spending.',study:'Manage everything academic.',planner:'Tasks, notes, reminders and a habit routine.'};
+let sec='health';
+/* transient: when true the Salud body shows the Foods library (opened from Hoy via
+   'My foods'); it is NOT a real subtab, so it is not persisted as subOf.health. */
+let foodsMode=false;
+/* per-section memory of the last subtab opened this session */
+const subOf=Object.assign({health:'today'},S.subOf||{});
+/* per-section scroll memory (session only, not persisted) */
+const scrollOf={};
+/* legacy view key (today/week/tracking/gym/stats/plan/foods) is derived from sec+sub */
+let tab='today';
+/* render the 5-section bottom bar into #nav */
+function navBar(){$('#nav').innerHTML=SECTIONS.map(([k,l,ic])=>`<button class="tab ${k==sec?'on':''}" data-sec="${k}"${k==sec?' aria-current="page"':''}><span class="ti" aria-hidden="true">${ic}</span><span class="tl">${l}</span></button>`).join('')}
+/* render the sticky subtab chip row (Salud only) */
+function subRow(subs,active){return`<div class="subtabs" role="tablist">${subs.map(([k,l])=>`<button class="stb ${k==active?'on':''}" role="tab" data-sub="${k}"${k==active?' aria-selected="true"':''}>${l}</button>`).join('')}</div>`}
+/* render the active section into #main */
+function render(){const m=$('#main'),info=SECMAP[sec];let legacy='today',body='';
+if(sec=='profile'){legacy='plan';body=V.plan()}
+else if(sec=='health'){
+if(foodsMode){legacy='foods';body=V.foods()}
+else{const sub=subOf.health||'today';legacy=sub;const vk={today:'today',week:'week',tracking:'tracking',gym:'gym',stats:'stats'}[sub]||'today';body=subRow(info.subs,sub)+V[vk]()}}
+else{/* provisional */const line=SOON[sec]||'';body=`<div class="cs"><div class="csi" aria-hidden="true">${info.icon}</div><h2>${info.label}</h2><div class="cst">Coming soon</div><p>${line}</p></div>`}
+tab=legacy;
+m.innerHTML=body;m.classList.toggle('wide',legacy=='week');m.style.animation='none';m.offsetHeight;m.style.animation='';
+if(legacy=='plan')res();if(legacy=='gym')gres();if(legacy=='today')flist();if(legacy=='stats')rs();
+dd();sovr()}
+/* set active section, remember its subtab, re-render + redraw bottom bar */
+function goSection(k){if(!SECMAP[k])k='health';foodsMode=false;sec=k;S.sec=k;save();navBar();render()}
+/* switch the Salud subtab */
+function goSub(k){foodsMode=false;subOf.health=k;S.subOf=subOf;save();render()}
+/* Compatibility wrapper: map a legacy view key to (section, subtab). Keeps every
+   existing caller (go(tab), go('today'), the My-foods/back data-t handlers, obr finish)
+   working on top of the two-level router. */
+function go(t){if(t=='plan'){return goSection('profile')}
+if(t=='foods'){foodsMode=true;sec='health';S.sec='health';save();navBar();render();return}
+const hs=['today','week','tracking','gym','stats'];if(hs.includes(t)){foodsMode=false;sec='health';subOf.health=t;S.sec='health';S.subOf=subOf;save();navBar();render();return}
+return goSection(t)}
 document.addEventListener('input',e=>{const k=e.target.dataset.k;if(!k)return;if(k=='p.wu'||k=='p.hu'){const q=k=='p.wu'?'w':'h';unit(k.slice(2),e.target.value);const f=document.querySelector(`[data-k="p.${q}"]`);if(f)f.value=S.p[q];res();return}const[o,p]=k.split('.');let v=e.target.value;if(e.target.type=='number'||e.target.type=='range'||e.target.dataset.n)v=v===''?'':(parseFloat(v)||0);S[o][p]=v;save();if(o=='p')res();else gres()});
 document.addEventListener('change',e=>{if(e.target.id=='imp'){const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const o=JSON.parse(t);if(!o.p||!o.foods)throw 0;localStorage.setItem(K,t);location.reload()}catch(x){toast('That file is not a Forma backup')}});return}if(e.target.id=='wdt'){wdt=e.target.value||today();return go(tab)}if(e.target.id=='mdt'){mdt=e.target.value||today();return go(tab)}if(e.target.id=='wcl'){S.wcl=+e.target.value;save();return go(tab)}if(e.target.id=='gsz'){S.gs=Math.min(2000,Math.max(50,Math.round(parseFloat(e.target.value))||250));save();return go(tab)}if(e.target.id=='wgl'){S.wa[day]=Math.max(0,Math.floor(parseFloat(e.target.value))||0);save();return go(tab)}if(e.target.id=='fs'){const f=S.foods.find(x=>x.id==e.target.value);$('#ql').textContent=f.b=='g'?'Amount (grams)':'Amount (units)';$('#qty').value=f.b=='g'?100:1}});
 function thDark(){const r=document.documentElement;return r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches}
@@ -2361,6 +2433,8 @@ function thToggle(){const r=document.documentElement;S.mode=r.dataset.theme=thDa
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{if(!S.mode)thSync()});
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const a=b.dataset.a,d=today(),v=id=>$('#'+id).value;
 if(b.dataset.lg){setLang(b.dataset.lg);return}
+if(b.dataset.sec){if(b.dataset.sec!=sec)scrollOf[sec]=scrollY;goSection(b.dataset.sec);const y=scrollOf[b.dataset.sec]||0;scrollTo(0,y);return}
+if(b.dataset.sub){goSub(b.dataset.sub);scrollTo(0,0);return}
 if(b.dataset.t){go(b.dataset.t);scrollTo(0,0);return}
 if(a=='rts'){const dy=glg!=null&&gPlan()[glg];if(!dy)return;const j=+b.dataset.j,e=dy[2][j];rtStart(gnm(glg,j,e),gRestSec(e),e.k==H);return}
 if(a=='rtsm'){const dy=glg!=null&&gPlan()[glg];if(!dy)return;const j=+b.dataset.j,e=dy[2][j];rtStart(gnm(glg,j,e),20,false,'Myo mini-set');return}
@@ -2555,6 +2629,7 @@ const D={
 "bar only":"solo la barra","Smith / resistance profile":"Barra Smith / máquina","Bar weight (lb)":"Peso de la barra (lb)","weight":"peso",
 "👟 Steps":"👟 Pasos","Target 8,000–10,000 steps/day":"Meta: 8.000–10.000 pasos al día","Not logged yet":"Aún sin registrar","Keep walking":"Sigue caminando","In the target range ✅":"En el rango objetivo ✅","Above target 🔥":"Por encima de la meta 🔥","Steps today":"Pasos de hoy","Total steps":"Pasos totales","Save":"Guardar","Last 7 days":"Últimos 7 días","Avg":"Prom.","Walking burns fat without taxing your muscle recovery or nervous system.":"Caminar quema grasa sin comprometer la recuperación muscular ni el sistema nervioso.","😴 Sleep & recovery":"😴 Sueño y recuperación","Target 7–9 hours of quality sleep":"Meta: 7–9 horas de sueño de calidad","Under-recovered ⚠️":"Recuperación insuficiente ⚠️","Almost there":"Casi en la meta","In the zone ✅":"En la zona ✅","Long sleep":"Sueño largo","Hours slept":"Horas dormidas","e.g. 7.5":"p. ej. 7,5","Stress today":"Estrés de hoy","1 = calm · 5 = very stressed":"1 = tranquilo · 5 = muy estresado","Low sleep or high stress: consider trimming volume or intensity today.":"Poco sueño o mucho estrés: considera reducir el volumen o la intensidad hoy.","Sleep and stress set how much training volume you can tolerate and how well you build muscle.":"El sueño y el estrés determinan cuánto volumen de entrenamiento toleras y qué tan bien ganas músculo.","💊 Creatine":"💊 Creatina","Mark as taken":"Marcar como tomada","Taken today ✅":"Tomada hoy ✅","Day streak":"Días seguidos","This week":"Esta semana","Creatine monohydrate, 3–5 g daily. Consistency matters more than timing.":"Monohidrato de creatina, 3–5 g al día. La constancia importa más que el horario.","Steps saved":"Pasos guardados","Steps added":"Pasos sumados","Enter your steps":"Ingresa tus pasos","Sleep saved":"Sueño guardado","Sleep cleared":"Sueño borrado","Enter hours between 0 and 24":"Ingresa horas entre 0 y 24","Creatine logged":"Creatina registrada","Creatine unmarked":"Creatina desmarcada",
 "Burgundy theme":"Tema vino","Olive theme":"Tema oliva","Cream theme":"Tema crema","Toggle light or dark":"Cambiar claro u oscuro","Language":"Idioma",
+"Health":"Salud","Finance":"Finanzas","Study":"Estudios","Planner":"Planner","Profile":"Perfil","Coming soon":"Próximamente","Track your finances and control spending.":"Medir tus finanzas y controlar gastos.","Manage everything academic.":"Gestionar todo lo académico.","Tasks, notes, reminders and a habit routine.":"Tareas, notas, recordatorios y rutina de hábitos.",
 "🏠 Today":"🏠 Hoy","🥑 Foods":"🥑 Alimentos","⚖️ Weight":"⚖️ Peso","📏 Body":"📏 Cuerpo","📊 Tracking":"📊 Seguimiento","Tracking":"Seguimiento","📏 Measurements":"📏 Medidas","🏋️ Gym":"🏋️ Gimnasio","Gym":"Gimnasio","Week":"Semana","Stats":"Estadísticas","Settings":"Ajustes","Set up your plan":"Configura tu plan","Reconfigure plan":"Reconfigurar plan","Reconfigure":"Reconfigurar","Config plan":"Configurar plan","Config routine":"Configurar rutina","Reset config settings":"Restablecer configuración","This resets your plan and routine settings to default. Your workout history and calibrations are kept. Continue?":"Esto restablece tu plan y rutina a los valores por defecto. Tu historial de entrenamientos y tus calibraciones se conservan. ¿Continuar?","Config reset":"Configuración restablecida","🏋️ How do you train?":"🏋️ ¿Cómo entrenas?","Days per week":"Días por semana","Time per session":"Tiempo por sesión","3 days":"3 días","4 days":"4 días","5 days":"5 días","Full body, 6 key movement patterns — Mon / Wed / Fri.":"Cuerpo completo, 6 patrones clave — Lun / Mié / Vie.","Upper / Lower, two hits per muscle — the system\u2019s main structure.":"Torso / Pierna, dos estímulos por músculo — la estructura principal del sistema.","PHAT: 2 strength days + 3 hypertrophy days.":"PHAT: 2 días de fuerza + 3 de hipertrofia.","Create my routine":"Crear mi rutina","Save and rebuild":"Guardar y reconstruir","Cancel":"Cancelar","This session will be":"Esta sesión será","short — compounds only":"corta — solo compuestos","long — everything + accessories":"larga — todo + accesorios","standard — the full session":"estándar — la sesión completa","Under ~55 min keeps only the heavy compounds (the lifts you progress). Over ~85 min adds the optional accessories. In between runs the full session.":"Menos de ~55 min deja solo los compuestos pesados (los que progresas). Más de ~85 min añade los accesorios opcionales. En medio corre la sesión completa.","days/week":"días/sem","min/session":"min/sesión","short · compounds only":"corta · solo compuestos","standard · full session":"estándar · sesión completa","long · + accessories":"larga · + accesorios","Which days?":"¿Qué días?","days chosen":"días elegidos","keep a rest day between sessions":"deja un día de descanso entre sesiones","Mon":"Lun","Tue":"Mar","Wed":"Mié","Thu":"Jue","Fri":"Vie","Sat":"Sáb","Sun":"Dom","Full body, 6 key movement patterns. One rest day between sessions.":"Cuerpo completo, 6 patrones clave. Un día de descanso entre sesiones.","Pick exactly":"Elige exactamente","training days":"días de entrenamiento","Full body needs a rest day between sessions":"Cuerpo completo necesita un día de descanso entre sesiones","RIR is required for every set. Tap Rest after a set for the recommended timer.":"El RIR es obligatorio en cada serie. Toca Descansar tras una serie para el cronómetro recomendado.","rest":"descanso","Routine ready":"Rutina lista","Enter minutes between 20 and 150":"Escribe minutos entre 20 y 150","🧮 1RM calculator":"🧮 Calculadora 1RM","One-rep max calculator":"Calculadora de una repetición máxima","Estimate your one-rep max (1RM) for any lift — the most you could lift for a single rep — from a weight and the reps you did. Uses the Epley formula.":"Calcula tu repetición máxima (1RM) para cualquier levantamiento — el peso máximo que puedes levantar en una sola repetición — a partir de un peso y las reps que hiciste. Usa la fórmula de Epley.","Weight lifted":"Peso levantado","Reps":"Repeticiones","Calculate one-rep max":"Calcular una repetición máxima","Estimated 1RM":"1RM estimado","Weight":"Peso","Use":"Uso","High reps — the estimate is rough":"Muchas reps — la estimación es aproximada","Past 12 reps the estimate drifts":"Tras 12 reps la estimación pierde precisión","1 rep max":"máximo 1 rep","2 reps":"2 reps","~4 reps · heavy strength":"~4 reps · fuerza pesada","~6 reps · strength":"~6 reps · fuerza","~8 reps · strength–hypertrophy":"~8 reps · fuerza–hipertrofia","~10 reps · hypertrophy":"~10 reps · hipertrofia","~12 reps · hypertrophy":"~12 reps · hipertrofia","~14 reps":"~14 reps","~16 reps · endurance":"~16 reps · resistencia","~18 reps":"~18 reps","~20 reps · endurance":"~20 reps · resistencia","🏋️ Log maxes":"🏋️ Registrar pesos","Log your maxes":"Registrar tus pesos","One-off calibration":"Calibración única","Weight (kg)":"Peso (kg)","Reps to failure":"Reps al fallo","Save":"Guardar","Compound":"Compuesto","Isolation":"Aislado","‹ Back to plan":"‹ Volver al plan","Target working set":"Serie objetivo","reps":"reps","1RM ≈":"1RM ≈","work set":"serie de trabajo","from your max":"desde tu máximo","high reps, rough estimate":"muchas reps, estimación aproximada","estimate drifts past 12 reps":"la estimación pierde precisión tras 12 reps","Enter the weight you lifted":"Escribe el peso que levantaste","Enter reps between 1 and 40":"Escribe reps entre 1 y 40","Check the weight and reps":"Revisa el peso y las reps","Saved · 1RM ≈":"Guardado · 1RM ≈","For each lift, enter a weight and the reps you can do":"Para cada ejercicio, escribe un peso y las reps que logras","to failure":"al fallo"," (RIR 0) — any rep count, e.g. 6 heavy or 20 light. This is just to estimate your strength; your daily sessions still keep heavy compounds 1–2 reps from failure.":" (RIR 0) — cualquier número de reps, p. ej. 6 pesadas o 20 ligeras. Es solo para estimar tu fuerza; tus sesiones diarias mantienen los compuestos pesados a 1–2 reps del fallo.","exercise":"ejercicio","exercises":"ejercicios",
 "Monthly measurements":"Medidas mensuales","Measure now":"Medir ahora","Tomorrow":"Mañana",
 "It has been a month since your last measurements. Ready to log new ones?":"Ha pasado un mes desde tus últimas medidas. ¿Listo para registrar nuevas?","Add your first set of body measurements so we can track your progress.":"Añade tu primer juego de medidas corporales para seguir tu progreso.",
@@ -2674,11 +2749,11 @@ function tr(n){if(n.nodeType==3){if(LANG!='es'&&n.__o===undefined)return;const v
 else if(n.nodeType==1){if(n.tagName=='SCRIPT'||n.tagName=='STYLE')return;for(const a of TA)if(n.hasAttribute(a)){const v=n.getAttribute(a),z=n.__a||(n.__a={}),c=z[a];if(c&&v===c.t&&c.l==LANG)continue;if(LANG!='es'&&!c)continue;const o=c&&v===c.t?c.o:v,g=LANG=='es'?ts(o):o;z[a]={o,t:g,l:LANG};if(g!==v)n.setAttribute(a,g)}for(let c=n.firstChild;c;c=c.nextSibling)tr(c)}}
 const MNS={en:['January','February','March','April','May','June','July','August','September','October','November','December'],es:['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']};
 function applyLang(){LOC=LANG=='es'?'es':'en-US';MN=MNS[LANG];DOW=LANG=='es'?'LMXJVSD':'MTWTFSS';DWK=LANG=='es'?'LUN MAR MIÉ JUE VIE SÁB DOM':'MON TUE WED THU FRI SAT SUN';document.documentElement.lang=LANG;document.querySelectorAll('.lgb').forEach(x=>x.classList.toggle('on',x.dataset.lg==LANG))}
-function setLang(v){LANG=v;S.lang=v;save();applyLang();if(!$('#ob').hidden)obr();else go(tab);tr(document.body)}
+function setLang(v){LANG=v;S.lang=v;save();applyLang();if(!$('#ob').hidden)obr();else{navBar();render()}tr(document.body)}
 LANG=S.lang||((navigator.language||'').toLowerCase().startsWith('es')?'es':'en');applyLang();
 new MutationObserver(rs=>{for(const r of rs){if(r.type=='characterData')tr(r.target);r.addedNodes.forEach(tr)}}).observe(document.body,{childList:true,subtree:true,characterData:true});tr(document.body);
 document.addEventListener('keydown',e=>{if(e.key!='Enter')return;const m={stv:'stset',slv:'slset',npv:'npset'}[e.target.id];if(m){e.preventDefault();const b=document.querySelector('[data-a="'+m+'"]');if(b)b.click()}});
-setInterval(wtick,20000);go('today');if(!S.done){$('#ob').hidden=false;obr()}else mprompt()
+setInterval(wtick,20000);subOf.health='today';goSection('health');if(!S.done){$('#ob').hidden=false;obr()}else mprompt()
 
 /* ---- PWA: installable, offline-first ------------------------------------
    Registers the companion service worker (sw.js, which must sit next to this
