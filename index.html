@@ -993,6 +993,33 @@ if(!Array.isArray(S.habits))S.habits=[];
    A day with no mood AND empty text is never persisted: saving a cleared entry
    deletes its key (see the jsave/jdel handlers). Persisted via the shared save(). */
 if(!S.journal||typeof S.journal!='object'||Array.isArray(S.journal))S.journal={};
+/* Planner > Bookmarks (Phase 5). Bookmark shape:
+   {id, url, title, desc, tag, created, updated}.
+   - url is the SANITIZED http/https string (required). It is produced by
+     safeUrl() at save time, so S.bookmarks only ever holds http/https links;
+     the href is additionally attribute-escaped at render time (like mdInline()).
+   - title is OPTIONAL plain text; when empty the list shows the derived host
+     (urlHost()) or "(Untitled)"/"(Sin título)".
+   - desc is an OPTIONAL plain-text note; tag is an OPTIONAL single text label.
+   - title/desc/tag are PLAIN text (never HTML) and are esc()'d on EVERY render.
+   - created/updated are Date.now(). IDs come from the shared S.nid++ counter.
+   OUT OF SCOPE on purpose for this static, offline, private PWA (all present in
+   MyBrain but deliberately dropped here): capture via the OS share menu (Web
+   Share Target), cloud sync, AI, and remote favicon/title fetching. Any of those
+   would require a backend or outbound network and break the offline/private
+   model, so adding a bookmark is always manual: the user pastes a URL. */
+if(!Array.isArray(S.bookmarks))S.bookmarks=[];
+/* Planner > Calendar (Phase 5, optional). Local event shape:
+   {id, title, date:'YYYY-MM-DD', time:'HH:MM'|'', desc, created}.
+   - title is required plain text; date uses the same fmt()/today() key format
+     and defaults to today() when left empty; time is OPTIONAL ('' = all day).
+   - title/desc are PLAIN text (never HTML) and are esc()'d on EVERY render.
+   - created is Date.now(). IDs come from the shared S.nid++ counter.
+   LOCAL ONLY on purpose for this static, offline, private PWA: there is NO
+   OS/cloud calendar sync and NO notifications or reminders firing. Those would
+   need a backend, outbound network, or native scheduling APIs that break the
+   offline/private model, so events live only in localStorage. */
+if(!Array.isArray(S.events))S.events=[];
 const toast=m=>{const t=$('#toast');t.textContent=m;t.className='on';clearTimeout(toast.t);toast.t=setTimeout(()=>t.className='',2600)};
 const r1=n=>Math.round(n*10)/10;
 
@@ -1312,7 +1339,59 @@ return`<h2>Journal</h2>
 ${editor}
 ${summaryCard}
 <h3 style="margin:16px 0 8px">History</h3>
-${keys.length?keys.map(row).join(''):'<p class="mut">No entries yet.</p>'}`}};
+${keys.length?keys.map(row).join(''):'<p class="mut">No entries yet.</p>'}`},
+
+bookmarks(){
+/* Order: most recently updated first, then most recently created. */
+const list=S.bookmarks.slice().sort((a,b)=>(b.updated||0)-(a.updated||0)||(b.created||0)-(a.created||0));
+/* Reuse the validated `.md a` link treatment inline (cream underline on wine):
+   do NOT introduce a new colour token. href is attribute-escaped like mdInline().
+   title/desc/tag are esc()'d so injected HTML renders as inert text. */
+const attrEsc=u=>String(u).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const row=bm=>{const host=urlHost(bm.url),disp=bm.title&&bm.title.trim()?esc(bm.title):(host?esc(host):'(Untitled)'),href=attrEsc(bm.url);
+return`<div class="card" style="margin-bottom:8px"><div class="row" style="justify-content:space-between;gap:8px;align-items:flex-start"><b style="min-width:0;overflow-wrap:anywhere">${disp}</b></div>
+<p style="margin:4px 0 0;overflow-wrap:anywhere"><a href="${href}" target="_blank" rel="noopener noreferrer" style="color:var(--ink);text-decoration:underline">${esc(bm.url)}</a></p>
+${bm.desc&&bm.desc.trim()?`<p class="mut" style="margin:6px 0 0;overflow-wrap:anywhere">${esc(bm.desc)}</p>`:''}
+${bm.tag&&bm.tag.trim()?`<div class="chips" style="margin:8px 0 0"><span class="chip">${esc(bm.tag)}</span></div>`:''}
+<div class="row" style="margin-top:8px"><a class="btn s" style="flex:none" href="${href}" target="_blank" rel="noopener noreferrer">Open</a><button class="btn s" style="flex:none" data-a="bmedit" data-id="${bm.id}">Edit</button><button class="btn s t" style="flex:none" data-a="bmdel" data-id="${bm.id}">Delete</button></div></div>`};
+let editor='';
+if(bmedit!=null){const d=bmdraft;
+editor=`<div class="card"><h3>${bmedit=='new'?'New bookmark':'Edit bookmark'}</h3>
+<label class="f">URL<input id="bm_url" value="${esc(d.url)}" placeholder="https://example.com" inputmode="url" aria-label="URL"></label>
+<label class="f">Title<input id="bm_title" value="${esc(d.title)}" placeholder="(Untitled)"></label>
+<label class="f">Description<textarea id="bm_desc" rows="2">${esc(d.desc)}</textarea></label>
+<label class="f">Tag<input id="bm_tag" value="${esc(d.tag)}" placeholder="Tag"></label>
+<div class="row" style="margin-top:16px"><button class="btn p" data-a="bmsave">Save bookmark</button><button class="btn t" data-a="bmcancel">Cancel</button>${bmedit!='new'?`<button class="btn t" data-a="bmdel" data-id="${bmedit}">Delete</button>`:''}</div></div>`;}
+return`<h2>Bookmarks</h2>
+${bmedit==null?`<div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Bookmarks</h3><button class="btn p" style="flex:none" data-a="bmnew">New bookmark</button></div></div>`:''}
+${editor}
+${bmedit==null?(list.length?list.map(row).join(''):'<p class="mut">No bookmarks yet</p>'):''}`},
+
+calendar(){
+/* Upcoming events (today or later), sorted ascending by date then time. */
+const list=upcomingEvents(S.events,today());
+/* Past events (date strictly before today), most recent first, reusing the same
+   row() renderer so their Edit/Delete UI stays reachable. */
+const past=pastEvents(S.events,today());
+/* title/desc are esc()'d so injected HTML renders as inert text. */
+const row=ev=>{const when=esc(fmtD(ev.date))+(ev.time?' · '+esc(ev.time):'');
+return`<div class="card" style="margin-bottom:8px"><div class="row" style="justify-content:space-between;gap:8px;align-items:flex-start"><b style="min-width:0;overflow-wrap:anywhere">${esc(ev.title)}</b></div>
+<p class="mut" style="margin:4px 0 0;overflow-wrap:anywhere">${when}</p>
+${ev.desc&&ev.desc.trim()?`<p class="mut" style="margin:6px 0 0;overflow-wrap:anywhere">${esc(ev.desc)}</p>`:''}
+<div class="row" style="margin-top:8px"><button class="btn s" style="flex:none" data-a="evedit" data-id="${ev.id}">Edit</button><button class="btn s t" style="flex:none" data-a="evdel" data-id="${ev.id}">Delete</button></div></div>`};
+let editor='';
+if(evedit!=null){const d=evdraft;
+editor=`<div class="card"><h3>${evedit=='new'?'New event':'Edit event'}</h3>
+<label class="f">Event title<input id="ev_title" value="${esc(d.title)}" placeholder="Add a title"></label>
+<div class="f" style="margin-top:8px">Date<div class="row" style="flex-wrap:nowrap;align-items:center;gap:8px">${dpk('ev_date',d.date||today())}</div></div>
+<label class="f" style="margin-top:8px">Time<input id="ev_time" type="time" value="${esc(d.time)}" aria-label="Time"></label>
+<label class="f">Description<textarea id="ev_desc" rows="2">${esc(d.desc)}</textarea></label>
+<div class="row" style="margin-top:16px"><button class="btn p" data-a="evsave">Save event</button><button class="btn t" data-a="evcancel">Cancel</button>${evedit!='new'?`<button class="btn t" data-a="evdel" data-id="${evedit}">Delete</button>`:''}</div></div>`;}
+return`<h2>Calendar</h2>
+${evedit==null?`<div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Events</h3><button class="btn p" style="flex:none" data-a="evnew">New event</button></div></div>`:''}
+${editor}
+${evedit==null?`<h3 style="margin:16px 0 8px">Upcoming</h3>${list.length?list.map(row).join(''):'<p class="mut">No events yet</p>'}`:''}
+${evedit==null&&past.length?`<h3 style="margin:16px 0 8px">Past</h3>${past.map(row).join('')}`:''}`}};
 
 const E=(n,s,r,rir,k,alt=[],x='')=>({n,s,r,rir,k,alt,x}),H='H',I='I';
 const D3=[['Mon','Session A',[E('Hack squat',3,'6–8','2',H,['Pendulum squat','Smith squat']),E('Flat bench press',3,'6–8','2',H,['Machine chest press']),E('Lat pulldown',3,'8–10','1–0',I,['Neutral-grip pulldown']),E('Romanian deadlift',2,'6–8','2',H,['Hip thrust']),E('T-bar row',3,'8–10','1–0',I,['Seated cable row']),E('Lateral raise',3,'10–12','0 last set',I,['Cable lateral raise']),E('EZ-bar curl',2,'8–12','0',I,['Incline biceps curl']),E('Cable pushdown',2,'8–12','0',I,['Overhead triceps extension'])]],
@@ -2346,6 +2425,57 @@ let hedit=null,hdraft={name:'',icon:''};
    re-render keeps the user's input. Mirrors tcap()/ncap(). */
 function hcap(){if(hedit==null)return;const n=$('#hk_name'),i=$('#hk_icon');if(n)hdraft.name=n.value;if(i)hdraft.icon=i.value}
 
+/* ---- Planner > Bookmarks (Phase 5) ---- */
+/* Transient editor state for the open bookmark (not persisted until Save).
+   bmedit: null=closed, 'new'=creating, or a bookmark id=editing. */
+let bmedit=null,bmdraft={url:'',title:'',desc:'',tag:''};
+/* Capture whatever is currently typed in the open bookmark editor into bmdraft
+   so a re-render keeps the user's input. Mirrors tcap()/ncap()/hcap(). */
+function bmcap(){if(bmedit==null)return;const g=id=>{const el=$('#'+id);return el?el.value:''};bmdraft.url=g('bm_url');bmdraft.title=g('bm_title');bmdraft.desc=g('bm_desc');bmdraft.tag=g('bm_tag')}
+/* SECURITY (anti-XSS). Normalize + validate a user-entered bookmark URL and
+   return a safe http/https string, or '' when it is invalid. Mirrors the link
+   precedent in mdInline(): only http: and https: are ever accepted; javascript:,
+   data:, vbscript:, file:, mailto: and every other scheme are rejected. A bare
+   host with no scheme (e.g. "example.com") gets "https://" prepended. The
+   returned string still MUST be attribute-escaped at render time (see V.bookmarks).
+   This is a pure function: it is mirrored verbatim into tools/url-sanitize.test.mjs. */
+function safeUrl(input){
+  let s=String(input==null?'':input).trim();
+  if(!s)return'';
+  if(!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(s)){
+    /* no scheme: only accept something that looks like a bare host, then https:// it */
+    if(/^[a-zA-Z0-9]([a-zA-Z0-9.-]*[a-zA-Z0-9])?(:\d+)?(\/|$|\?|#)/.test(s)&&/\./.test(s.split(/[\/?#]/)[0]))s='https://'+s;
+    else return'';
+  }
+  if(!/^https?:\/\//i.test(s))return'';
+  try{const u=new URL(s);if(u.protocol!=='http:'&&u.protocol!=='https:')return'';return u.href}
+  catch(e){return''}
+}
+/* Derive a display host from a safe URL for the title fallback / link label.
+   Returns '' on failure; the caller esc()'s it on render. Pure, mirrored in test. */
+function urlHost(u){try{return new URL(u).host}catch(e){return''}}
+
+/* ---- Planner > Calendar (Phase 5, optional) ---- */
+/* Transient editor state for the open event (not persisted until Save).
+   evedit: null=closed, 'new'=creating, or an event id=editing. */
+let evedit=null,evdraft={title:'',date:'',time:'',desc:''};
+/* Capture whatever is currently typed in the open event editor into evdraft so a
+   re-render keeps the user's input. The date comes from the dpk hidden input
+   (ev_date) via the CHANGE listener, so it is NOT read here. Mirrors bmcap(). */
+function evcap(){if(evedit==null)return;const g=id=>{const el=$('#'+id);return el?el.value:''};evdraft.title=g('ev_title');evdraft.time=g('ev_time');evdraft.desc=g('ev_desc')}
+/* PURE grouping/sorting helper for the 'Upcoming' list. Given the events array
+   and a today key ('YYYY-MM-DD'), returns events whose date is today or later,
+   sorted ascending by date then time (empty time sorts before any set time, so
+   an all-day event leads its day). Does not mutate the input. Mirrored verbatim
+   into tools/calendar-group.test.mjs. */
+function upcomingEvents(events,todayKey){return(events||[]).filter(e=>e&&e.date&&e.date>=todayKey).slice().sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:(a.time||'')<(b.time||'')?-1:(a.time||'')>(b.time||'')?1:0)}
+/* PURE helper for the 'Past' list. Given the events array and a today key
+   ('YYYY-MM-DD'), returns events whose date is strictly before today (date <
+   today, so today itself is excluded), sorted DESCENDING by date then time
+   (most recent first). Does not mutate the input. Mirrored verbatim into
+   tools/calendar-group.test.mjs. */
+function pastEvents(events,todayKey){return(events||[]).filter(e=>e&&e.date&&e.date<todayKey).slice().sort((a,b)=>a.date>b.date?-1:a.date<b.date?1:(a.time||'')>(b.time||'')?-1:(a.time||'')<(b.time||'')?1:0)}
+
 /* ---- Planner > Journal + daily mood (Phase 4) ---- */
 /* Transient editor state. The journal is exactly one entry per day, so the
    editor targets a SELECTED DATE (jdate, default today, changeable via dpk).
@@ -2704,7 +2834,7 @@ const SECTIONS=[
 ['health','Health',ICO.heart,[['today','Today'],['week','Week'],['tracking','Tracking'],['gym','Gym'],['stats','Stats']]],
 ['finance','Finance',ICO.wallet,null],
 ['study','Study',ICO.book,null],
-['planner','Planner',ICO.list,[['tasks','Tasks'],['notes','Notes'],['habits','Habits'],['journal','Journal']]],
+['planner','Planner',ICO.list,[['tasks','Tasks'],['notes','Notes'],['habits','Habits'],['journal','Journal'],['bookmarks','Bookmarks'],['calendar','Calendar']]],
 ['profile','Profile',ICO.person,null]];
 const SECMAP=Object.fromEntries(SECTIONS.map(s=>[s[0],{label:s[1],icon:s[2],subs:s[3]}]));
 /* provisional 'Coming soon' copy: [EnglishLine] (translated to ES via the i18n map) */
@@ -2729,7 +2859,7 @@ if(sec=='profile'){legacy='plan';body=V.plan()}
 else if(sec=='health'){
 if(foodsMode){legacy='foods';body=V.foods()}
 else{const sub=subOf.health||'today';legacy=sub;const vk={today:'today',week:'week',tracking:'tracking',gym:'gym',stats:'stats'}[sub]||'today';body=subRow(info.subs,sub)+V[vk]()}}
-else if(sec=='planner'){const sub=subOf.planner||'tasks';legacy=sub;body=subRow(info.subs,sub)+(sub=='notes'?V.notes():sub=='habits'?V.habits():sub=='journal'?V.journal():V.tasks())}
+else if(sec=='planner'){const sub=subOf.planner||'tasks';legacy=sub;body=subRow(info.subs,sub)+(sub=='notes'?V.notes():sub=='habits'?V.habits():sub=='journal'?V.journal():sub=='bookmarks'?V.bookmarks():sub=='calendar'?V.calendar():V.tasks())}
 else{/* provisional */const line=SOON[sec]||'';body=`<div class="cs"><div class="csi" aria-hidden="true">${info.icon}</div><h2>${info.label}</h2><div class="cst">Coming soon</div><p>${line}</p></div>`}
 tab=legacy;
 m.innerHTML=body;m.classList.toggle('wide',legacy=='week');m.style.animation='none';m.offsetHeight;m.style.animation='';
@@ -2752,7 +2882,7 @@ const hs=['today','week','tracking','gym','stats'];if(hs.includes(t)){foodsMode=
 if(t=='tasks'){return goSection('planner')}
 return goSection(t)}
 document.addEventListener('input',e=>{const k=e.target.dataset.k;if(!k)return;if(k=='p.wu'||k=='p.hu'){const q=k=='p.wu'?'w':'h';unit(k.slice(2),e.target.value);const f=document.querySelector(`[data-k="p.${q}"]`);if(f)f.value=S.p[q];res();return}const[o,p]=k.split('.');let v=e.target.value;if(e.target.type=='number'||e.target.type=='range'||e.target.dataset.n)v=v===''?'':(parseFloat(v)||0);S[o][p]=v;save();if(o=='p')res();else gres()});
-document.addEventListener('change',e=>{if(e.target.id=='imp'){const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const o=JSON.parse(t);if(!o.p||!o.foods)throw 0;localStorage.setItem(K,t);location.reload()}catch(x){toast('That file is not a Forma backup')}});return}if(e.target.id=='wdt'){wdt=e.target.value||today();return go(tab)}if(e.target.id=='mdt'){mdt=e.target.value||today();return go(tab)}if(e.target.id=='tk_due'){tcap();tdraft.due=e.target.value||'';render();return}if(e.target.id=='tk_remind'){tdraft.remind=e.target.value||'';return}if(e.target.id=='jk_date'){jcap();const nk=e.target.value||today();if(nk==jdate){render();return}jdate=nk;jload(jdate);render();return}
+document.addEventListener('change',e=>{if(e.target.id=='imp'){const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const o=JSON.parse(t);if(!o.p||!o.foods)throw 0;localStorage.setItem(K,t);location.reload()}catch(x){toast('That file is not a Forma backup')}});return}if(e.target.id=='wdt'){wdt=e.target.value||today();return go(tab)}if(e.target.id=='mdt'){mdt=e.target.value||today();return go(tab)}if(e.target.id=='tk_due'){tcap();tdraft.due=e.target.value||'';render();return}if(e.target.id=='tk_remind'){tdraft.remind=e.target.value||'';return}if(e.target.id=='jk_date'){jcap();const nk=e.target.value||today();if(nk==jdate){render();return}jdate=nk;jload(jdate);render();return}if(e.target.id=='ev_date'){evcap();evdraft.date=e.target.value||today();render();return}
 const ta=e.target.dataset&&e.target.dataset.a;
 if(ta=='ttog'){const t=S.tasks.find(x=>x.id==+e.target.dataset.id);if(t){t.done=!t.done;save();render()}return}
 if(ta=='tstog'){const t=S.tasks.find(x=>x.id==+e.target.dataset.id);if(t&&t.subtasks&&t.subtasks[+e.target.dataset.i]){t.subtasks[+e.target.dataset.i].done=!t.subtasks[+e.target.dataset.i].done;save();render()}return}
@@ -2979,6 +3109,16 @@ else if(a=='jmood'){jcap();jdraft.mood=+b.dataset.v;render();return}
 else if(a=='jsave'){jcap();const mood=jdraft.mood||0,text=(jdraft.text||'').trim();if(!mood&&!text){const had=!!S.journal[jdate];delete S.journal[jdate];jdraft={mood:0,text:''};save();render();if(had)toast('Entry deleted');return}S.journal[jdate]={mood,text,updated:Date.now()};jdraft={mood,text};save();render();toast('Entry saved');return}
 else if(a=='jedit'){jdate=b.dataset.d;jload(jdate);scrollTo(0,0);render();return}
 else if(a=='jdel'){const k=b.dataset.d;delete S.journal[k];if(k==jdate){jdraft={mood:0,text:''}}save();render();toast('Entry deleted');return}
+else if(a=='bmnew'){bmdraft={url:'',title:'',desc:'',tag:''};bmedit='new';render();return}
+else if(a=='bmedit'){const bm=S.bookmarks.find(x=>x.id==+b.dataset.id);if(!bm)return;bmdraft={url:bm.url||'',title:bm.title||'',desc:bm.desc||'',tag:bm.tag||''};bmedit=bm.id;scrollTo(0,0);render();return}
+else if(a=='bmcancel'){bmedit=null;render();return}
+else if(a=='bmsave'){bmcap();const url=safeUrl(bmdraft.url);if(!url)return toast('Enter a valid URL');const title=(bmdraft.title||'').trim()||urlHost(url);const fields={url,title,desc:(bmdraft.desc||'').trim(),tag:(bmdraft.tag||'').trim()};if(bmedit=='new')S.bookmarks.push({id:S.nid++,...fields,created:Date.now(),updated:Date.now()});else{const bm=S.bookmarks.find(x=>x.id==bmedit);if(bm){Object.assign(bm,fields);bm.updated=Date.now()}}bmedit=null;save();render();toast('Bookmark saved');return}
+else if(a=='bmdel'){S.bookmarks=S.bookmarks.filter(x=>x.id!=+b.dataset.id);bmedit=null;save();render();toast('Bookmark deleted');return}
+else if(a=='evnew'){evdraft={title:'',date:today(),time:'',desc:''};evedit='new';render();return}
+else if(a=='evedit'){const ev=S.events.find(x=>x.id==+b.dataset.id);if(!ev)return;evdraft={title:ev.title||'',date:ev.date||today(),time:ev.time||'',desc:ev.desc||''};evedit=ev.id;scrollTo(0,0);render();return}
+else if(a=='evcancel'){evedit=null;render();return}
+else if(a=='evsave'){evcap();const title=(evdraft.title||'').trim();if(!title)return toast('Add a title');const fields={title,date:evdraft.date||today(),time:(evdraft.time||'').trim(),desc:(evdraft.desc||'').trim()};if(evedit=='new')S.events.push({id:S.nid++,...fields,created:Date.now()});else{const ev=S.events.find(x=>x.id==evedit);if(ev)Object.assign(ev,fields)}evedit=null;save();render();toast('Event saved');return}
+else if(a=='evdel'){S.events=S.events.filter(x=>x.id!=+b.dataset.id);evedit=null;save();render();toast('Event deleted');return}
 else return;save();if(['gsw','gpick','sgd','sgday','sgunit','sginc','sgmic','sgeq','sgmx','sgmj','sgwarm','sgprog','gmv','gaddclose','sgo','greconf','sgcancel','gcfgtab','gcal','gcalclose','gcalc','gcalcclose','gcalcgo','glogedit'].includes(a)&&$('#gout')){const y=scrollY;$('#gout').classList.add('q');gview();scrollTo(0,y);return}go(tab)});
 function ap(){const r=document.documentElement;if(r.dataset.th)delete r.dataset.th;if(S.th){delete S.th;save()}if(S.mode)r.dataset.theme=S.mode}ap();thSync();
 let LANG='en',LOC='en-US',DOW='MTWTFSS',DWK='MON TUE WED THU FRI SAT SUN';
@@ -2992,6 +3132,8 @@ const D={
 "Tasks":"Tareas","New task":"Nueva tarea","Edit task":"Editar tarea","Title":"Título","Description":"Descripción","Priority":"Prioridad","Low":"Baja","Medium":"Media","High":"Alta","Due date":"Fecha límite","Reminder":"Recordatorio","Subtasks":"Subtareas","Add subtask":"Agregar subtarea","Completed":"Completadas","Pending":"Pendientes","No tasks yet":"Aún no hay tareas","Save task":"Guardar tarea","Task saved":"Tarea guardada","Task deleted":"Tarea eliminada","Add a title":"Agrega un título","What needs doing?":"¿Qué hay que hacer?","New subtask":"Nueva subtarea","Subtask":"Subtarea","Pick a date above to set a due date (optional).":"Elige una fecha arriba para poner una fecha límite (opcional).","Toggle subtask":"Alternar subtarea","Toggle task complete":"Alternar tarea completada","Remove subtask":"Quitar subtarea","Reminder date and time":"Fecha y hora del recordatorio","Clear date":"Quitar fecha","No due date":"Sin fecha límite",
 "Habits":"Hábitos","New habit":"Nuevo hábito","Edit habit":"Editar hábito","Habit name":"Nombre del hábito","Icon":"Icono","Done today":"Hecho hoy","Mark done":"Marcar hecho","Streak":"Racha","Best":"Mejor","Current streak":"Racha actual","Best streak":"Mejor racha","Current streak · Best streak":"Racha actual · Mejor racha","No habits yet":"Aún no hay hábitos","Save habit":"Guardar hábito","Habit saved":"Hábito guardado","Habit deleted":"Hábito eliminado","Toggle habit for today":"Alternar hábito de hoy","Mark day":"Marcar día","Add a name":"Agrega un nombre",
 "Journal":"Diario","Mood":"Estado de ánimo","How are you feeling?":"¿Cómo te sientes?","Great":"Muy bien","Good":"Bien","Okay":"Normal","Bad":"Mal","Awful":"Muy mal","Journal entry":"Entrada de diario","Write about your day…":"Escribe sobre tu día…","Mood summary":"Resumen de ánimo","Average mood":"Ánimo medio","Last 30 days":"Últimos 30 días","Save entry":"Guardar entrada","Entry saved":"Entrada guardada","Log more days to see your mood summary.":"Registra más días para ver tu resumen de ánimo.",
+"Bookmarks":"Marcadores","New bookmark":"Nuevo marcador","Edit bookmark":"Editar marcador","URL":"URL","Open":"Abrir","Tag":"Etiqueta","No bookmarks yet":"Aún no hay marcadores","Save bookmark":"Guardar marcador","Bookmark saved":"Marcador guardado","Bookmark deleted":"Marcador eliminado","Enter a valid URL":"Escribe una URL válida",
+"Calendar":"Calendario","Events":"Eventos","New event":"Nuevo evento","Edit event":"Editar evento","Event title":"Título del evento","Time":"Hora","No events yet":"Aún no hay eventos","Upcoming":"Próximos","Past":"Pasados","Save event":"Guardar evento","Event saved":"Evento guardado","Event deleted":"Evento eliminado",
 "🏠 Today":"🏠 Hoy","🥑 Foods":"🥑 Alimentos","⚖️ Weight":"⚖️ Peso","📏 Body":"📏 Cuerpo","📊 Tracking":"📊 Seguimiento","Tracking":"Seguimiento","📏 Measurements":"📏 Medidas","🏋️ Gym":"🏋️ Gimnasio","Gym":"Gimnasio","Week":"Semana","Stats":"Estadísticas","Settings":"Ajustes","Set up your plan":"Configura tu plan","Reconfigure plan":"Reconfigurar plan","Reconfigure":"Reconfigurar","Config plan":"Configurar plan","Config routine":"Configurar rutina","Reset config settings":"Restablecer configuración","This resets your plan and routine settings to default. Your workout history and calibrations are kept. Continue?":"Esto restablece tu plan y rutina a los valores por defecto. Tu historial de entrenamientos y tus calibraciones se conservan. ¿Continuar?","Config reset":"Configuración restablecida","🏋️ How do you train?":"🏋️ ¿Cómo entrenas?","Days per week":"Días por semana","Time per session":"Tiempo por sesión","3 days":"3 días","4 days":"4 días","5 days":"5 días","Full body, 6 key movement patterns — Mon / Wed / Fri.":"Cuerpo completo, 6 patrones clave — Lun / Mié / Vie.","Upper / Lower, two hits per muscle — the system\u2019s main structure.":"Torso / Pierna, dos estímulos por músculo — la estructura principal del sistema.","PHAT: 2 strength days + 3 hypertrophy days.":"PHAT: 2 días de fuerza + 3 de hipertrofia.","Create my routine":"Crear mi rutina","Save and rebuild":"Guardar y reconstruir","Cancel":"Cancelar","This session will be":"Esta sesión será","short — compounds only":"corta — solo compuestos","long — everything + accessories":"larga — todo + accesorios","standard — the full session":"estándar — la sesión completa","Under ~55 min keeps only the heavy compounds (the lifts you progress). Over ~85 min adds the optional accessories. In between runs the full session.":"Menos de ~55 min deja solo los compuestos pesados (los que progresas). Más de ~85 min añade los accesorios opcionales. En medio corre la sesión completa.","days/week":"días/sem","min/session":"min/sesión","short · compounds only":"corta · solo compuestos","standard · full session":"estándar · sesión completa","long · + accessories":"larga · + accesorios","Which days?":"¿Qué días?","days chosen":"días elegidos","keep a rest day between sessions":"deja un día de descanso entre sesiones","Mon":"Lun","Tue":"Mar","Wed":"Mié","Thu":"Jue","Fri":"Vie","Sat":"Sáb","Sun":"Dom","Full body, 6 key movement patterns. One rest day between sessions.":"Cuerpo completo, 6 patrones clave. Un día de descanso entre sesiones.","Pick exactly":"Elige exactamente","training days":"días de entrenamiento","Full body needs a rest day between sessions":"Cuerpo completo necesita un día de descanso entre sesiones","RIR is required for every set. Tap Rest after a set for the recommended timer.":"El RIR es obligatorio en cada serie. Toca Descansar tras una serie para el cronómetro recomendado.","rest":"descanso","Routine ready":"Rutina lista","Enter minutes between 20 and 150":"Escribe minutos entre 20 y 150","🧮 1RM calculator":"🧮 Calculadora 1RM","One-rep max calculator":"Calculadora de una repetición máxima","Estimate your one-rep max (1RM) for any lift — the most you could lift for a single rep — from a weight and the reps you did. Uses the Epley formula.":"Calcula tu repetición máxima (1RM) para cualquier levantamiento — el peso máximo que puedes levantar en una sola repetición — a partir de un peso y las reps que hiciste. Usa la fórmula de Epley.","Weight lifted":"Peso levantado","Reps":"Repeticiones","Calculate one-rep max":"Calcular una repetición máxima","Estimated 1RM":"1RM estimado","Weight":"Peso","Use":"Uso","High reps — the estimate is rough":"Muchas reps — la estimación es aproximada","Past 12 reps the estimate drifts":"Tras 12 reps la estimación pierde precisión","1 rep max":"máximo 1 rep","2 reps":"2 reps","~4 reps · heavy strength":"~4 reps · fuerza pesada","~6 reps · strength":"~6 reps · fuerza","~8 reps · strength–hypertrophy":"~8 reps · fuerza–hipertrofia","~10 reps · hypertrophy":"~10 reps · hipertrofia","~12 reps · hypertrophy":"~12 reps · hipertrofia","~14 reps":"~14 reps","~16 reps · endurance":"~16 reps · resistencia","~18 reps":"~18 reps","~20 reps · endurance":"~20 reps · resistencia","🏋️ Log maxes":"🏋️ Registrar pesos","Log your maxes":"Registrar tus pesos","One-off calibration":"Calibración única","Weight (kg)":"Peso (kg)","Reps to failure":"Reps al fallo","Save":"Guardar","Compound":"Compuesto","Isolation":"Aislado","‹ Back to plan":"‹ Volver al plan","Target working set":"Serie objetivo","reps":"reps","1RM ≈":"1RM ≈","work set":"serie de trabajo","from your max":"desde tu máximo","high reps, rough estimate":"muchas reps, estimación aproximada","estimate drifts past 12 reps":"la estimación pierde precisión tras 12 reps","Enter the weight you lifted":"Escribe el peso que levantaste","Enter reps between 1 and 40":"Escribe reps entre 1 y 40","Check the weight and reps":"Revisa el peso y las reps","Saved · 1RM ≈":"Guardado · 1RM ≈","For each lift, enter a weight and the reps you can do":"Para cada ejercicio, escribe un peso y las reps que logras","to failure":"al fallo"," (RIR 0) — any rep count, e.g. 6 heavy or 20 light. This is just to estimate your strength; your daily sessions still keep heavy compounds 1–2 reps from failure.":" (RIR 0) — cualquier número de reps, p. ej. 6 pesadas o 20 ligeras. Es solo para estimar tu fuerza; tus sesiones diarias mantienen los compuestos pesados a 1–2 reps del fallo.","exercise":"ejercicio","exercises":"ejercicios",
 "Monthly measurements":"Medidas mensuales","Measure now":"Medir ahora","Tomorrow":"Mañana",
 "It has been a month since your last measurements. Ready to log new ones?":"Ha pasado un mes desde tus últimas medidas. ¿Listo para registrar nuevas?","Add your first set of body measurements so we can track your progress.":"Añade tu primer juego de medidas corporales para seguir tu progreso.",
