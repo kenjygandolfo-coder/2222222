@@ -329,6 +329,7 @@ body{font-variant-numeric:lining-nums}
 .hb i{display:block;width:100%;max-width:24px;min-height:4px;border-radius:7px 7px 3px 3px;background:var(--line);transition:height .6s cubic-bezier(.2,.8,.2,1)}
 .hb i.mid{background:var(--gold)}.hb i.ok{background:linear-gradient(180deg,color-mix(in srgb,var(--pri) 70%,#fff),var(--pri))}
 .hb .cur span{color:var(--olv-t);font-weight:700}
+.hb label input[data-a="hday"]:focus-visible+i{outline:2px solid var(--olv-t);outline-offset:2px;box-shadow:0 0 0 3px color-mix(in srgb,var(--olv-t) 30%,transparent)}
 .hq{display:flex;gap:8.0px;margin:8px 0 0}.hq .btn{flex:1;min-width:0;box-shadow:none;background:var(--bg);padding:8.0px 8px;font-size:13px}
 .bar.tg{position:relative}.bar.tg .tk{position:absolute;top:0;bottom:0;width:2px;background:var(--gold);opacity:.9}
 /* FINDING 1: a macro consumed>goal bar reads EXCEEDED with BOTH colour and a
@@ -928,6 +929,25 @@ transition-duration:1ms!important;transition-delay:0ms!important;scroll-behavior
 <script>
 const K='forma1',$=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=x=>`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`,today=()=>fmt(new Date());
+/* Pure, testable streak math for a habit `log` map {'YYYY-MM-DD':true}.
+   Returns {current, best}. CONVENTION:
+     - BEST  = longest run of consecutive calendar days present/true in log,
+       over all history.
+     - CURRENT = consecutive done days ending at TODAY; if today is NOT yet
+       marked, it counts the run ending YESTERDAY instead (so a not-yet-marked
+       today never breaks an active run). It is 0 only when neither today nor
+       yesterday is done. A gap of >=1 missing day breaks a run.
+   Date stepping uses the same fmt()/local-midnight scheme as the rest of the
+   app so keys line up with today(). This function is MIRRORED verbatim in
+   tools/habit-streak.test.mjs — keep the two in sync. */
+function habitStreaks(log){log=log||{};const keys=Object.keys(log).filter(k=>log[k]).sort();if(!keys.length)return{current:0,best:0};
+const dnum=k=>{const[y,m,d]=k.split('-').map(Number);return Math.floor(new Date(y,m-1,d).getTime()/864e5)};
+const nums=keys.map(dnum);
+let best=1,run=1;for(let i=1;i<nums.length;i++){if(nums[i]==nums[i-1]+1)run++;else run=1;if(run>best)best=run}
+const set=new Set(nums),tn=dnum(today());
+let start=set.has(tn)?tn:(set.has(tn-1)?tn-1:null),current=0;
+if(start!=null){let c=start;while(set.has(c)){current++;c--}}
+return{current,best}}
 let S={p:{sex:'',w:'',wu:'',h:'',hu:'',age:'',act:0,goal:'',pct:0,kcal:0,mode:'pct'},
 foods:[{id:1,name:'Chicken breast (raw)',cat:'Protein',b:'g',k:120,p:23,c:0,f:2.6},{id:2,name:'White rice (cooked)',cat:'Carbs',b:'g',k:130,p:2.7,c:28,f:.3},{id:3,name:'Whole egg',cat:'Protein',b:'u',k:72,p:6.3,c:.4,f:4.8},{id:4,name:'Oats (dry)',cat:'Carbs',b:'g',k:389,p:16.9,c:66,f:6.9}],
 log:{},wa:{},rec:[],cats:['Protein','Carbs','Fats','Dairy','Fruit & Veg','Snacks','Drinks'],wt:{},ms:{},gym:{yrs:.5,days:4,min:65},nid:10};
@@ -953,6 +973,16 @@ if(!Array.isArray(S.tasks))S.tasks=[];
    counter (same as tasks/foods). Empty titles are allowed (shown as
    "(Untitled)"), mirroring MyBrain. */
 if(!Array.isArray(S.notes))S.notes=[];
+/* Planner > Habits (Phase 3). Habit shape:
+   {id, name, icon, created, log}. `name` is a required non-empty string;
+   `icon` is an OPTIONAL short emoji/label (default '' -> a neutral default is
+   rendered); `created` is Date.now(); `log` is a SPARSE MAP {'YYYY-MM-DD':true}
+   of days marked done (keys use the fmt()/today() format; an absent/falsy key
+   means not done). IDs come from the shared S.nid++ counter (same as
+   tasks/notes/foods). Frequency is implicitly DAILY — per-weekday targets are
+   intentionally DEFERRED to keep Phase 3 scope tight. Streaks are derived from
+   `log` by the pure habitStreaks() helper (see below), never stored. */
+if(!Array.isArray(S.habits))S.habits=[];
 const toast=m=>{const t=$('#toast');t.textContent=m;t.className='on';clearTimeout(toast.t);toast.t=setTimeout(()=>t.className='',2600)};
 const r1=n=>Math.round(n*10)/10;
 
@@ -1199,7 +1229,32 @@ ${d.mode=='preview'?`<div class="md">${mdToHtml(d.body||'')}</div>`:`<label clas
 return`<h2>Notes</h2>
 ${nedit==null?`<div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Notes</h3><button class="btn p" style="flex:none" data-a="nnew">New note</button></div></div>`:''}
 ${editor}
-${nedit==null?(nlist.length?nlist.map(row).join(''):'<p class="mut">No notes yet</p>'):''}`}};
+${nedit==null?(nlist.length?nlist.map(row).join(''):'<p class="mut">No notes yet</p>'):''}`},
+
+habits(){
+const tk=today();
+/* 7-day mini-grid reusing the .hb bars: done day -> i.ok (wine gradient) full
+   height; not-done -> plain i (--line) short stub. Each cell is a native
+   checkbox (keyboard-accessible, mirrors the Tasks toggle) wired in CHANGE. */
+const mini=h=>`<div class="hb" style="height:56px;margin-top:10px">${l7(tk).map(x=>{const on=!!h.log[x];return`<div class="${x==tk?'cur':''}"><label style="width:100%;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;margin:0"><input type="checkbox" data-a="hday" data-id="${h.id}" data-d="${x}" ${on?'checked':''} aria-label="Mark day" style="position:absolute;opacity:0;width:1px;height:1px"><i class="${on?'ok':''}" style="height:${on?'100':'18'}%"></i><span>${dl(x)}</span></label></div>`}).join('')}</div>`;
+const row=h=>{const st=habitStreaks(h.log),on=!!h.log[tk];
+return`<div class="card" style="margin-bottom:8px"><div class="row" style="justify-content:space-between;gap:8px;align-items:flex-start"><b style="min-width:0;overflow-wrap:anywhere">${esc(h.icon&&h.icon.trim()?h.icon:'✅')} ${esc(h.name)}</b><span class="chip" style="flex:none;color:var(--ok-fg);font-weight:700" title="Current streak · Best streak">🔥 ${st.current} · ${st.best}</span></div>
+<label class="row" style="flex-wrap:nowrap;align-items:center;gap:8px;margin:10px 0 0"><input type="checkbox" data-a="htog" data-id="${h.id}" ${on?'checked':''} aria-label="Toggle habit for today" style="width:auto;flex:none"><span style="font-weight:600;color:${on?'var(--ok-fg)':'var(--mut)'}">${on?'Done today':'Mark done'}</span></label>
+${mini(h)}
+<div class="row" style="margin-top:10px"><button class="btn s" style="flex:none" data-a="hedit" data-id="${h.id}">Edit</button><button class="btn s t" style="flex:none" data-a="hdel" data-id="${h.id}">Delete</button></div></div>`};
+/* Ordering: habits NOT done today come first (nudges action), then by created
+   ascending so the oldest habit stays near the top within each group. */
+const list=S.habits.slice().sort((a,b)=>{const da=!!a.log[tk],db=!!b.log[tk];if(da!=db)return da?1:-1;return a.created-b.created});
+let editor='';
+if(hedit!=null){const d=hdraft;
+editor=`<div class="card"><h3>${hedit=='new'?'New habit':'Edit habit'}</h3>
+<label class="f">Name<input id="hk_name" value="${esc(d.name)}" placeholder="Habit name"></label>
+<label class="f">Icon<input id="hk_icon" value="${esc(d.icon)}" placeholder="🧘" maxlength="4" aria-label="Icon"></label>
+<div class="row" style="margin-top:16px"><button class="btn p" data-a="hsave">Save habit</button><button class="btn t" data-a="hcancel">Cancel</button>${hedit!='new'?`<button class="btn t" data-a="hdel" data-id="${hedit}">Delete</button>`:''}</div></div>`;}
+return`<h2>Habits</h2>
+${hedit==null?`<div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Habits</h3><button class="btn p" style="flex:none" data-a="hnew">New habit</button></div></div>`:''}
+${editor}
+${hedit==null?(list.length?list.map(row).join(''):'<p class="mut">No habits yet</p>'):''}`}};
 
 const E=(n,s,r,rir,k,alt=[],x='')=>({n,s,r,rir,k,alt,x}),H='H',I='I';
 const D3=[['Mon','Session A',[E('Hack squat',3,'6–8','2',H,['Pendulum squat','Smith squat']),E('Flat bench press',3,'6–8','2',H,['Machine chest press']),E('Lat pulldown',3,'8–10','1–0',I,['Neutral-grip pulldown']),E('Romanian deadlift',2,'6–8','2',H,['Hip thrust']),E('T-bar row',3,'8–10','1–0',I,['Seated cable row']),E('Lateral raise',3,'10–12','0 last set',I,['Cable lateral raise']),E('EZ-bar curl',2,'8–12','0',I,['Incline biceps curl']),E('Cable pushdown',2,'8–12','0',I,['Overhead triceps extension'])]],
@@ -2225,6 +2280,14 @@ let nedit=null,ndraft={title:'',body:'',mode:'edit'};
    re-render (toggling Edit/Preview) keeps the user's input. Mirrors tcap(). */
 function ncap(){if(nedit==null)return;const t=$('#nk_title'),b=$('#nk_body');if(t)ndraft.title=t.value;if(b)ndraft.body=b.value}
 
+/* ---- Planner > Habits (Phase 3) ---- */
+/* Transient editor state for the open habit (not persisted until Save).
+   hedit: null=closed, 'new'=creating, or a habit id=editing. */
+let hedit=null,hdraft={name:'',icon:''};
+/* Capture whatever is currently typed in the open habit editor into hdraft so a
+   re-render keeps the user's input. Mirrors tcap()/ncap(). */
+function hcap(){if(hedit==null)return;const n=$('#hk_name'),i=$('#hk_icon');if(n)hdraft.name=n.value;if(i)hdraft.icon=i.value}
+
 /* Hand-written vanilla-JS Markdown renderer. NO external libraries.
    SECURITY: the raw input is HTML-escaped FIRST via esc() (& < > "), so no
    user HTML can ever reach the DOM; Markdown transforms run only on the
@@ -2555,7 +2618,7 @@ const SECTIONS=[
 ['health','Health',ICO.heart,[['today','Today'],['week','Week'],['tracking','Tracking'],['gym','Gym'],['stats','Stats']]],
 ['finance','Finance',ICO.wallet,null],
 ['study','Study',ICO.book,null],
-['planner','Planner',ICO.list,[['tasks','Tasks'],['notes','Notes']]],
+['planner','Planner',ICO.list,[['tasks','Tasks'],['notes','Notes'],['habits','Habits']]],
 ['profile','Profile',ICO.person,null]];
 const SECMAP=Object.fromEntries(SECTIONS.map(s=>[s[0],{label:s[1],icon:s[2],subs:s[3]}]));
 /* provisional 'Coming soon' copy: [EnglishLine] (translated to ES via the i18n map) */
@@ -2580,7 +2643,7 @@ if(sec=='profile'){legacy='plan';body=V.plan()}
 else if(sec=='health'){
 if(foodsMode){legacy='foods';body=V.foods()}
 else{const sub=subOf.health||'today';legacy=sub;const vk={today:'today',week:'week',tracking:'tracking',gym:'gym',stats:'stats'}[sub]||'today';body=subRow(info.subs,sub)+V[vk]()}}
-else if(sec=='planner'){const sub=subOf.planner||'tasks';legacy=sub;body=subRow(info.subs,sub)+(sub=='notes'?V.notes():V.tasks())}
+else if(sec=='planner'){const sub=subOf.planner||'tasks';legacy=sub;body=subRow(info.subs,sub)+(sub=='notes'?V.notes():sub=='habits'?V.habits():V.tasks())}
 else{/* provisional */const line=SOON[sec]||'';body=`<div class="cs"><div class="csi" aria-hidden="true">${info.icon}</div><h2>${info.label}</h2><div class="cst">Coming soon</div><p>${line}</p></div>`}
 tab=legacy;
 m.innerHTML=body;m.classList.toggle('wide',legacy=='week');m.style.animation='none';m.offsetHeight;m.style.animation='';
@@ -2606,7 +2669,9 @@ document.addEventListener('input',e=>{const k=e.target.dataset.k;if(!k)return;if
 document.addEventListener('change',e=>{if(e.target.id=='imp'){const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const o=JSON.parse(t);if(!o.p||!o.foods)throw 0;localStorage.setItem(K,t);location.reload()}catch(x){toast('That file is not a Forma backup')}});return}if(e.target.id=='wdt'){wdt=e.target.value||today();return go(tab)}if(e.target.id=='mdt'){mdt=e.target.value||today();return go(tab)}if(e.target.id=='tk_due'){tcap();tdraft.due=e.target.value||'';render();return}if(e.target.id=='tk_remind'){tdraft.remind=e.target.value||'';return}
 const ta=e.target.dataset&&e.target.dataset.a;
 if(ta=='ttog'){const t=S.tasks.find(x=>x.id==+e.target.dataset.id);if(t){t.done=!t.done;save();render()}return}
-if(ta=='tstog'){const t=S.tasks.find(x=>x.id==+e.target.dataset.id);if(t&&t.subtasks&&t.subtasks[+e.target.dataset.i]){t.subtasks[+e.target.dataset.i].done=!t.subtasks[+e.target.dataset.i].done;save();render()}return}if(e.target.id=='wcl'){S.wcl=+e.target.value;save();return go(tab)}if(e.target.id=='gsz'){S.gs=Math.min(2000,Math.max(50,Math.round(parseFloat(e.target.value))||250));save();return go(tab)}if(e.target.id=='wgl'){S.wa[day]=Math.max(0,Math.floor(parseFloat(e.target.value))||0);save();return go(tab)}if(e.target.id=='fs'){const f=S.foods.find(x=>x.id==e.target.value);$('#ql').textContent=f.b=='g'?'Amount (grams)':'Amount (units)';$('#qty').value=f.b=='g'?100:1}});
+if(ta=='tstog'){const t=S.tasks.find(x=>x.id==+e.target.dataset.id);if(t&&t.subtasks&&t.subtasks[+e.target.dataset.i]){t.subtasks[+e.target.dataset.i].done=!t.subtasks[+e.target.dataset.i].done;save();render()}return}
+if(ta=='htog'){const h=S.habits.find(x=>x.id==+e.target.dataset.id);if(h){const k=today();if(h.log[k])delete h.log[k];else h.log[k]=true;save();render()}return}
+if(ta=='hday'){const h=S.habits.find(x=>x.id==+e.target.dataset.id);if(h){const k=e.target.dataset.d;if(h.log[k])delete h.log[k];else h.log[k]=true;save();render()}return}if(e.target.id=='wcl'){S.wcl=+e.target.value;save();return go(tab)}if(e.target.id=='gsz'){S.gs=Math.min(2000,Math.max(50,Math.round(parseFloat(e.target.value))||250));save();return go(tab)}if(e.target.id=='wgl'){S.wa[day]=Math.max(0,Math.floor(parseFloat(e.target.value))||0);save();return go(tab)}if(e.target.id=='fs'){const f=S.foods.find(x=>x.id==e.target.value);$('#ql').textContent=f.b=='g'?'Amount (grams)':'Amount (units)';$('#qty').value=f.b=='g'?100:1}});
 function thDark(){const r=document.documentElement;return r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches}
 function thSync(){const d=thDark();document.documentElement.classList.toggle('dark-theme',d);
 document.querySelectorAll('.thb').forEach(b=>{b.textContent=d?'\u{1F319}':'\u2600\uFE0F';
@@ -2819,6 +2884,11 @@ else if(a=='ncancel'){nedit=null;render();return}
 else if(a=='nmode'){ncap();ndraft.mode=b.dataset.v;render();return}
 else if(a=='nsave'){ncap();const title=(ndraft.title||'').trim(),bodyv=ndraft.body||'';if(nedit=='new')S.notes.push({id:S.nid++,title,body:bodyv,created:Date.now(),updated:Date.now()});else{const n=S.notes.find(x=>x.id==nedit);if(n){n.title=title;n.body=bodyv;n.updated=Date.now()}}nedit=null;save();render();toast('Note saved');return}
 else if(a=='ndel'){S.notes=S.notes.filter(x=>x.id!=+b.dataset.id);nedit=null;save();render();toast('Note deleted');return}
+else if(a=='hnew'){hdraft={name:'',icon:''};hedit='new';render();return}
+else if(a=='hedit'){const h=S.habits.find(x=>x.id==+b.dataset.id);if(!h)return;hdraft={name:h.name,icon:h.icon||''};hedit=h.id;scrollTo(0,0);render();return}
+else if(a=='hcancel'){hedit=null;render();return}
+else if(a=='hsave'){hcap();const name=(hdraft.name||'').trim();if(!name)return toast('Add a name');const icon=(hdraft.icon||'').trim();if(hedit=='new')S.habits.push({id:S.nid++,name,icon,created:Date.now(),log:{}});else{const h=S.habits.find(x=>x.id==hedit);if(h){h.name=name;h.icon=icon}}hedit=null;save();render();toast('Habit saved');return}
+else if(a=='hdel'){S.habits=S.habits.filter(x=>x.id!=+b.dataset.id);hedit=null;save();render();toast('Habit deleted');return}
 else return;save();if(['gsw','gpick','sgd','sgday','sgunit','sginc','sgmic','sgeq','sgmx','sgmj','sgwarm','sgprog','gmv','gaddclose','sgo','greconf','sgcancel','gcfgtab','gcal','gcalclose','gcalc','gcalcclose','gcalcgo','glogedit'].includes(a)&&$('#gout')){const y=scrollY;$('#gout').classList.add('q');gview();scrollTo(0,y);return}go(tab)});
 function ap(){const r=document.documentElement;if(r.dataset.th)delete r.dataset.th;if(S.th){delete S.th;save()}if(S.mode)r.dataset.theme=S.mode}ap();thSync();
 let LANG='en',LOC='en-US',DOW='MTWTFSS',DWK='MON TUE WED THU FRI SAT SUN';
@@ -2830,6 +2900,7 @@ const D={
 "Burgundy theme":"Tema vino","Olive theme":"Tema oliva","Cream theme":"Tema crema","Toggle light or dark":"Cambiar claro u oscuro","Language":"Idioma",
 "Health":"Salud","Finance":"Finanzas","Study":"Estudios","Planner":"Planner","Profile":"Perfil","Coming soon":"Próximamente","Track your finances and control spending.":"Medir tus finanzas y controlar gastos.","Manage everything academic.":"Gestionar todo lo académico.","Tasks, notes, reminders and a habit routine.":"Tareas, notas, recordatorios y rutina de hábitos.",
 "Tasks":"Tareas","New task":"Nueva tarea","Edit task":"Editar tarea","Title":"Título","Description":"Descripción","Priority":"Prioridad","Low":"Baja","Medium":"Media","High":"Alta","Due date":"Fecha límite","Reminder":"Recordatorio","Subtasks":"Subtareas","Add subtask":"Agregar subtarea","Completed":"Completadas","Pending":"Pendientes","No tasks yet":"Aún no hay tareas","Save task":"Guardar tarea","Task saved":"Tarea guardada","Task deleted":"Tarea eliminada","Add a title":"Agrega un título","What needs doing?":"¿Qué hay que hacer?","New subtask":"Nueva subtarea","Subtask":"Subtarea","Pick a date above to set a due date (optional).":"Elige una fecha arriba para poner una fecha límite (opcional).","Toggle subtask":"Alternar subtarea","Toggle task complete":"Alternar tarea completada","Remove subtask":"Quitar subtarea","Reminder date and time":"Fecha y hora del recordatorio","Clear date":"Quitar fecha","No due date":"Sin fecha límite",
+"Habits":"Hábitos","New habit":"Nuevo hábito","Edit habit":"Editar hábito","Habit name":"Nombre del hábito","Icon":"Icono","Done today":"Hecho hoy","Mark done":"Marcar hecho","Streak":"Racha","Best":"Mejor","Current streak":"Racha actual","Best streak":"Mejor racha","Current streak · Best streak":"Racha actual · Mejor racha","No habits yet":"Aún no hay hábitos","Save habit":"Guardar hábito","Habit saved":"Hábito guardado","Habit deleted":"Hábito eliminado","Toggle habit for today":"Alternar hábito de hoy","Mark day":"Marcar día","Add a name":"Agrega un nombre",
 "🏠 Today":"🏠 Hoy","🥑 Foods":"🥑 Alimentos","⚖️ Weight":"⚖️ Peso","📏 Body":"📏 Cuerpo","📊 Tracking":"📊 Seguimiento","Tracking":"Seguimiento","📏 Measurements":"📏 Medidas","🏋️ Gym":"🏋️ Gimnasio","Gym":"Gimnasio","Week":"Semana","Stats":"Estadísticas","Settings":"Ajustes","Set up your plan":"Configura tu plan","Reconfigure plan":"Reconfigurar plan","Reconfigure":"Reconfigurar","Config plan":"Configurar plan","Config routine":"Configurar rutina","Reset config settings":"Restablecer configuración","This resets your plan and routine settings to default. Your workout history and calibrations are kept. Continue?":"Esto restablece tu plan y rutina a los valores por defecto. Tu historial de entrenamientos y tus calibraciones se conservan. ¿Continuar?","Config reset":"Configuración restablecida","🏋️ How do you train?":"🏋️ ¿Cómo entrenas?","Days per week":"Días por semana","Time per session":"Tiempo por sesión","3 days":"3 días","4 days":"4 días","5 days":"5 días","Full body, 6 key movement patterns — Mon / Wed / Fri.":"Cuerpo completo, 6 patrones clave — Lun / Mié / Vie.","Upper / Lower, two hits per muscle — the system\u2019s main structure.":"Torso / Pierna, dos estímulos por músculo — la estructura principal del sistema.","PHAT: 2 strength days + 3 hypertrophy days.":"PHAT: 2 días de fuerza + 3 de hipertrofia.","Create my routine":"Crear mi rutina","Save and rebuild":"Guardar y reconstruir","Cancel":"Cancelar","This session will be":"Esta sesión será","short — compounds only":"corta — solo compuestos","long — everything + accessories":"larga — todo + accesorios","standard — the full session":"estándar — la sesión completa","Under ~55 min keeps only the heavy compounds (the lifts you progress). Over ~85 min adds the optional accessories. In between runs the full session.":"Menos de ~55 min deja solo los compuestos pesados (los que progresas). Más de ~85 min añade los accesorios opcionales. En medio corre la sesión completa.","days/week":"días/sem","min/session":"min/sesión","short · compounds only":"corta · solo compuestos","standard · full session":"estándar · sesión completa","long · + accessories":"larga · + accesorios","Which days?":"¿Qué días?","days chosen":"días elegidos","keep a rest day between sessions":"deja un día de descanso entre sesiones","Mon":"Lun","Tue":"Mar","Wed":"Mié","Thu":"Jue","Fri":"Vie","Sat":"Sáb","Sun":"Dom","Full body, 6 key movement patterns. One rest day between sessions.":"Cuerpo completo, 6 patrones clave. Un día de descanso entre sesiones.","Pick exactly":"Elige exactamente","training days":"días de entrenamiento","Full body needs a rest day between sessions":"Cuerpo completo necesita un día de descanso entre sesiones","RIR is required for every set. Tap Rest after a set for the recommended timer.":"El RIR es obligatorio en cada serie. Toca Descansar tras una serie para el cronómetro recomendado.","rest":"descanso","Routine ready":"Rutina lista","Enter minutes between 20 and 150":"Escribe minutos entre 20 y 150","🧮 1RM calculator":"🧮 Calculadora 1RM","One-rep max calculator":"Calculadora de una repetición máxima","Estimate your one-rep max (1RM) for any lift — the most you could lift for a single rep — from a weight and the reps you did. Uses the Epley formula.":"Calcula tu repetición máxima (1RM) para cualquier levantamiento — el peso máximo que puedes levantar en una sola repetición — a partir de un peso y las reps que hiciste. Usa la fórmula de Epley.","Weight lifted":"Peso levantado","Reps":"Repeticiones","Calculate one-rep max":"Calcular una repetición máxima","Estimated 1RM":"1RM estimado","Weight":"Peso","Use":"Uso","High reps — the estimate is rough":"Muchas reps — la estimación es aproximada","Past 12 reps the estimate drifts":"Tras 12 reps la estimación pierde precisión","1 rep max":"máximo 1 rep","2 reps":"2 reps","~4 reps · heavy strength":"~4 reps · fuerza pesada","~6 reps · strength":"~6 reps · fuerza","~8 reps · strength–hypertrophy":"~8 reps · fuerza–hipertrofia","~10 reps · hypertrophy":"~10 reps · hipertrofia","~12 reps · hypertrophy":"~12 reps · hipertrofia","~14 reps":"~14 reps","~16 reps · endurance":"~16 reps · resistencia","~18 reps":"~18 reps","~20 reps · endurance":"~20 reps · resistencia","🏋️ Log maxes":"🏋️ Registrar pesos","Log your maxes":"Registrar tus pesos","One-off calibration":"Calibración única","Weight (kg)":"Peso (kg)","Reps to failure":"Reps al fallo","Save":"Guardar","Compound":"Compuesto","Isolation":"Aislado","‹ Back to plan":"‹ Volver al plan","Target working set":"Serie objetivo","reps":"reps","1RM ≈":"1RM ≈","work set":"serie de trabajo","from your max":"desde tu máximo","high reps, rough estimate":"muchas reps, estimación aproximada","estimate drifts past 12 reps":"la estimación pierde precisión tras 12 reps","Enter the weight you lifted":"Escribe el peso que levantaste","Enter reps between 1 and 40":"Escribe reps entre 1 y 40","Check the weight and reps":"Revisa el peso y las reps","Saved · 1RM ≈":"Guardado · 1RM ≈","For each lift, enter a weight and the reps you can do":"Para cada ejercicio, escribe un peso y las reps que logras","to failure":"al fallo"," (RIR 0) — any rep count, e.g. 6 heavy or 20 light. This is just to estimate your strength; your daily sessions still keep heavy compounds 1–2 reps from failure.":" (RIR 0) — cualquier número de reps, p. ej. 6 pesadas o 20 ligeras. Es solo para estimar tu fuerza; tus sesiones diarias mantienen los compuestos pesados a 1–2 reps del fallo.","exercise":"ejercicio","exercises":"ejercicios",
 "Monthly measurements":"Medidas mensuales","Measure now":"Medir ahora","Tomorrow":"Mañana",
 "It has been a month since your last measurements. Ready to log new ones?":"Ha pasado un mes desde tus últimas medidas. ¿Listo para registrar nuevas?","Add your first set of body measurements so we can track your progress.":"Añade tu primer juego de medidas corporales para seguir tu progreso.",
