@@ -20,7 +20,6 @@
    off; .dark-theme is a convenience hook. data-theme is left UNSET when the user
    has never chosen, so the prefers-color-scheme block keeps following the OS live. */
 (function(){try{var s=JSON.parse(localStorage.getItem('forma1')||'{}'),r=document.documentElement;
-if(s.th)r.dataset.th=s.th;
 if(s.mode)r.dataset.theme=s.mode;
 var d=s.mode?s.mode=='dark':window.matchMedia('(prefers-color-scheme:dark)').matches;
 r.classList.toggle('dark-theme',d)}catch(e){}})();
@@ -37,41 +36,38 @@ input,textarea,select{caret-color:var(--olv-t)}
 ::selection{background:color-mix(in srgb,var(--olv-t) 30%,transparent);color:var(--ink)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bgd:#240F12;--cardd:#2F181B;--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:hsl(353 10% 52%);--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#D2CBBC;--mut:hsl(353 12% 68%);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 18% 20%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}}
 :root[data-theme="dark"]{--bgd:#240F12;--cardd:#2F181B;--bg:var(--bgd);--card:var(--cardd);--line:var(--lined);--elev:var(--elevd);--line-ui:hsl(353 10% 52%);--data-1:#BF4A5B;--data-2:#8F9BB5;--data-3:#DCD5B8;--pri-hov:hsl(351 45% 33%);--pri-dk:hsl(351 45% 28%);--ink:#D2CBBC;--mut:hsl(353 12% 68%);--pri:var(--pri-d);--acc:var(--acc-d);--onpri:var(--onpd);--gold:#8A8560;--olv-t:#A6A684;--olv-tx:#A6A684;--olv-s:hsl(64 18% 20%);--sh:0 4px 14px rgba(0,0,0,.35);--shh:0 14px 32px rgba(0,0,0,.5)}
-/* The .wine cream-flip is LIGHT-MODE ONLY. In dark mode a .wine card must render
-   like any normal dark card (the surface itself is wine-tinted in FEAT-002), so
-   reset the surface and hand every local token back to the inherited dark value. */
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card.wine{background:var(--card);color:var(--ink);--card:inherit;--ink:inherit;--mut:inherit;--line-ui:inherit;--line:inherit;--olv-t:inherit;--olv-tx:inherit;--data-1:inherit;--data-2:inherit;--ok-fg:inherit;--err-fg:inherit;--warn-fg:inherit;--info-fg:inherit;--pri:inherit;--pri-hov:inherit;--pri-dk:inherit;--onpri:inherit}}
-:root[data-theme="dark"] .card.wine{background:var(--card);color:var(--ink);--card:inherit;--ink:inherit;--mut:inherit;--line-ui:inherit;--line:inherit;--olv-t:inherit;--olv-tx:inherit;--data-1:inherit;--data-2:inherit;--ok-fg:inherit;--err-fg:inherit;--warn-fg:inherit;--info-fg:inherit;--pri:inherit;--pri-hov:inherit;--pri-dk:inherit;--onpri:inherit}
-/* likewise undo the wine-card button text/border flip in dark */
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card.wine .btn,:root:not([data-theme="light"]) .card.wine .btn.s,:root:not([data-theme="light"]) .card.wine .btn.a{color:var(--olv-t);border-color:var(--olv-t)}}
-:root[data-theme="dark"] .card.wine .btn,:root[data-theme="dark"] .card.wine .btn.s,:root[data-theme="dark"] .card.wine .btn.a{color:var(--olv-t);border-color:var(--olv-t)}
-/* ===== FEAT-002 accent themes (data-th) =====
-   burgundy is the DEFAULT identity (no override: it keeps the :root + dark values
-   above, so the current look is byte-unchanged). olive and cream override only
-   --pri / --onpri / --data-1 (+ decorative --pri-hov/--pri-dk) for light AND BOTH
-   dark contexts. The two dark blocks must stay in sync with each other, so each
-   accent repeats its dark override under BOTH dark selectors. The dark accent rules
-   carry extra specificity (data-th combined with the dark selector) so they beat the
-   generic dark overrides above regardless of source order. Every --onpri/--pri and
-   --data-1/surface pair is validated by tools/contrast-check.mjs. */
-:root[data-th="olive"]{--pri:#3C3F1E;--pri-hov:#2E3016;--pri-dk:#24260F;--onpri:#F3EAD9;--data-1:#5A5E30}
-:root[data-th="cream"]{--pri:#7A5A1E;--pri-hov:#634915;--pri-dk:#4E3A10;--onpri:#FBF4E3;--data-1:#8A6A28}
-@media(prefers-color-scheme:dark){
-:root:not([data-theme="light"])[data-th="olive"]{--pri:#8A8F5C;--pri-hov:#6F744A;--pri-dk:#5A5E3C;--onpri:#17170F;--data-1:#A7AD74}
-:root:not([data-theme="light"])[data-th="cream"]{--pri:#C9A05A;--pri-hov:#A98448;--pri-dk:#876938;--onpri:#17150F;--data-1:#D8B26A}}
-:root[data-theme="dark"][data-th="olive"]{--pri:#8A8F5C;--pri-hov:#6F744A;--pri-dk:#5A5E3C;--onpri:#17170F;--data-1:#A7AD74}
-:root[data-theme="dark"][data-th="cream"]{--pri:#C9A05A;--pri-hov:#A98448;--pri-dk:#876938;--onpri:#17150F;--data-1:#D8B26A}
-/* ===== FEAT-002 dark primary button: cream fill + wine text =====
+/* The wine cream-flip is LIGHT-MODE ONLY. FEAT-002 generalises it to EVERY content
+   card (except the olive hero) via .card:not(.hero):not(.bt-hero):not(.phero). In dark
+   mode those cards must render like a normal dark card (the surface is wine-tinted in
+   FEAT-002), so reset the surface and hand every local token back to the inherited
+   dark value. The two dark blocks are kept byte-for-byte in sync. */
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card:not(.hero):not(.bt-hero):not(.phero){background:var(--card);color:var(--ink);--card:inherit;--ink:inherit;--mut:inherit;--line-ui:inherit;--line:inherit;--olv-t:inherit;--olv-tx:inherit;--data-1:inherit;--data-2:inherit;--ok-fg:inherit;--err-fg:inherit;--warn-fg:inherit;--info-fg:inherit;--pri:inherit;--pri-hov:inherit;--pri-dk:inherit;--onpri:inherit}}
+:root[data-theme="dark"] .card:not(.hero):not(.bt-hero):not(.phero){background:var(--card);color:var(--ink);--card:inherit;--ink:inherit;--mut:inherit;--line-ui:inherit;--line:inherit;--olv-t:inherit;--olv-tx:inherit;--data-1:inherit;--data-2:inherit;--ok-fg:inherit;--err-fg:inherit;--warn-fg:inherit;--info-fg:inherit;--pri:inherit;--pri-hov:inherit;--pri-dk:inherit;--onpri:inherit}
+/* likewise undo the wine-card button text/border flip in dark (and keep :not(.p) so the
+   dark cream-fill wine-text primary button below still wins on specificity) */
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card:not(.hero):not(.bt-hero):not(.phero) .btn:not(.p),:root:not([data-theme="light"]) .card:not(.hero):not(.bt-hero):not(.phero) .btn.s,:root:not([data-theme="light"]) .card:not(.hero):not(.bt-hero):not(.phero) .btn.a{color:var(--olv-t);border-color:var(--olv-t)}}
+:root[data-theme="dark"] .card:not(.hero):not(.bt-hero):not(.phero) .btn:not(.p),:root[data-theme="dark"] .card:not(.hero):not(.bt-hero):not(.phero) .btn.s,:root[data-theme="dark"] .card:not(.hero):not(.bt-hero):not(.phero) .btn.a{color:var(--olv-t);border-color:var(--olv-t)}
+/* FEAT-002 light-only wine-card input/ddb/seg/chip re-tint is reset in dark so the dark
+   theme keeps its normal field surfaces (both dark blocks stay byte-for-byte in sync) */
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .card:not(.hero):not(.bt-hero):not(.phero) input,:root:not([data-theme="light"]) .card:not(.hero):not(.bt-hero):not(.phero) textarea,:root:not([data-theme="light"]) .card:not(.hero):not(.bt-hero):not(.phero) .ddb,:root:not([data-theme="light"]) .card:not(.hero):not(.bt-hero):not(.phero) .seg .btn:not(.on){background:color-mix(in srgb,var(--bg) 65%,var(--card))}}
+:root[data-theme="dark"] .card:not(.hero):not(.bt-hero):not(.phero) input,:root[data-theme="dark"] .card:not(.hero):not(.bt-hero):not(.phero) textarea,:root[data-theme="dark"] .card:not(.hero):not(.bt-hero):not(.phero) .ddb,:root[data-theme="dark"] .card:not(.hero):not(.bt-hero):not(.phero) .seg .btn:not(.on){background:color-mix(in srgb,var(--bg) 65%,var(--card))}
+/* FEAT-002 review fix: the LIGHT-only wine .tile treatment (below) is reset in dark so
+   the Trends stat tiles keep their normal dark surface/ink/accent (both dark blocks stay
+   byte-for-byte in sync). */
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .tile{background:var(--card);color:var(--ink);border-color:color-mix(in srgb,var(--olv-t) 22%,transparent)}:root:not([data-theme="light"]) .tile b{color:var(--olv-t)}:root:not([data-theme="light"]) .tile span{color:var(--mut)}:root:not([data-theme="light"]) .tile::before{background:linear-gradient(90deg,var(--olv-t),transparent)}}
+:root[data-theme="dark"] .tile{background:var(--card);color:var(--ink);border-color:color-mix(in srgb,var(--olv-t) 22%,transparent)}:root[data-theme="dark"] .tile b{color:var(--olv-t)}:root[data-theme="dark"] .tile span{color:var(--mut)}:root[data-theme="dark"] .tile::before{background:linear-gradient(90deg,var(--olv-t),transparent)}
+/* Accent identity is permanently burgundy (the :root + dark values above); the
+   olive/cream swatch accents and the data-th machinery were removed. */
+/* ===== dark primary button: cream fill + wine text =====
    On the new wine dark surface (#2F181B card) the old wine button (--pri #A8404F)
    is only 2.77:1 against the card, so for coherence with the light .wine cards the
    DARK primary button becomes a solid cream fill with wine text (#5C1A22 on
    #F3EAD9 = 10.81:1). Scoped to .btn.p ONLY (NOT global --pri) so tabs (.tab.on),
    segment on-states (.seg .btn.on), fabs (.fab.on), the accent button (.btn.a) and
-   data fills (which read --data-1) are untouched. Excluded when an olive/cream
-   accent is active (data-th) so those validated accent buttons still win. Both dark
-   selectors carry an identical rule. */
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]):not([data-th="olive"]):not([data-th="cream"]) .btn.p{background:#F3EAD9;color:#5C1A22;box-shadow:0 10px 22px -10px rgba(0,0,0,.6)}}
-:root[data-theme="dark"]:not([data-th="olive"]):not([data-th="cream"]) .btn.p{background:#F3EAD9;color:#5C1A22;box-shadow:0 10px 22px -10px rgba(0,0,0,.6)}
+   data fills (which read --data-1) are untouched. Both dark selectors carry an
+   identical rule. */
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.p{background:#F3EAD9;color:#5C1A22;box-shadow:0 10px 22px -10px rgba(0,0,0,.6)}}
+:root[data-theme="dark"] .btn.p{background:#F3EAD9;color:#5C1A22;box-shadow:0 10px 22px -10px rgba(0,0,0,.6)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Montserrat,system-ui,sans-serif;transition:background .4s,color .4s}
 h1,h2,h3{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;margin:0;letter-spacing:.02em}
@@ -116,10 +112,13 @@ table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8.0px 4p
    text 10.81 - all >= WCAG thresholds. Scoped to LIGHT mode only (the dark resets
    below hand it back to the normal dark card, because FEAT-002 makes the whole
    dark theme wine and a cream card there would look wrong). */
-.card.wine{background:#5C1A22;color:#F3EAD9;--card:#5C1A22;--ink:#F3EAD9;--mut:#E3D6C2;--line-ui:#B88A92;--line:#B88A92;--olv-t:#F3EAD9;--olv-tx:#F3EAD9;--data-1:#F3EAD9;--data-2:#A8AE78;--ok-fg:#72CC8D;--err-fg:#EB8C7E;--warn-fg:#CBA362;--info-fg:#F3EAD9;--pri:#F3EAD9;--pri-hov:#F3EAD9;--pri-dk:#F3EAD9;--onpri:#5C1A22}
+.card:not(.hero):not(.bt-hero):not(.phero){background:#5C1A22;color:#F3EAD9;--card:#5C1A22;--ink:#F3EAD9;--mut:#E3D6C2;--line-ui:#B88A92;--line:#B88A92;--olv-t:#F3EAD9;--olv-tx:#F3EAD9;--data-1:#F3EAD9;--data-2:#A8AE78;--ok-fg:#72CC8D;--err-fg:#EB8C7E;--warn-fg:#CBA362;--info-fg:#F3EAD9;--pri:#F3EAD9;--pri-hov:#F3EAD9;--pri-dk:#F3EAD9;--onpri:#5C1A22}
 /* olive-outline secondary/tertiary buttons would read olive-on-wine inside a wine
    card; flip their text/border to cream so they stay legible (>=4.5:1). */
-.card.wine .btn,.card.wine .btn.s,.card.wine .btn.a{color:var(--ink);border-color:var(--ink)}
+/* FEAT-002: flip is scoped with :not(.p) so the PRIMARY button is left alone - on a
+   wine card .btn.p keeps its cream fill (--pri=#F3EAD9) with WINE text (--onpri=#5C1A22
+   = 10.81:1); only the secondary/tertiary/ghost buttons flip to cream text+border. */
+.card:not(.hero):not(.bt-hero):not(.phero) .btn:not(.p),.card:not(.hero):not(.bt-hero):not(.phero) .btn.s,.card:not(.hero):not(.bt-hero):not(.phero) .btn.a{color:var(--ink);border-color:var(--ink)}
 .card:has(.dd.open){position:relative;z-index:6}
 select{display:none}
 .dd{position:relative}
@@ -144,7 +143,6 @@ button.chip:hover{transform:translateY(-1px);box-shadow:var(--sh)}.chip.on{backg
 .fo{display:flex;justify-content:space-between;gap:8px;width:100%;font:inherit;color:var(--ink);background:none;border:0;border-radius:12px;padding:8px 16px;cursor:pointer;text-align:left;transition:background .15s,padding .2s}
 .fo:hover{background:color-mix(in srgb,var(--olv-t) 14%,var(--card));padding-left:16.0px}.fo.on{background:var(--pri);color:var(--onpri)}.fo.on .mut{color:inherit;opacity:.8}
 .hd{display:flex;gap:8px;align-items:center}
-.sw{width:26px;height:26px;border-radius:50%;padding:0;border:2px solid var(--card);cursor:pointer;box-shadow:var(--sh);transition:transform .2s}.sw:hover{transform:scale(1.18)}.sw.on{outline:2px solid var(--ink);outline-offset:2px}
 .g2{display:grid;gap:16.0px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin-top:16.0px}.g2 .card{margin:0}
 .split{display:grid;grid-template-columns:auto 1fr;gap:32.0px;align-items:center}@media(max-width:560px){.split{grid-template-columns:1fr}}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8.0px;margin-bottom:16px}.stats b{display:block;font:600 26px 'Cormorant Garamond',Georgia,serif}
@@ -209,7 +207,7 @@ header{padding:8px 16px}
 header h1{display:flex;align-items:center;gap:8px;font-size:19px;font-style:normal}
 header h1::before{content:"";width:18px;height:18px;border-radius:50% 50% 50% 4px;transform:rotate(-18deg);background:linear-gradient(135deg,var(--pri),var(--gold));box-shadow:0 4px 10px -4px var(--pri)}
 .hd{gap:4px;padding:4px 4px 4px 8px;border-radius:999px;background:color-mix(in srgb,var(--card) 70%,transparent);border:1px solid var(--line);backdrop-filter:blur(10px);flex:none}header h1{min-width:0;overflow:hidden;text-overflow:ellipsis}
-.sw{width:24px;height:24px}.hd .btn.s{background:transparent;padding:4px 8px;font-size:14px;line-height:1}
+.hd .btn.s{background:transparent;padding:4px 8px;font-size:14px;line-height:1}
 .hd .btn.s.thb{font-size:16px;padding:4px 6px}
 nav{left:50%;right:auto;transform:translateX(-50%);width:min(560px,calc(100% - 16px));max-width:none;margin:0;gap:4px;border-radius:24px 24px 0 0;background:color-mix(in srgb,var(--card) 92%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);border:1px solid var(--line);border-bottom:0;box-shadow:0 -10px 30px -14px color-mix(in srgb,#000 30%,transparent)}
 .tab{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:transparent;box-shadow:none;padding:6px 4px;min-height:48px;flex:1 1 0;text-align:center;font-weight:600;color:var(--mut);border-radius:0 0 16px 16px}
@@ -547,6 +545,28 @@ nav,.fab,#toast,.rt,.ddl,.dpl,.sov-p,.mdl .card{box-shadow:var(--shp)}
    This transparent override (equal specificity, later in source) wins and keeps the glyph
    on the wine surface at 10.81:1. Do NOT remove or reorder it above the earlier .wrow .wb rule. */
 .wrow .wb{background:transparent}
+/* ===== FEAT-002 LOAD-BEARING on wine cards (generalised surface) =====
+   Several components hardcode a cream-biased fill against --card (now wine) so they
+   drop below threshold once every card is wine. Re-tint them to an elevated-wine
+   surface (color-mix --ink 12% over --card = #6E3338) so cream --ink text clears
+   8.02:1 and the --line-ui border clears 3.23:1 on #5C1A22. Scoped to the same
+   broadened wine selector; harmless in dark (cards are reset to the dark surface and
+   the dark input/ddb/seg rules keep their own values). */
+.card:not(.hero):not(.bt-hero):not(.phero) input,.card:not(.hero):not(.bt-hero):not(.phero) textarea,.card:not(.hero):not(.bt-hero):not(.phero) .ddb,.card:not(.hero):not(.bt-hero):not(.phero) .seg .btn:not(.on){background:color-mix(in srgb,var(--ink) 12%,var(--card))}
+/* (.chip / .note already re-tint to an olive-over-card mix in the 60-30-10 block below,
+   which resolves to validated cream-over-wine inside a wine card, so no chip override here) */
+/* FEAT-002 review fix: the Trends stat tiles (.tile) render as SIBLINGS of the cards,
+   not inside a .card, so the broadened wine selector never reached them and they stayed
+   cream among the wine cards. The user asked for ALL white cards to be wine, and these
+   are prominent card-like boxes, so give them the same wine surface in LIGHT mode:
+   surface #5C1A22, cream number (.tile b #F3EAD9 = 10.81:1), cream-muted label
+   (.tile span #E3D6C2 = 9.02:1), a GREEN ::before accent (#A8AE78 = 5.53:1, >=3:1 as a
+   graphic), and a cream-mauve border (#B88A92 = 4.36:1 as a graphic). Scoped LIGHT-only;
+   the two dark blocks reset .tile back to its normal dark surface so dark is unchanged. */
+.tile{background:#5C1A22;color:#F3EAD9;border-color:#B88A92}
+.tile b{color:#F3EAD9}
+.tile span{color:#E3D6C2}
+.tile::before{background:linear-gradient(90deg,#A8AE78,transparent)}
 /* press: inverse scale (declared last so it wins over hover) */
 :is(.btn,.tab,.fab,.chip,.opt,.fo,.ddo,.dpc,.dpn,.hc):active{transform:scale(.98)}
 .btn:active{box-shadow:none}.btn.p:active{box-shadow:var(--shv)}
@@ -592,9 +612,9 @@ input:focus,select:focus,textarea:focus,button:focus-visible{box-shadow:none}
 input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
 /* On olive / wine surfaces the olive ring would vanish (1:1) - switch to cream */
 :is(.hero,.phero,.rt,.fo.on) :focus-visible{--focus:var(--onpri)}
-/* .card.wine inverts --onpri to wine (for its cream-fill button), so its focus
+/* wine cards invert --onpri to wine (for their cream-fill button), so their focus
    ring must use the card's cream --ink instead to clear 3:1 on the wine surface */
-.card.wine :focus-visible{--focus:var(--ink)}
+.card:not(.hero):not(.bt-hero):not(.phero) :focus-visible{--focus:var(--ink)}
 /* Muted text on dark surfaces: solid colour instead of opacity */
 .hero .mut,.phero span,.pbig small,.fo.on .mut,.rt .rtl span{color:var(--onpri-mut);opacity:1}
 /* the goal chip sits on a lightened tint of the hero, so the muted tone only
@@ -633,9 +653,9 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
 
 /* ===== v10: motion system - inertia curve, calibrated durations, staggered entry ===== */
 :root{--ease:cubic-bezier(.2,.8,.2,1);--t-micro:180ms;--t-press:100ms;--t-data:360ms;--t-panel:300ms;--stagger:60ms}
-.btn,.tab,.chip,button.chip,.fo,.ddo,.sw,.ftog,.ddb,.wkn,.opt,.hc,.dpc,.crb,.fab{transition-duration:var(--t-micro);transition-timing-function:var(--ease)}
+.btn,.tab,.chip,button.chip,.fo,.ddo,.ftog,.ddb,.wkn,.opt,.hc,.dpc,.crb,.fab{transition-duration:var(--t-micro);transition-timing-function:var(--ease)}
 .card{transition:transform var(--t-micro) var(--ease),box-shadow var(--t-micro) var(--ease)}
-:is(.btn,.tab,.fab,.chip,.opt,.fo,.ddo,.dpc,.dpn,.hc,.sw):active{transition-duration:var(--t-press)}
+:is(.btn,.tab,.fab,.chip,.opt,.fo,.ddo,.dpc,.dpn,.hc):active{transition-duration:var(--t-press)}
 /* data components: long enough for the eye to register the delta */
 .bar i,.pbar i{transition:width var(--t-data) var(--ease)}
 .hb i{transition:height var(--t-data) var(--ease)}
@@ -845,7 +865,7 @@ input,.ddb,.ftog,.card{border-color:var(--line-ui)}
 @media (forced-colors:active){
 .gmvb[disabled],.dpc:disabled,button:disabled,input:disabled,select:disabled,textarea:disabled{opacity:1;color:GrayText;border-color:GrayText}
 :focus-visible,button:focus-visible,.wnt:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline-color:Highlight}
-.tab.on,.btn.p,.sw.on,.dpc.sel,.ddo.on,.fo.on{outline:2px solid Highlight;outline-offset:-2px}
+.tab.on,.btn.p,.dpc.sel,.ddo.on,.fo.on{outline:2px solid Highlight;outline-offset:-2px}
 }
 /* ===== v12: reduced motion (must stay last) =====
    Kills entry travel and every hover/press displacement, keeps colour feedback.
@@ -855,10 +875,10 @@ input,.ddb,.ftog,.card{border-color:var(--line-ui)}
 *{animation-duration:1ms!important;animation-delay:0ms!important;animation-iteration-count:1!important;
 transition-duration:1ms!important;transition-delay:0ms!important;scroll-behavior:auto!important}
 .card,.tile,.note,.phero,main,main>h2,#gout .card,.rt.done{animation:none!important}
-:is(.card,.tile,.btn,.tab,.fab,.sw,.ddb,.ftog,.chip,button.chip,.opt,.wkn,.fo,.ddo,.dpc,.hc,.crb,.dpn):is(:hover,:active,:focus-visible){transform:none!important}
+:is(.card,.tile,.btn,.tab,.fab,.ddb,.ftog,.chip,button.chip,.opt,.wkn,.fo,.ddo,.dpc,.hc,.crb,.dpn):is(:hover,:active,:focus-visible){transform:none!important}
 }
 </style></head><body>
-<header><h1>Forma</h1><div class="hd"><button class="sw" data-th="burgundy" aria-label="Burgundy theme" style="background:#5C1A22"></button><button class="sw" data-th="olive" aria-label="Olive theme" style="background:#3C3F1E"></button><button class="sw" data-th="cream" aria-label="Cream theme" style="background:#7A5A1E"></button><button class="btn s lgb" data-lg="en" aria-label="English">EN</button><button class="btn s lgb" data-lg="es" aria-label="Español">ES</button><button class="btn s thb" data-a="theme" aria-label="Toggle light or dark">🌗</button></div></header>
+<header><h1>Forma</h1><div class="hd"><button class="btn s lgb" data-lg="en" aria-label="English">EN</button><button class="btn s lgb" data-lg="es" aria-label="Español">ES</button><button class="btn s thb" data-a="theme" aria-label="Toggle light or dark">🌗</button></div></header>
 <nav id="nav"></nav><main id="main"></main><div id="toast"></div><div class="mdl" id="mdl" hidden><div class="card"><div style="font-size:44px">📏</div><h3>Monthly measurements</h3><p class="mut" id="mdt2"></p><div class="row" style="flex-wrap:nowrap"><button class="btn p" data-a="mgo">Measure now</button><button class="btn t" data-a="mlater">Tomorrow</button></div></div></div>
 <div class="mdl" id="cfm" hidden><div class="card"><div style="font-size:40px">⚠️</div><h3 id="cfmt"></h3><p class="mut" id="cfmb"></p><label class="row" id="cfmxw" style="flex-wrap:nowrap;align-items:center;gap:8px;justify-content:center;font-size:13px;color:var(--mut);margin-bottom:8px"><input type="checkbox" id="cfmx" style="width:auto;flex:none"> <span id="cfmxl">Don’t ask again</span></label><div class="row" style="flex-wrap:nowrap"><button class="btn p" data-a="cfmyes" id="cfmyes">Yes, I’m sure</button><button class="btn t" data-a="cfmno">No</button></div></div></div>
 <div class="mdl" id="cpy" hidden><div class="card"><div style="font-size:40px">📋</div><h3 id="cpyt">Copy session</h3><p class="mut" id="cpyb"></p><div class="f" style="text-align:left"><span>Copy to</span><div class="chips" id="cpysel" style="margin:4px 0 0"></div></div><p class="cap" style="margin:0 0 8px">This overwrites the chosen session completely — same exercises, order, equipment and tags. It affects your routine; experts only.</p><div class="row" style="flex-wrap:nowrap"><button class="btn p" data-a="cpyyes">Copy</button><button class="btn t" data-a="cpyno">Cancel</button></div></div></div>
@@ -2356,7 +2376,6 @@ if(a=='sov'){sov(b.dataset.v);return}
 if(a=='sclose'){sov(null);return}
 
 if(a=='gcv'){gcv[b.dataset.f]=b.dataset.v;$('#gch').innerHTML=gcharts();return}
-if(b.dataset.th){S.th=b.dataset.th;save();return ap()}
 if(a=='minfo'){mi=!mi;$('#mif').classList.toggle('open',mi);b.classList.toggle('open',mi);return}
 if(a=='osx'){S.p.sex=b.dataset.v;save();return obr()}
 if(a=='ohu'||a=='owu'){unit(a=='ohu'?'hu':'wu',b.dataset.v);return obr()}
@@ -2527,7 +2546,7 @@ else if(a=='slst'){const s=(S.str??={}),x=+b.dataset.v;if(s[day]==x)delete s[day
 else if(a=='crtog'){const c=(S.cre??={});if(c[day])delete c[day];else c[day]=1;toast(c[day]?'Creatine logged':'Creatine unmarked')}
 else if(a=='wkp'||a=='wkx'){const x=new Date(wk0+'T00:00');x.setDate(x.getDate()+(a=='wkx'?7:-7));wk0=fmt(x)}
 else return;save();if(['gsw','gpick','sgd','sgday','sgunit','sginc','sgmic','sgeq','sgmx','sgmj','sgwarm','sgprog','gmv','gaddclose','sgo','greconf','sgcancel','gcfgtab','gcal','gcalclose','gcalc','gcalcclose','gcalcgo','glogedit'].includes(a)&&$('#gout')){const y=scrollY;$('#gout').classList.add('q');gview();scrollTo(0,y);return}go(tab)});
-function ap(){const r=document.documentElement;r.dataset.th=S.th||'burgundy';if(S.mode)r.dataset.theme=S.mode;document.querySelectorAll('.sw').forEach(x=>x.classList.toggle('on',x.dataset.th==r.dataset.th))}ap();thSync();
+function ap(){const r=document.documentElement;if(r.dataset.th)delete r.dataset.th;if(S.th){delete S.th;save()}if(S.mode)r.dataset.theme=S.mode}ap();thSync();
 let LANG='en',LOC='en-US',DOW='MTWTFSS',DWK='MON TUE WED THU FRI SAT SUN';
 const D={
 "Close":"Cerrar","Failure. Every set of isolation and machine lifts":"Fallo. Todas las series de ejercicios aislados y de máquina","Top end of heavy compounds":"Extremo alto de los compuestos pesados","Stop timer":"Detener temporizador","Rest over, next set":"Descanso terminado, siguiente serie","Heavy compound · rest 3–4 min":"Compuesto pesado · descanso 3–4 min","Isolation lift · rest 2 min":"Ejercicio de aislamiento · descanso 2 min","Heavy compound":"Compuesto pesado","Isolation lift":"Ejercicio de aislamiento","RIR is required for every set.":"El RIR es obligatorio en cada serie.","⏱ Auto-start rest":"⏱ Descanso automático","⏱ Heavy 3:30":"⏱ Pesado 3:30","⏱ Isolation 2:00":"⏱ Aislamiento 2:00","Deload week: about half the sets, lighter weights, stop 3–4 reps short of failure.":"Semana de descarga: aproximadamente la mitad de las series, pesos más ligeros y detén cada serie 3–4 repeticiones antes del fallo.","Too close to failure for this target":"Demasiado cerca del fallo para este objetivo","Easier than planned":"Más fácil de lo planeado","Room to spare: add a rep or a little weight":"Te sobró margen: añade una repetición o un poco de peso","Push closer to failure on isolation lifts":"Acércate más al fallo en los ejercicios aislados","✅ On target":"✅ En el objetivo","Enter RIR (0–5) for every set":"Escribe el RIR (0–5) en cada serie","Workout saved · some sets were off the RIR target":"Entrenamiento guardado · algunas series se salieron del objetivo de RIR","📈 Strength progress":"📈 Progreso de fuerza","Squat":"Sentadilla","🏋️ Squat":"🏋️ Sentadilla","Deadlift":"Peso muerto","Estimated 1RM":"1RM estimado","No sessions logged yet. Log a workout with this lift to start your chart.":"Aún no hay sesiones. Registra un entrenamiento con este ejercicio para iniciar tu gráfico.","Log one more session to see the trend.":"Registra una sesión más para ver la tendencia.","Estimated 1RM per session from your best set, adjusted for the reps you had left (RIR). Deload sessions are left out.":"1RM estimado por sesión a partir de tu mejor serie, ajustado según las repeticiones que te quedaban (RIR). Las sesiones de descarga no se incluyen.","⚠️ Possible recovery issue":"⚠️ Posible problema de recuperación","👀 Strength is stalling":"👀 La fuerza se está estancando","Your numbers are trending down. Plan a deload week: about half the sets, weights around 10% lighter, and every set 3–4 reps from failure. If that feels like too much, drop 1 set from every exercise for the next two weeks.":"Tus números van a la baja. Planifica una semana de descarga: aproximadamente la mitad de las series, pesos alrededor de un 10 % más ligeros y cada serie a 3–4 repeticiones del fallo. Si es demasiado, quita 1 serie de cada ejercicio durante las próximas dos semanas.","Try cutting 1–2 sets from the stalled lifts next session, hit your RIR targets and protect your sleep. If it continues, take a deload.":"Prueba a quitar 1–2 series de los ejercicios estancados en la próxima sesión, cumple tus objetivos de RIR y cuida tu sueño. Si continúa, haz una descarga.","Your heavy lifts are being taken to failure, which adds fatigue.":"Estás llevando los ejercicios pesados al fallo, lo que añade fatiga.","Start deload week":"Iniciar semana de descarga","Dismiss":"Descartar","End deload":"Terminar descarga","🔄 Deload week":"🔄 Semana de descarga","Until":"Hasta","Half the sets, weights about 10% lighter, every set stopped 3–4 reps short of failure.":"La mitad de las series, pesos un 10 % más ligeros y cada serie detenida 3–4 repeticiones antes del fallo.","Open the Gym tab to see what to do.":"Abre la pestaña Gimnasio para ver qué hacer.","View":"Ver","Deload week started":"Semana de descarga iniciada","Deload ended":"Descarga terminada","Edit":"Editar","Saved workout \u2014 tap Edit to change it.":"Entrenamiento guardado \u2014 toca Editar para cambiarlo.","Progression rep goal":"Meta de reps para progresar","hit this many reps to earn the next weight jump":"logra estas reps para ganar el siguiente salto de peso","Progression rep goal fixed at 3 per mini-set":"Meta de reps para progresar fija en 3 por mini-serie","Priming reps":"Reps de activación (pre-agotamiento)",

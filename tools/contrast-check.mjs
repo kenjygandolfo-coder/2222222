@@ -31,8 +31,8 @@ function ratio(a, b) {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-// --- Accent palettes (must match the [data-th=...] CSS in index.html) ---
-// Surfaces are shared across accents (they come from the base :root / dark blocks):
+// --- Accent palette (burgundy is the permanent identity; the olive/cream swatch
+// accents were removed). Surfaces come from the base :root / dark blocks: ---
 const SURF = {
   light: { card: '#FBF7EE', bg: '#ECE5D6' },
   // FEAT-002: the dark theme is now a deep WINE field, not warm charcoal.
@@ -40,19 +40,12 @@ const SURF = {
   dark:  { card: '#2F181B', bg: '#240F12' },
 };
 
-// burgundy is the DEFAULT identity (no CSS override): these are today's values.
+// burgundy is the ONLY (and permanent) identity (no CSS override): these are
+// today's values.
 const THEMES = {
   burgundy: {
     light: { pri: '#5C1A22', onpri: '#F8F2E7', data1: '#5C1A22' },
     dark:  { pri: '#A8404F', onpri: '#F3EAD9', data1: '#BF4A5B' },
-  },
-  olive: {
-    light: { pri: '#3C3F1E', onpri: '#F3EAD9', data1: '#5A5E30' },
-    dark:  { pri: '#8A8F5C', onpri: '#17170F', data1: '#A7AD74' },
-  },
-  cream: {
-    light: { pri: '#7A5A1E', onpri: '#FBF4E3', data1: '#8A6A28' },
-    dark:  { pri: '#C9A05A', onpri: '#17150F', data1: '#D8B26A' },
   },
 };
 
@@ -139,6 +132,13 @@ wineRow('err-fg',     '#EB8C7E', WINE_LIGHT, AA_TEXT);
 wineRow('warn-fg',    '#CBA362', WINE_LIGHT, AA_TEXT);
 // inverted primary button: wine text on cream fill
 wineRow('btn.p text', '#5C1A22', '#F3EAD9', AA_TEXT);
+// FEAT-002 review fix: the Trends stat tiles (.tile) now take the same wine surface in
+// LIGHT mode. Their number (.tile b), label (.tile span), the ::before accent bar and
+// the tile border all paint directly on the #5C1A22 tile surface, so validate each pair.
+wineRow('tile num',   '#F3EAD9', WINE_LIGHT, AA_TEXT);  // .tile b cream number
+wineRow('tile label', '#E3D6C2', WINE_LIGHT, AA_TEXT);  // .tile span cream-muted label
+wineRow('tile accent','#A8AE78', WINE_LIGHT, AA_NON);   // .tile::before green accent bar
+wineRow('tile border','#B88A92', WINE_LIGHT, AA_NON);   // .tile border
 console.log('\nLight .wine card locals vs #5C1A22 surface (WCAG 2.2)\n');
 console.table(wineLightRows);
 
