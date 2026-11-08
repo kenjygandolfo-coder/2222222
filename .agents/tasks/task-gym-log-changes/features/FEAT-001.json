@@ -1,0 +1,25 @@
+{
+ "id": "FEAT-001",
+ "type": "feat",
+ "description": "Implement the 5 gym changes in gymapp.html, bump sw.js CACHE (and add gymapp.html to SHELL if appropriate), commit on main",
+ "status": "completed",
+ "steps": [
+  "1 Gym planner: add calendar showing workouts on the day they were done",
+  "2 Log: remove global edit and save workout buttons; add edit and save exercise buttons per exercise",
+  "3 Plate calculator: remove per exercise; one general main button inside the log",
+  "4 Prefill next session with previous session's sets and weights as-is, no suggested progression",
+  "5 Save exercise marks that exercise visually distinct/highlighted vs unsaved ones"
+ ],
+ "acceptance_criteria": [
+  "All five behaviors work",
+  "inline script passes node --check",
+  "existing tools tests pass",
+  "sw.js CACHE bumped"
+ ],
+ "verification": [
+  "node --check on extracted script",
+  "run tools/*.test.mjs"
+ ],
+ "blocked_reason": null,
+ "findings": "No plate calculator or edit button existed in gymapp.html; added a single general plate calculator button in the log and per-exercise Edit/Save exercise. Global Save workout removed (workout entry is created on first Save exercise). Prefill uses last session sets as-is (weight/reps; RIR left blank). sw.js CACHE forma-v40, gymapp.html added to SHELL. Not browser-tested (no browser available); node --check and tools tests pass."
+}
