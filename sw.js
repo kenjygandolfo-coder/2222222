@@ -1,7 +1,10 @@
 /* Forma service worker — offline shell cache.
    Paired with index.html; they must be served from the same folder. Bump CACHE
    whenever you want returning installs to drop the old shell. User data lives
-   in localStorage, which the worker never touches, so a cache reset is safe. */
+   in localStorage, which the worker never touches, so a cache reset is safe.
+   On every change also update BUILD_TS and BUILD_VER (next to the toast helper
+   in index.html and gymapp.html) so the logo triple tap/long press shows the
+   right update time; BUILD_VER must equal CACHE. */
 const CACHE = 'forma-v70';
 const SHELL = ['./', 'index.html', 'gymapp.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'];
 

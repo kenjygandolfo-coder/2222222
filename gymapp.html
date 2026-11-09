@@ -684,6 +684,17 @@ try{const x=localStorage.getItem(K);if(x)S=Object.assign(S,JSON.parse(x))}catch(
 if(!S.done)S.p={sex:'',w:'',wu:'',h:'',hu:'',age:'',act:0,goal:'',pct:0,kcal:0,mode:'pct'};
 const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
 const toast=m=>{const t=$('#toast');t.textContent=m;t.className='on';clearTimeout(toast.t);toast.t=setTimeout(()=>t.className='',2600)};
+/* ===== Build info: triple tap or long press on the Forma logo shows the last update time =====
+   UPDATE BUILD_TS AND BUILD_VER ON EVERY CHANGE, together with the CACHE name in sw.js
+   (BUILD_VER must equal sw.js CACHE). BUILD_TS is an ISO-8601 UTC string. */
+const BUILD_TS='2026-11-09T04:54:19Z',BUILD_VER='forma-v70';
+const buildMsg=(ts,ver,lang,lastMod)=>{const d=new Date(lastMod||ts),ok=!isNaN(d.getTime()),s=ok?d.toLocaleString(lang=='es'?'es':'en-US',{dateStyle:'medium',timeStyle:'short'}):String(ts);return(lang=='es'?'Última actualización: ':'Last updated: ')+s+' ('+ver+')'};
+function buildInfo(){const lg=typeof LANG!='undefined'?LANG:'en',show=lm=>toast(buildMsg(BUILD_TS,BUILD_VER,lg,lm));let done=0;const fin=lm=>{if(!done){done=1;show(lm)}};setTimeout(()=>fin(''),1500);try{fetch(location.pathname,{method:'HEAD',cache:'no-store'}).then(r=>fin(r.ok?r.headers.get('Last-Modified'):'')).catch(()=>fin(''))}catch(e){fin('')}}
+(function(){const h=document.querySelector('header h1');if(!h)return;h.style.cssText+=';user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;cursor:default';let n=0,tt=0,lp=0,fired=0;
+h.addEventListener('pointerdown',()=>{fired=0;clearTimeout(lp);lp=setTimeout(()=>{fired=1;n=0;buildInfo()},600)});
+const cancel=()=>clearTimeout(lp);h.addEventListener('pointerleave',cancel);h.addEventListener('pointercancel',cancel);
+h.addEventListener('pointerup',()=>{cancel();if(fired)return;n++;clearTimeout(tt);tt=setTimeout(()=>n=0,700);if(n>=3){n=0;buildInfo()}});
+h.addEventListener('contextmenu',e=>e.preventDefault())})();
 const r1=n=>Math.round(n*10)/10;
 
 let adjDraft=null;
