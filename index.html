@@ -924,6 +924,24 @@ transition-duration:1ms!important;transition-delay:0ms!important;scroll-behavior
 :is(.card,.tile,.btn,.tab,.subtabs .stb,.ddb,.ftog,.chip,button.chip,.opt,.wkn,.fo,.ddo,.dpc,.hc,.crb,.dpn):is(:hover,:active,:focus-visible){transform:none!important}
 }
 html.glgo .rt{z-index:210}html.glgo #toast{z-index:220}
+
+/* ===== v59: Water + Creatine share one row as two equal tiles on phones ===== */
+@media(max-width:640px){
+.bento{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.bento>*,.bt-L>*,.bt-R>*,.bt-S>*,.bt-pair>*{grid-column:1/-1}
+.bento .bt-wat,.bento .bt-cre{grid-column:auto;aspect-ratio:1;min-width:0;padding:14px;border-radius:20px;transform:none!important;
+display:flex;flex-direction:column;justify-content:center;align-items:stretch;gap:8px}
+.bento .bt-wat{order:5}.bento .bt-cre{order:6}.bento .bt-stp{order:7}.bento .bt-slp{order:8}.bento .bt-nap{order:9}
+.bento .bt-wat .hdr,.bento .bt-cre .hdr{gap:6px;margin:0}
+.bento .bt-wat h3,.bento .bt-cre h3{font-size:1rem;white-space:nowrap}
+.bento .bt-wat .ibtn,.bento .bt-cre .ibtn{width:40px;min-width:40px;height:40px}
+.bento .bt-wat svg{max-width:100%}
+.bento .bt-wat .wrow{gap:12px;margin-top:0}
+.bento .bt-wat .wrow .wb{width:44px;height:44px;font-size:22px}
+.bento .bt-cre .crb{margin:0!important;min-height:44px;padding:8px;font-size:.8125rem;line-height:1.2;white-space:normal}
+.bento .bt-cre .kpi{margin:0!important;justify-content:center;gap:6px}
+.bento .bt-cre .kpi .big{font-size:1.75rem}
+}
 </style></head><body>
 <header><h1>Forma</h1><div class="hd"><div class="lgw"><button class="btn s lgb" data-lg="en" aria-label="English">EN</button><button class="btn s lgb" data-lg="es" aria-label="Español">ES</button></div><button class="btn s thb" data-a="theme" aria-label="Toggle light or dark">🌗</button></div></header>
 <nav id="nav"></nav><main id="main"></main><div id="glgroot"></div><div id="lgmroot"></div><div id="toast"></div><div class="mdl" id="wdl" hidden role="dialog" aria-modal="true"><div class="card" style="position:relative"><button class="gx" data-a="wx" aria-label="Close" style="position:absolute;top:10px;right:10px">✕</button><div style="font-size:44px">⚖️</div><h3>Daily weigh-in</h3><p class="mut">You have not logged your weight today.</p><div class="row" style="flex-wrap:wrap"><button class="btn p" data-a="wgo">Log now</button><button class="btn t" data-a="wlater">Later</button><button class="btn t" data-a="wskip">Not weighing today</button></div></div></div><div class="mdl" id="mdl" hidden><div class="card"><div style="font-size:44px">📏</div><h3>Monthly measurements</h3><p class="mut" id="mdt2"></p><div class="row" style="flex-wrap:nowrap"><button class="btn p" data-a="mgo">Measure now</button><button class="btn t" data-a="mlater">Tomorrow</button></div></div></div>
