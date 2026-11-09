@@ -621,6 +621,21 @@ display:flex;flex-direction:column;justify-content:center;align-items:stretch;ga
 .bento .bt-cre .kpi{margin:0!important;justify-content:center;gap:6px}
 .bento .bt-cre .kpi .big{font-size:1.75rem}
 }
+/* ===== v61: fix Water/Creatine row: equal columns, clear gap, no overflow, top-aligned headers ===== */
+@media(max-width:640px){
+.bento{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px;row-gap:16px;width:100%;max-width:100%;box-sizing:border-box}
+.bento .bt-wat,.bento .bt-cre{aspect-ratio:auto;width:auto;min-width:0;max-width:100%;box-sizing:border-box;overflow:hidden;
+justify-content:flex-start;align-items:stretch;align-self:stretch;gap:10px;padding:14px}
+.bento .bt-wat>*,.bento .bt-cre>*{min-width:0;max-width:100%;box-sizing:border-box}
+.bento .bt-wat .hdr,.bento .bt-cre .hdr{display:flex;align-items:center;justify-content:space-between;flex:none;min-height:36px;margin:0!important;gap:6px}
+.bento .bt-wat h3,.bento .bt-cre h3{margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:.9375rem;line-height:1.2}
+.bento .bt-wat .hdr .ibtn,.bento .bt-cre .hdr .ibtn{width:36px!important;min-width:36px!important;max-width:36px;height:36px!important;min-height:36px!important;padding:0;font-size:16px;flex:none}
+.bento .bt-wat svg{width:100%;max-width:100%;height:auto;flex:none}
+.bento .bt-wat .wrow{margin:auto 0 0;gap:10px;flex:none}
+.bento .bt-wat .wrow .wb{width:40px;height:40px;min-width:40px;min-height:40px;font-size:20px}
+.bento .bt-cre .crb{width:100%;max-width:100%;min-width:0;box-sizing:border-box;margin:auto 0 0!important;min-height:44px;height:auto;padding:8px 6px;font-size:.8125rem;line-height:1.2;white-space:normal;overflow-wrap:anywhere}
+.bento .bt-cre .kpi{margin:0!important;justify-content:center;gap:6px;flex:none}
+}
 </style></head><body>
 <header><h1>Forma</h1><div class="hd"><div class="lgw"><button class="btn s lgb" data-lg="en" aria-label="English">EN</button><button class="btn s lgb" data-lg="es" aria-label="Español">ES</button></div><button class="btn s" id="th" aria-label="Toggle light or dark">🌗</button></div></header>
 <nav id="nav"></nav><main id="main"></main><div id="glgroot"></div><div id="lgmroot"></div><div id="toast"></div><div class="mdl" id="wdl" hidden role="dialog" aria-modal="true"><div class="card" style="position:relative"><button class="gx" data-a="wx" aria-label="Close" style="position:absolute;top:10px;right:10px">✕</button><div style="font-size:44px">⚖️</div><h3>Daily weigh-in</h3><p class="mut">You have not logged your weight today.</p><div class="row" style="flex-wrap:wrap"><button class="btn p" data-a="wgo">Log now</button><button class="btn t" data-a="wlater">Later</button><button class="btn t" data-a="wskip">Not weighing today</button></div></div></div><div class="mdl" id="sdl" hidden role="dialog" aria-modal="true"><div class="card" style="position:relative"><button class="gx" data-a="sx" aria-label="Close" style="position:absolute;top:10px;right:10px">✕</button><div style="font-size:44px">😴</div><h3>Sleep log</h3><p class="mut">You have not logged last night's sleep.</p><div class="row" style="flex-wrap:wrap"><button class="btn p" data-a="sgo">Log now</button><button class="btn t" data-a="slater">Later</button><button class="btn t" data-a="sskip">Didn't track sleep</button></div></div></div><div class="mdl" id="mdl" hidden><div class="card"><div style="font-size:44px">📏</div><h3>Monthly measurements</h3><p class="mut" id="mdt2"></p><div class="row" style="flex-wrap:nowrap"><button class="btn p" data-a="mgo">Measure now</button><button class="btn t" data-a="mlater">Tomorrow</button></div></div></div>
