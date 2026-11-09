@@ -1164,4 +1164,19 @@ LANG=S.lang||((navigator.language||'').toLowerCase().startsWith('es')?'es':'en')
 new MutationObserver(rs=>{for(const r of rs){if(r.type=='characterData')tr(r.target);r.addedNodes.forEach(tr)}}).observe(document.body,{childList:true,subtree:true,characterData:true});tr(document.body);
 document.addEventListener('keydown',e=>{if(e.key!='Enter')return;const m={stv:'stset',slv:'slset'}[e.target.id];if(m){e.preventDefault();const b=document.querySelector('[data-a="'+m+'"]');if(b)b.click()}});
 setInterval(wtick,20000);go('today');if(!S.done){$('#ob').hidden=false;obr()}else mprompt()
+
+(function(){
+if(!('serviceWorker'in navigator))return;
+if(location.protocol!=='https:'&&location.hostname!=='localhost'&&location.hostname!=='127.0.0.1')return;
+navigator.serviceWorker.register('sw.js').then(function(reg){
+  try{reg.update();}catch(e){}
+  document.addEventListener('visibilitychange',function(){if(!document.hidden){try{reg.update();}catch(e){}}});
+}).catch(function(){});
+var hadCtl=!!navigator.serviceWorker.controller,reloaded=false;
+navigator.serviceWorker.addEventListener('controllerchange',function(){
+  if(!hadCtl||reloaded)return;
+  try{if(sessionStorage.getItem('swReloaded'))return;sessionStorage.setItem('swReloaded','1');}catch(e){}
+  reloaded=true;location.reload();
+});
+})();
 </script></body></html>

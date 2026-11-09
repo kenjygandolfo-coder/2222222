@@ -2,12 +2,12 @@
    Paired with index.html; they must be served from the same folder. Bump CACHE
    whenever you want returning installs to drop the old shell. User data lives
    in localStorage, which the worker never touches, so a cache reset is safe. */
-const CACHE = 'forma-v42';
+const CACHE = 'forma-v43';
 const SHELL = ['./', 'index.html', 'gymapp.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
   self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL).catch(() => {})));
+  e.waitUntil(caches.open(CACHE).then(c => Promise.all(SHELL.map(u => c.add(new Request(u, {cache: 'reload'})).catch(() => {})))));
 });
 
 self.addEventListener('activate', e => {
@@ -29,7 +29,7 @@ self.addEventListener('fetch', e => {
   // Page loads: network-first so an updated app wins, cache as the offline fallback.
   if (r.mode === 'navigate') {
     e.respondWith(
-      fetch(r)
+      fetch(r, {cache: 'no-store'})
         .then(res => { const cp = res.clone(); caches.open(CACHE).then(c => c.put(r, cp)); return res; })
         .catch(() => caches.match(r).then(m => m || caches.match('index.html') || caches.match('./')))
     );
