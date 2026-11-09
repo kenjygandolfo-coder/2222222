@@ -774,6 +774,13 @@ color:var(--mut);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
 
 /* ===== v19: caption tier + common-region date badge (8pt rhythm) ===== */
 .cap{font-size:clamp(.75rem,.72rem + .1vw,.875rem);line-height:1.5;color:var(--mut);margin:8px 0 0;max-width:60ch}
+.ttw{position:relative;margin-top:8px;touch-action:pan-y}.tth{position:absolute;left:0;right:0;height:0;border-top:1px solid var(--line)}.tth span{position:absolute;left:0;top:-8px;width:46px;font-size:11px;color:var(--mut);background:var(--card);font-variant-numeric:tabular-nums}
+.ttb{position:absolute;box-sizing:border-box;border-radius:16px;display:flex;align-items:stretch;overflow:hidden;box-shadow:var(--sh);z-index:1;transition:box-shadow .2s}.ttb.sel{outline:3px solid var(--ink)}.ttb.drag{z-index:5;box-shadow:var(--shh);opacity:.92}
+.ttm{flex:1;min-width:0;display:flex;align-items:center;gap:10px;border:0;background:transparent;font:inherit;text-align:left;padding:0 4px 0 10px;cursor:pointer;box-shadow:none;border-radius:0;overflow:hidden}.ttm:hover{transform:none;box-shadow:none}
+.tti{font-size:26px;line-height:1;flex:none}.ttx{display:flex;flex-direction:column;min-width:0;line-height:1.2}.ttx b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ttx small{font-size:11px;opacity:.85;white-space:nowrap}
+.ttg{flex:none;width:40px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;background:rgba(0,0,0,.14)}.ttb.drag .ttg{cursor:grabbing}
+.ttn{position:absolute;left:48px;right:0;height:0;border-top:2px solid #E53935;z-index:6;pointer-events:none}.ttn::before{content:"";position:absolute;left:-5px;top:-6px;width:10px;height:10px;border-radius:50%;background:#E53935}.ttn b{position:absolute;right:0;top:-18px;font-size:11px;font-weight:600;color:#fff;background:#E53935;border-radius:8px;padding:1px 6px}
+.ttpal{display:flex;flex-wrap:wrap;gap:8px}.ttic,.ttco{width:44px;height:44px;border-radius:14px;border:2px solid transparent;cursor:pointer;font-size:22px;padding:0;background:var(--card);box-shadow:none;display:inline-flex;align-items:center;justify-content:center}.ttic.on,.ttco.on{border-color:var(--ink)}
 .dbg{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
 margin-bottom:24px;padding:16px 24px;border-radius:24px;
 background:color-mix(in srgb,var(--olv-t) 10%,var(--card));
@@ -1063,6 +1070,58 @@ if(!Array.isArray(S.habits))S.habits=[];
    A day with no mood AND empty text is never persisted: saving a cleared entry
    deletes its key (see the jsave/jdel handlers). Persisted via the shared save(). */
 if(!S.journal||typeof S.journal!='object'||Array.isArray(S.journal))S.journal={};
+/* Planner > Journal > Daily routine (TimeTune-style). A weekday-assigned set of
+   routine TEMPLATES (an "ideal day"), not a dated calendar. Shape:
+     S.tt = {n, templates:[{id,name,blocks:[{id,title,icon,color,s,e}]}],
+             assign:{Mon:templateId,...,Sun:templateId}}
+   s/e are minutes since midnight (0..1440, e>s). color is one of TT_PAL hex values.
+   The pure helpers between the TT-PURE markers are loaded VERBATIM by
+   tools/timetune.test.mjs; keep them free of DOM and S access. */
+/* TT-PURE-START */
+const TT_DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const TT_PAL=[['Meal','#F59E0B'],['Gym','#EF4444'],['Work','#3B82F6'],['Sleep','#6366F1'],['Study','#8B5CF6'],['Leisure','#10B981'],['Chores','#EC4899'],['Other','#14B8A6']];
+const TT_ICONS=['🍴','🏋️','💻','😴','🍳','📚','🚶','🧘','🚿','🚌','🎮','👥','☕','🛒','🏠','⏰'];
+const TT_PPM=1,TT_MINLEN=5;
+function ttMin(s){const m=/^(\d{1,2}):(\d{2})$/.exec(String(s==null?'':s));if(!m)return NaN;const h=+m[1],n=+m[2];if(h>24||n>59||(h==24&&n))return NaN;return h*60+n}
+function ttFmt(m){m=Math.max(0,Math.min(1440,Math.round(+m||0)));return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')}
+function ttInp(m){return m>=1440?'00:00':ttFmt(m)}
+function ttEnd(s){const m=ttMin(s);return m===0?1440:m}
+function ttSnap(m,step){step=step>0?step:5;return Math.round(m/step)*step}
+function ttClamp(s,e){s=Math.max(0,Math.min(1440-TT_MINLEN,Math.round(+s||0)));e=Math.max(s+TT_MINLEN,Math.min(1440,Math.round(+e||0)));return[s,e]}
+function ttMove(b,ns,step){const d=b.e-b.s;let s=ttSnap(ns,step);s=Math.max(0,Math.min(1440-d,s));return{s,e:s+d}}
+function ttPx(min,ppm){return Math.round(min*(ppm||TT_PPM))}
+function ttFromPx(px,ppm){return px/(ppm||TT_PPM)}
+function ttInk(hex){const m=/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex||'');if(!m)return'#fff';const l=(0.299*parseInt(m[1],16)+0.587*parseInt(m[2],16)+0.114*parseInt(m[3],16))/255;return l>0.6?'#1b1b1b':'#fff'}
+function ttLayout(blocks){const o=blocks.slice().sort((a,b)=>a.s-b.s||a.e-b.e),out={};let cl=[],end=-1;
+const flush=()=>{const n=cl.reduce((m,x)=>Math.max(m,x.lane+1),1);cl.forEach(x=>{out[x.b.id]={lane:x.lane,lanes:n}});cl=[]};
+let laneEnd=[];
+for(const b of o){if(cl.length&&b.s>=end){flush();laneEnd=[]}
+let ln=laneEnd.findIndex(v=>v<=b.s);if(ln<0){ln=laneEnd.length;laneEnd.push(b.e)}else laneEnd[ln]=b.e;
+cl.push({b,lane:ln});end=cl.length>1?Math.max(end,b.e):b.e}
+if(cl.length)flush();return out}
+function ttDay(ds){const[y,m,d]=String(ds).split('-').map(Number);return TT_DAYS[(new Date(y,m-1,d).getDay()+6)%7]}
+function ttFor(tt,ds){const id=tt.assign[ttDay(ds)];return tt.templates.find(t=>t.id==id)||null}
+function ttNowMin(d){return d.getHours()*60+d.getMinutes()}
+function ttAssign(tt,day,id){if(TT_DAYS.includes(day)&&tt.templates.some(t=>t.id==id))tt.assign[day]=id;return tt}
+function ttDelTpl(tt,id){if(tt.templates.length<2)return false;tt.templates=tt.templates.filter(t=>t.id!=id);TT_DAYS.forEach(d=>{if(tt.assign[d]==id)tt.assign[d]=tt.templates[0].id});return true}
+function ttDefault(){const B=(id,title,icon,color,s,e)=>({id,title,icon,color,s:s*60,e:e*60});
+return{n:100,templates:[
+{id:'wd',name:'Weekdays',blocks:[B('a1','Sleep','😴','#6366F1',0,7),B('a2','Breakfast','🍳','#F59E0B',7,8),B('a3','Work','💻','#3B82F6',9,13),B('a4','Lunch','🍴','#F59E0B',13,14),B('a5','Work','💻','#3B82F6',14,18),B('a6','Gym','🏋️','#EF4444',18,19),B('a7','Dinner','🍴','#F59E0B',20,21),B('a8','Sleep','😴','#6366F1',23,24)]},
+{id:'we',name:'Weekend',blocks:[B('b1','Sleep','😴','#6366F1',0,8),B('b2','Breakfast','🍳','#F59E0B',8,9),B('b3','Leisure','🎮','#10B981',10,12),B('b4','Lunch','🍴','#F59E0B',13,14),B('b5','Gym','🏋️','#EF4444',16,17),B('b6','Dinner','🍴','#F59E0B',20,21),B('b7','Sleep','😴','#6366F1',23,24)]}],
+assign:{Mon:'wd',Tue:'wd',Wed:'wd',Thu:'wd',Fri:'wd',Sat:'we',Sun:'we'}}}
+function ttBlk(b){if(!b||typeof b!='object')return null;const s=+b.s,e=+b.e;if(!isFinite(s)||!isFinite(e))return null;const c=ttClamp(s,e),pal=TT_PAL.find(p=>p[1].toLowerCase()==String(b.color).toLowerCase());
+return{id:b.id==null?'':String(b.id),title:String(b.title==null?'':b.title).slice(0,40),icon:String(b.icon||'⏰').slice(0,8),color:pal?pal[1]:TT_PAL[TT_PAL.length-1][1],s:c[0],e:c[1]}}
+function ttNorm(x){if(!x||typeof x!='object'||Array.isArray(x))return ttDefault();
+let n=isFinite(+x.n)&&+x.n>=100?Math.floor(+x.n):100;const seen={},tp=[];
+(Array.isArray(x.templates)?x.templates:[]).forEach(t=>{if(!t||typeof t!='object'||t.id==null||seen['t'+t.id])return;seen['t'+t.id]=1;const ids={};
+const bl=(Array.isArray(t.blocks)?t.blocks:[]).map(ttBlk).filter(Boolean);bl.forEach(b=>{if(!b.id||ids[b.id])b.id='x'+(n++);ids[b.id]=1});
+tp.push({id:String(t.id),name:String(t.name==null?'':t.name).slice(0,40)||'Routine',blocks:bl.sort((a,b)=>a.s-b.s||a.e-b.e)})});
+if(!tp.length)return ttDefault();
+const as={},src=x.assign&&typeof x.assign=='object'?x.assign:{};
+TT_DAYS.forEach((d,i)=>{as[d]=tp.some(t=>t.id==src[d])?String(src[d]):(i>4&&tp[1]?tp[1].id:tp[0].id)});
+return{n,templates:tp,assign:as}}
+/* TT-PURE-END */
+S.tt=ttNorm(S.tt);
 /* Planner > Bookmarks (Phase 5). Bookmark shape:
    {id, url, title, desc, tag, created, updated}.
    - url is the SANITIZED http/https string (required). It is produced by
@@ -1094,7 +1153,7 @@ const toast=m=>{const t=$('#toast');t.textContent=m;t.className='on';clearTimeou
 /* ===== Build info: triple tap or long press on the Forma logo shows the last update time =====
    UPDATE BUILD_TS AND BUILD_VER ON EVERY CHANGE, together with the CACHE name in sw.js
    (BUILD_VER must equal sw.js CACHE). BUILD_TS is an ISO-8601 UTC string. */
-const BUILD_TS='2026-11-09T04:54:19Z',BUILD_VER='forma-v70';
+const BUILD_TS='2026-11-09T04:57:21Z',BUILD_VER='forma-v71';
 const buildMsg=(ts,ver,lang,lastMod)=>{const d=new Date(lastMod||ts),ok=!isNaN(d.getTime()),s=ok?d.toLocaleString(lang=='es'?'es':'en-US',{dateStyle:'medium',timeStyle:'short'}):String(ts);return(lang=='es'?'Última actualización: ':'Last updated: ')+s+' ('+ver+')'};
 function buildInfo(){const lg=typeof LANG!='undefined'?LANG:'en',show=lm=>toast(buildMsg(BUILD_TS,BUILD_VER,lg,lm));let done=0;const fin=lm=>{if(!done){done=1;show(lm)}};setTimeout(()=>fin(''),1500);try{fetch(location.pathname,{method:'HEAD',cache:'no-store'}).then(r=>fin(r.ok?r.headers.get('Last-Modified'):'')).catch(()=>fin(''))}catch(e){fin('')}}
 (function(){const h=document.querySelector('header h1');if(!h)return;h.style.cssText+=';user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;cursor:default';let n=0,tt=0,lp=0,fired=0;
@@ -1446,6 +1505,7 @@ return`<div class="card" style="margin-bottom:8px"><div class="row" style="justi
 return`<h2>Journal</h2>
 ${editor}
 ${summaryCard}
+${ttView()}
 <h3 style="margin:16px 0 8px">History</h3>
 ${keys.length?keys.map(row).join(''):'<p class="mut">No entries yet.</p>'}`},
 
@@ -2686,6 +2746,43 @@ function jload(k){const e=S.journal[k]||{};jdraft={mood:e.mood||0,text:e.text||'
    mood face) keeps the user's typed text. Mirrors tcap()/ncap()/hcap(). */
 function jcap(){const t=$('#jk_text');if(t)jdraft.text=t.value}
 
+/* ---- Daily routine (TimeTune-style timeline) UI. Pure helpers live above
+   (TT-PURE). ttSel = template being viewed (default: today's), ttEd = block
+   being edited ('new' | id | null), ttd = its draft (minutes), ttOpen = shown. */
+let ttSel=null,ttEd=null,ttd={},ttOpen=true,ttDrag=null;
+function ttCur(){const t=S.tt.templates;return t.find(x=>x.id==ttSel)||ttFor(S.tt,today())||t[0]}
+function ttCap(){const a=$('#tt_title'),s=$('#tt_s'),e=$('#tt_e');if(a)ttd.title=a.value;if(s){const m=ttMin(s.value);if(!isNaN(m)&&m<1440)ttd.s=m}if(e){const m=ttEnd(e.value);if(!isNaN(m))ttd.e=m}}
+function ttNowTick(){const n=$('#ttn');if(!n)return;const m=ttNowMin(new Date());n.style.top=ttPx(m)+'px';const l=n.querySelector('b');if(l)l.textContent=ttFmt(m)}
+function ttView(){const tt=S.tt,cur=ttCur();
+const head=`<div class="row" style="justify-content:space-between;gap:8px;align-items:center"><h3 style="margin:0">Daily routine</h3><button class="btn s" style="flex:none" data-a="ttopen">${ttOpen?'Hide':'Show'}</button></div>`;
+if(!ttOpen)return`<div class="card tt">${head}</div>`;
+const chips=tt.templates.map(t=>`<button class="chip ${t.id==cur.id?'on':''}" data-a="ttpick" data-id="${esc(t.id)}">${esc(t.name)}</button>`).join('')+`<button class="chip" data-a="ttnew">+ New routine</button>`;
+const days=TT_DAYS.map(d=>`<button class="btn s ${tt.assign[d]==cur.id?'on':''}" style="padding:8px 0" data-a="ttday" data-d="${d}" aria-pressed="${tt.assign[d]==cur.id?'true':'false'}">${d}</button>`).join('');
+let ed='';
+if(ttEd!=null){const d=ttd;
+const ic=TT_ICONS.map(i=>`<button class="ttic ${d.icon==i?'on':''}" data-a="tticon" data-v="${i}" aria-label="Icon ${i}">${i}</button>`).join('');
+const co=TT_PAL.map(p=>`<button class="ttco ${d.color==p[1]?'on':''}" style="background:${p[1]}" data-a="ttcol" data-v="${p[1]}" aria-label="${p[0]}" aria-pressed="${d.color==p[1]?'true':'false'}" title="${p[0]}"></button>`).join('');
+ed=`<div class="card" id="tted" style="background:var(--bg)"><h3>${ttEd=='new'?'New block':'Edit block'}</h3>
+<label class="f">Title<input id="tt_title" value="${esc(d.title)}" maxlength="40" placeholder="Title" aria-label="Title"></label>
+<div class="row" style="flex-wrap:nowrap;gap:8px"><label class="f" style="flex:1;min-width:0">Start<input id="tt_s" type="time" step="300" value="${ttInp(d.s)}"></label><label class="f" style="flex:1;min-width:0">End<input id="tt_e" type="time" step="300" value="${ttInp(d.e)}"></label></div>
+<div class="row" style="margin-top:8px"><button class="btn s" style="flex:none" data-a="ttup">Move up</button><button class="btn s" style="flex:none" data-a="ttdn">Move down</button></div>
+<div class="f" style="margin-top:12px">Category</div><div class="ttpal">${co}</div>
+<div class="f" style="margin-top:12px">Icon</div><div class="ttpal">${ic}</div>
+<div class="row" style="margin-top:16px"><button class="btn p" data-a="ttsave">Save block</button><button class="btn t" data-a="ttcancel">Cancel</button>${ttEd!='new'?`<button class="btn t" data-a="ttbdel">Delete</button>`:''}</div></div>`}
+const lay=ttLayout(cur.blocks),hrs=[];for(let h=0;h<=24;h++)hrs.push(`<div class="tth" style="top:${ttPx(h*60)}px"><span>${ttFmt(h*60)}</span></div>`);
+const blocks=cur.blocks.map(b=>{const l=lay[b.id]||{lane:0,lanes:1},ink=ttInk(b.color),h=Math.max(ttPx(b.e-b.s),22);
+return`<div class="ttb ${ttEd==b.id?'sel':''}" data-id="${esc(b.id)}" style="top:${ttPx(b.s)}px;height:${h}px;left:calc(54px + ${l.lane} * (100% - 58px) / ${l.lanes});width:calc((100% - 58px) / ${l.lanes} - 4px);background:${b.color};color:${ink}">
+<button class="ttm" data-a="ttedit" data-id="${esc(b.id)}" style="color:${ink}"><span class="tti" aria-hidden="true">${esc(b.icon)}</span><span class="ttx"><b>${esc(b.title||'(Untitled)')}</b><small class="ttt">${ttFmt(b.s)} - ${ttFmt(b.e)}</small></span></button><div class="ttg" role="presentation" aria-label="Drag to move" title="Drag to move">⋮</div></div>`}).join('');
+const nm=ttNowMin(new Date());
+return`<div class="card tt">${head}
+<p class="cap" style="margin:4px 0 8px">Plan an ideal day. Drag the handle on a block to move it, or tap a block to set exact times.</p>
+<div class="chips">${chips}</div>
+<label class="f">Routine name<input id="tt_name" value="${esc(cur.name)}" maxlength="40" aria-label="Routine name"></label>
+<div class="f" style="margin-top:8px">Use on these days</div><div class="seg" style="gap:4px">${days}</div>
+<div class="row" style="margin:0 0 8px"><button class="btn p" style="flex:none" data-a="ttadd">+ Add block</button><button class="btn s" style="flex:none" data-a="ttnow">Now</button>${tt.templates.length>1?`<button class="btn s t" style="flex:none" data-a="ttdel">Delete routine</button>`:''}</div>
+${ed}
+<div class="ttw" id="ttw" style="height:${ttPx(1440)}px">${hrs.join('')}${blocks}<div class="ttn" id="ttn" style="top:${ttPx(nm)}px" aria-label="Now"><b>${ttFmt(nm)}</b></div></div></div>`}
+
 /* Hand-written vanilla-JS Markdown renderer. NO external libraries.
    SECURITY: the raw input is HTML-escaped FIRST via esc() (& < > "), so no
    user HTML can ever reach the DOM; Markdown transforms run only on the
@@ -3132,6 +3229,14 @@ b.setAttribute('aria-label',d?'Dark theme on. Switch to light':'Light theme on. 
 b.setAttribute('aria-pressed',d?'true':'false')})}
 function thToggle(){const r=document.documentElement;S.mode=r.dataset.theme=thDark()?'light':'dark';save();thSync()}
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{if(!S.mode)thSync()});
+/* Daily routine drag: pointer events on the .ttg handle only (touch-action:none),
+   so the page still scrolls when a finger starts on the block body. */
+document.addEventListener('pointerdown',e=>{const g=e.target.closest&&e.target.closest('.ttg');if(!g)return;const el=g.closest('.ttb'),c=ttCur(),bk=el&&c&&c.blocks.find(x=>x.id==el.dataset.id);if(!bk)return;e.preventDefault();try{g.setPointerCapture(e.pointerId)}catch(x){}ttDrag={el,bk,y0:e.pageY,s0:bk.s,ns:bk.s,pid:e.pointerId};el.classList.add('drag')});
+document.addEventListener('pointermove',e=>{if(!ttDrag||e.pointerId!=ttDrag.pid)return;e.preventDefault();if(e.clientY<90)scrollBy(0,-14);else if(e.clientY>innerHeight-120)scrollBy(0,14);const m=ttMove(ttDrag.bk,ttDrag.s0+ttFromPx(e.pageY-ttDrag.y0),5);ttDrag.ns=m.s;ttDrag.el.style.top=ttPx(m.s)+'px';const t=ttDrag.el.querySelector('.ttt');if(t)t.textContent=ttFmt(m.s)+' - '+ttFmt(m.e)});
+function ttDragEnd(e,ok){if(!ttDrag||e.pointerId!=ttDrag.pid)return;const d=ttDrag;ttDrag=null;if(ok&&d.ns!=d.s0){const m=ttMove(d.bk,d.ns,5);d.bk.s=m.s;d.bk.e=m.e;ttCur().blocks.sort((p,q)=>p.s-q.s||p.e-q.e);save()}render()}
+document.addEventListener('pointerup',e=>ttDragEnd(e,true));document.addEventListener('pointercancel',e=>ttDragEnd(e,false));
+document.addEventListener('change',e=>{if(e.target.id!='tt_name')return;const c=ttCur();c.name=(e.target.value||'').trim().slice(0,40)||c.name;save();render()});
+setInterval(ttNowTick,60000);
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const a=b.dataset.a,d=today(),v=id=>$('#'+id).value;
 if(b.dataset.lg){setLang(b.dataset.lg);return}
 if(b.dataset.sec){if(b.dataset.sec!=sec)scrollOf[sec]=scrollY;goSection(b.dataset.sec);const y=scrollOf[b.dataset.sec]||0;scrollTo(0,y);return}
@@ -3373,6 +3478,20 @@ else if(a=='jmood'){jcap();jdraft.mood=+b.dataset.v;render();return}
 else if(a=='jsave'){jcap();const mood=jdraft.mood||0,text=(jdraft.text||'').trim();if(!mood&&!text){const had=!!S.journal[jdate];delete S.journal[jdate];jdraft={mood:0,text:''};save();render();if(had)toast('Entry deleted');return}S.journal[jdate]={mood,text,updated:Date.now()};jdraft={mood,text};save();render();toast('Entry saved');return}
 else if(a=='jedit'){jdate=b.dataset.d;jload(jdate);scrollTo(0,0);render();return}
 else if(a=='jdel'){const k=b.dataset.d;delete S.journal[k];if(k==jdate){jdraft={mood:0,text:''}}save();render();toast('Entry deleted');return}
+else if(a=='ttopen'){ttOpen=!ttOpen;render();return}
+else if(a=='ttpick'){ttSel=b.dataset.id;ttEd=null;render();return}
+else if(a=='ttnew'){const id='x'+(S.tt.n++);S.tt.templates.push({id,name:'Routine '+(S.tt.templates.length+1),blocks:[]});ttSel=id;ttEd=null;save();render();return}
+else if(a=='ttday'){ttAssign(S.tt,b.dataset.d,ttCur().id);save();render();return}
+else if(a=='ttdel'){const c=ttCur();if(!ttDelTpl(S.tt,c.id))return toast('Keep at least one routine');ttSel=null;ttEd=null;save();render();toast('Routine deleted');return}
+else if(a=='ttnow'){const n=$('#ttn');if(n)scrollTo(0,Math.max(0,n.getBoundingClientRect().top+scrollY-200));return}
+else if(a=='ttadd'){const c=ttCur(),last=c.blocks.reduce((m,x)=>Math.max(m,x.e),0),s=Math.min(last,1380);ttd={title:'',icon:TT_ICONS[TT_ICONS.length-1],color:TT_PAL[0][1],s,e:Math.min(1440,s+60)};ttEd='new';render();const el=$('#tted');if(el)el.scrollIntoView({block:'center'});return}
+else if(a=='ttedit'){const x=ttCur().blocks.find(q=>q.id==b.dataset.id);if(!x)return;ttd={title:x.title,icon:x.icon,color:x.color,s:x.s,e:x.e};ttEd=x.id;render();const el=$('#tted');if(el)el.scrollIntoView({block:'center'});return}
+else if(a=='ttcancel'){ttEd=null;render();return}
+else if(a=='tticon'){ttCap();ttd.icon=b.dataset.v;render();return}
+else if(a=='ttcol'){ttCap();ttd.color=b.dataset.v;render();return}
+else if(a=='ttup'||a=='ttdn'){ttCap();const m=ttMove(ttd,ttd.s+(a=='ttup'?-15:15),15);ttd.s=m.s;ttd.e=m.e;render();return}
+else if(a=='ttsave'){ttCap();const title=(ttd.title||'').trim();if(!title)return toast('Add a title');if(ttd.e<=ttd.s)return toast('End must be after start');const c=ttCur(),cl=ttClamp(ttd.s,ttd.e),f={title,icon:ttd.icon||'⏰',color:ttd.color,s:cl[0],e:cl[1]};if(ttEd=='new')c.blocks.push({id:'x'+(S.tt.n++),...f});else{const x=c.blocks.find(q=>q.id==ttEd);if(x)Object.assign(x,f)}c.blocks.sort((p,q)=>p.s-q.s||p.e-q.e);ttEd=null;save();render();toast('Block saved');return}
+else if(a=='ttbdel'){const c=ttCur();c.blocks=c.blocks.filter(q=>q.id!=ttEd);ttEd=null;save();render();toast('Block deleted');return}
 else if(a=='bmnew'){bmdraft={url:'',title:'',desc:'',tag:''};bmedit='new';render();return}
 else if(a=='bmedit'){const bm=S.bookmarks.find(x=>x.id==+b.dataset.id);if(!bm)return;bmdraft={url:bm.url||'',title:bm.title||'',desc:bm.desc||'',tag:bm.tag||''};bmedit=bm.id;scrollTo(0,0);render();return}
 else if(a=='bmcancel'){bmedit=null;render();return}
@@ -3387,6 +3506,7 @@ else return;save();if(['gsw','gpick','sgd','sgday','sgunit','sginc','sgmic','sge
 function ap(){const r=document.documentElement;if(r.dataset.th)delete r.dataset.th;if(S.th){delete S.th;save()}if(S.mode)r.dataset.theme=S.mode}ap();thSync();
 let LANG='en',LOC='en-US',DOW='MTWTFSS',DWK='MON TUE WED THU FRI SAT SUN';
 const D={
+"Daily routine":"Rutina diaria","Hide":"Ocultar","Show":"Mostrar","+ New routine":"+ Nueva rutina","Routine name":"Nombre de la rutina","Use on these days":"Usar en estos días","+ Add block":"+ Añadir bloque","Now":"Ahora","Delete routine":"Eliminar rutina","New block":"Nuevo bloque","Edit block":"Editar bloque","Start":"Inicio","End":"Fin","Category":"Categoría","Icon":"Icono","Save block":"Guardar bloque","Move up":"Subir","Move down":"Bajar","Add a title":"Añade un título","End must be after start":"El fin debe ser posterior al inicio","Keep at least one routine":"Conserva al menos una rutina","Routine deleted":"Rutina eliminada","Block saved":"Bloque guardado","Block deleted":"Bloque eliminado","Drag to move":"Arrastra para mover","Plan an ideal day. Drag the handle on a block to move it, or tap a block to set exact times.":"Planifica un día ideal. Arrastra el asa de un bloque para moverlo, o toca un bloque para fijar horas exactas.","Weekdays":"Entre semana","Weekend":"Fin de semana","Meal":"Comida","Gym":"Gimnasio","Work":"Trabajo","Sleep":"Sueño","Study":"Estudio","Leisure":"Ocio","Chores":"Tareas","Other":"Otro","Breakfast":"Desayuno","Lunch":"Almuerzo","Dinner":"Cena","(Untitled)":"(Sin título)","Title":"Título","Routine":"Rutina",
 "Notes":"Notas","New note":"Nueva nota","Edit note":"Editar nota","Note":"Nota","Write in Markdown…":"Escribe en Markdown…","Preview":"Vista previa","Markdown supported":"Markdown admitido","No notes yet":"Aún no hay notas","Save note":"Guardar nota","Note saved":"Nota guardada","Note deleted":"Nota eliminada","(Untitled)":"(Sin título)","Updated":"Modificado",
 "Close":"Cerrar","Failure. Every set of isolation and machine lifts":"Fallo. Todas las series de ejercicios aislados y de máquina","Top end of heavy compounds":"Extremo alto de los compuestos pesados","Stop timer":"Detener temporizador","Rest over, next set":"Descanso terminado, siguiente serie","Heavy compound · rest 3–4 min":"Compuesto pesado · descanso 3–4 min","Isolation lift · rest 2 min":"Ejercicio de aislamiento · descanso 2 min","Heavy compound":"Compuesto pesado","Isolation lift":"Ejercicio de aislamiento","RIR is required for every set.":"El RIR es obligatorio en cada serie.","⏱ Auto-start rest":"⏱ Descanso automático","⏱ Heavy 3:30":"⏱ Pesado 3:30","⏱ Isolation 2:00":"⏱ Aislamiento 2:00","Deload week: about half the sets, lighter weights, stop 3–4 reps short of failure.":"Semana de descarga: aproximadamente la mitad de las series, pesos más ligeros y detén cada serie 3–4 repeticiones antes del fallo.","Too close to failure for this target":"Demasiado cerca del fallo para este objetivo","Easier than planned":"Más fácil de lo planeado","Room to spare: add a rep or a little weight":"Te sobró margen: añade una repetición o un poco de peso","Push closer to failure on isolation lifts":"Acércate más al fallo en los ejercicios aislados","✅ On target":"✅ En el objetivo","Enter RIR (0–5) for every set":"Escribe el RIR (0–5) en cada serie","Workout saved · some sets were off the RIR target":"Entrenamiento guardado · algunas series se salieron del objetivo de RIR","📈 Strength progress":"📈 Progreso de fuerza","Squat":"Sentadilla","🏋️ Squat":"🏋️ Sentadilla","Deadlift":"Peso muerto","Estimated 1RM":"1RM estimado","No sessions logged yet. Log a workout with this lift to start your chart.":"Aún no hay sesiones. Registra un entrenamiento con este ejercicio para iniciar tu gráfico.","Log one more session to see the trend.":"Registra una sesión más para ver la tendencia.","Estimated 1RM per session from your best set, adjusted for the reps you had left (RIR). Deload sessions are left out.":"1RM estimado por sesión a partir de tu mejor serie, ajustado según las repeticiones que te quedaban (RIR). Las sesiones de descarga no se incluyen.","⚠️ Possible recovery issue":"⚠️ Posible problema de recuperación","👀 Strength is stalling":"👀 La fuerza se está estancando","Your numbers are trending down. Plan a deload week: about half the sets, weights around 10% lighter, and every set 3–4 reps from failure. If that feels like too much, drop 1 set from every exercise for the next two weeks.":"Tus números van a la baja. Planifica una semana de descarga: aproximadamente la mitad de las series, pesos alrededor de un 10 % más ligeros y cada serie a 3–4 repeticiones del fallo. Si es demasiado, quita 1 serie de cada ejercicio durante las próximas dos semanas.","Try cutting 1–2 sets from the stalled lifts next session, hit your RIR targets and protect your sleep. If it continues, take a deload.":"Prueba a quitar 1–2 series de los ejercicios estancados en la próxima sesión, cumple tus objetivos de RIR y cuida tu sueño. Si continúa, haz una descarga.","Your heavy lifts are being taken to failure, which adds fatigue.":"Estás llevando los ejercicios pesados al fallo, lo que añade fatiga.","Start deload week":"Iniciar semana de descarga","Dismiss":"Descartar","End deload":"Terminar descarga","🔄 Deload week":"🔄 Semana de descarga","Until":"Hasta","Half the sets, weights about 10% lighter, every set stopped 3–4 reps short of failure.":"La mitad de las series, pesos un 10 % más ligeros y cada serie detenida 3–4 repeticiones antes del fallo.","Open the Gym tab to see what to do.":"Abre la pestaña Gimnasio para ver qué hacer.","View":"Ver","Deload week started":"Semana de descarga iniciada","Deload ended":"Descarga terminada","Edit":"Editar","Saved workout \u2014 tap Edit to change it.":"Entrenamiento guardado \u2014 toca Editar para cambiarlo.","Progression rep goal":"Meta de reps para progresar","hit this many reps to earn the next weight jump":"logra estas reps para ganar el siguiente salto de peso","Progression rep goal fixed at 3 per mini-set":"Meta de reps para progresar fija en 3 por mini-serie","Priming reps":"Reps de activación (pre-agotamiento)",
 "bar only":"solo la barra","Smith / resistance profile":"Barra Smith / máquina","Bar weight (lb)":"Peso de la barra (lb)","weight":"peso",

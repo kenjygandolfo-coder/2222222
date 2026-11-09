@@ -5,7 +5,7 @@
    On every change also update BUILD_TS and BUILD_VER (next to the toast helper
    in index.html and gymapp.html) so the logo triple tap/long press shows the
    right update time; BUILD_VER must equal CACHE. */
-const CACHE = 'forma-v70';
+const CACHE = 'forma-v71';
 const SHELL = ['./', 'index.html', 'gymapp.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
