@@ -957,6 +957,33 @@ justify-content:flex-start;align-items:stretch;align-self:stretch;gap:10px;paddi
 .bento .bt-cre .crb{width:100%;max-width:100%;min-width:0;box-sizing:border-box;margin:auto 0 0!important;min-height:44px;height:auto;padding:8px 6px;font-size:.8125rem;line-height:1.2;white-space:normal;overflow-wrap:anywhere}
 .bento .bt-cre .kpi{margin:0!important;justify-content:center;gap:6px;flex:none}
 }
+/* ===== v63: Water+Creatine (row 1) and Sleep+Steps (row 2) share one tile treatment (.tile2) on phones ===== */
+@media(max-width:640px){
+.bento .tile2{grid-column:auto;aspect-ratio:auto;width:auto;min-width:0;max-width:100%;box-sizing:border-box;overflow:hidden;display:flex;flex-direction:column;
+justify-content:flex-start;align-items:stretch;align-self:stretch;gap:10px;padding:14px;border-radius:20px;transform:none!important}
+.bento .tile2>*{min-width:0;max-width:100%;box-sizing:border-box;margin-top:0;margin-bottom:0}
+.bento .tile2>.hdr{display:flex;align-items:center;justify-content:space-between;flex:none;min-height:36px;margin:0!important;gap:6px}
+.bento .tile2>h3{min-height:36px;display:flex;align-items:center}
+.bento .tile2 h3{margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:.9375rem;line-height:1.2}
+.bento .tile2 .hdr .ibtn{width:36px!important;min-width:36px!important;max-width:36px;height:36px!important;min-height:36px!important;padding:0;font-size:16px;flex:none}
+.bento .bt-wat{order:5}.bento .bt-cre{order:6}.bento .bt-slp{order:7}.bento .bt-stp{order:8}
+.bento .bt-stp.tile2,.bento .bt-slp.tile2{display:flex}
+.bento .bt-stp .kpi,.bento .bt-slp .kpi{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 6px;margin:0!important}
+.bento .bt-stp .kpi .big,.bento .bt-slp .kpi .big{font-size:1.5rem;line-height:1.1}
+.bento .bt-stp .kpi .mut,.bento .bt-slp .kpi .mut{font-size:.75rem;line-height:1.2;overflow-wrap:anywhere}
+.bento .bt-stp .bar,.bento .bt-slp .bar{margin:0}
+.bento .bt-stp .hst,.bento .bt-slp .hst{padding:3px 8px;font-size:.6875rem;line-height:1.25;white-space:normal;max-width:100%}
+.bento .bt-stp .hq{flex-direction:column;gap:6px;margin:auto 0 0}
+.bento .bt-stp .hq .btn{width:100%;min-height:36px;padding:6px;font-size:.75rem}
+.bento .bt-slp .note{margin:0!important;padding:8px;font-size:.6875rem;line-height:1.3}
+.bento .bt-slp .note .mut{display:none}
+.bento .bt-slp .fld{margin:auto 0 0!important;display:flex;flex-direction:column;gap:6px}
+.bento .bt-slp .fld .row{flex-direction:column!important;flex-wrap:nowrap;align-items:stretch!important;gap:6px;margin:0}
+.bento .bt-slp .fld label{margin:0;font-size:.75rem}
+.bento .bt-slp .fld input{width:100%;min-width:0;box-sizing:border-box;font-size:.875rem;padding:8px}
+.bento .bt-slp .fld .btn{width:100%;min-width:0;max-width:100%;min-height:36px;margin:0!important;padding:6px;font-size:.75rem;align-self:stretch!important;white-space:normal;line-height:1.2}
+.bento .bt-slp .cap{display:none}
+}
 </style></head><body>
 <header><h1>Forma</h1><div class="hd"><div class="lgw"><button class="btn s lgb" data-lg="en" aria-label="English">EN</button><button class="btn s lgb" data-lg="es" aria-label="Español">ES</button></div><button class="btn s thb" data-a="theme" aria-label="Toggle light or dark">🌗</button></div></header>
 <nav id="nav"></nav><main id="main"></main><div id="glgroot"></div><div id="lgmroot"></div><div id="napsroot"></div><div id="toast"></div><div class="mdl" id="wdl" hidden role="dialog" aria-modal="true"><div class="card" style="position:relative"><button class="gx" data-a="wx" aria-label="Close" style="position:absolute;top:10px;right:10px">✕</button><div style="font-size:44px">⚖️</div><h3>Daily weigh-in</h3><p class="mut">You have not logged your weight today.</p><div class="row" style="flex-wrap:wrap"><button class="btn p" data-a="wgo">Log now</button><button class="btn t" data-a="wlater">Later</button><button class="btn t" data-a="wskip">Not weighing today</button></div></div></div><div class="mdl" id="sdl" hidden role="dialog" aria-modal="true"><div class="card" style="position:relative"><button class="gx" data-a="sx" aria-label="Close" style="position:absolute;top:10px;right:10px">✕</button><div style="font-size:44px">😴</div><h3>Sleep log</h3><p class="mut">You have not logged last night's sleep.</p><div class="row" style="flex-wrap:wrap"><button class="btn p" data-a="sgo">Log now</button><button class="btn t" data-a="slater">Later</button><button class="btn t" data-a="sskip">Didn't track sleep</button></div></div></div><div class="mdl" id="mdl" hidden><div class="card"><div style="font-size:44px">📏</div><h3>Monthly measurements</h3><p class="mut" id="mdt2"></p><div class="row" style="flex-wrap:nowrap"><button class="btn p" data-a="mgo">Measure now</button><button class="btn t" data-a="mlater">Tomorrow</button></div></div></div>
@@ -1122,12 +1149,12 @@ const slS=!sl?['Not logged yet','']:sl<6?['Under-recovered \u26a0\ufe0f','w']:sl
 const npS=!np?['No nap today','']:np<=.5?['Power nap ✅','ok']:np<=1.5?['Long nap','w']:['Very long nap','w'];
 return{st,sl,sr,cr,np,slCls,sa,la,na,cs,stS,slS,npS,low:(sl&&sl<6)||sr>=4}}
 function hab(d){const h=habd(d);
-return[`<div class="card bt-stp"><div class="hdr"><h3>👟 Steps</h3>${dtl('steps','Steps history and details')}</div>
+return[`<div class="card bt-stp tile2"><div class="hdr"><h3>👟 Steps</h3>${dtl('steps','Steps history and details')}</div>
 <div class="kpi"><span class="big">${n0(h.st)}</span><span class="mut">of 8,000–10,000</span></div>
 <div class="bar tg"><i style="width:${Math.min(100,h.st/STEP_MAX*100)}%"></i><b class="tk" style="left:${STEP_MIN/STEP_MAX*100}%"></b></div>
 <div><span class="hst ${h.stS[1]}">${h.stS[0]}</span></div>
 <div class="hq"><button class="btn" data-a="stadd" data-v="1000">+1,000</button><button class="btn" data-a="stadd" data-v="2000">+2,000</button><button class="btn" data-a="stadd" data-v="5000">+5,000</button></div></div>`,
-`<div class="card bt-slp"><div class="hdr"><h3>😴 Night sleep</h3>${dtl('sleep','Sleep history and details')}</div>
+`<div class="card bt-slp tile2"><div class="hdr"><h3>😴 Night sleep</h3>${dtl('sleep','Sleep history and details')}</div>
 <div class="kpi"><span class="big">${h.sl?r1(h.sl):'–'}</span><span class="mut">of 7–9 h</span></div>
 <div class="bar tg"><i style="width:${Math.min(100,h.sl/9*100)}%"></i><b class="tk" style="left:${7/9*100}%"></b></div>
 <div><span class="hst ${h.slS[1]}">${h.slS[0]}</span></div>
@@ -1135,7 +1162,7 @@ ${h.low?`<div class="note warn" style="margin-top:16px"><b>Ease off today</b><di
 <div class="fld"><label class="f" for="slv">Hours slept</label><div class="row" style="flex-wrap:nowrap;align-items:center"><input id="slv" class="acc" type="number" min="0" max="24" step="0.25" inputmode="decimal" value="${h.sl||''}" placeholder="e.g. 7.5"><button class="btn p" style="flex:none" data-a="slset">Save</button></div>
 <button class="btn s" style="margin-top:8px;align-self:flex-start" data-a="napo" aria-haspopup="dialog">😴 Add nap</button>
 <p class="cap">Sleep cycles run about 1 h 30 min, so totals like 6, 7.5 or 9 h usually feel better than waking mid-cycle.</p></div></div>`,
-`<div class="card wine bt-cre"><div class="hdr"><h3>💊 Creatine</h3>${dtl('creatine','Creatine history and details')}</div>
+`<div class="card wine bt-cre tile2"><div class="hdr"><h3>💊 Creatine</h3>${dtl('creatine','Creatine history and details')}</div>
 <button class="btn crb ${h.cr?'':'p'}" data-a="crtog">${h.cr?'Taken today ✅':'Mark as taken'}</button>
 <div class="kpi" style="margin:16px 0 0"><span class="big">${h.cs}</span><span class="mut">day streak</span></div></div>`]}
 function stepsDetail(d){const h=habd(d);
@@ -2740,7 +2767,7 @@ function wnext(d){const g=wgoal(d),gs=wgs(),w=S.wa[d]||0,left=Math.ceil((g.goal-
 function wgauge(d){const g=wgoal(d),gs=wgs(),w=S.wa[d]||0,gg=g.goal/gs,mx=Math.max(4,Math.ceil(gg*1.5)),t=Math.min(1,w/mx),A='M20 120A100 100 0 0 1 220 120';
 return`<svg id="wsv" viewBox="8 8 224 132" data-mx="${mx}" role="img" aria-label="${n0(w*gs)} of ${n0(g.goal)} ml logged, ${w} of ${Math.round(gg)} glasses" style="width:100%;max-width:360px;display:block;margin:0 auto"><defs><linearGradient id="wgr" x1="0" x2="1"><stop offset="0" style="stop-color:var(--olv-t)"/><stop offset="1" style="stop-color:var(--data-1)"/></linearGradient></defs><path d="${A}" pathLength="100" fill="none" stroke="var(--line)" stroke-width="16" stroke-linecap="round"/><path id="wpa" d="${A}" pathLength="100" fill="none" stroke="url(#wgr)" stroke-width="16" stroke-linecap="round" stroke-dasharray="${t*100} 100"/><text id="wtx" x="120" y="92" text-anchor="middle" style="font:italic 600 40px 'Cormorant Garamond',serif;fill:var(--olv-t)">${w}</text><text x="120" y="110" text-anchor="middle" style="font:500 8px Montserrat,sans-serif;fill:var(--mut)">glasses</text><text id="wt2" x="120" y="132" text-anchor="middle" style="font:600 9px Montserrat,sans-serif;fill:var(--ink)">${n0(w*gs)} / ${n0(g.goal)} ml</text></svg>`}
 function wcard(d){
-return`<div class="card wat wine bt-wat"><div class="hdr"><h3>💧 Water</h3>${dtl('water','Water log, goal and reminders')}</div>${wgauge(d)}<div class="wrow"><button class="btn s wb" data-a="wm" aria-label="Remove one glass">−</button><button class="btn s wb" data-a="wp" aria-label="Add one glass">+</button></div></div>`}
+return`<div class="card wat wine bt-wat tile2"><div class="hdr"><h3>💧 Water</h3>${dtl('water','Water log, goal and reminders')}</div>${wgauge(d)}<div class="wrow"><button class="btn s wb" data-a="wm" aria-label="Remove one glass">−</button><button class="btn s wb" data-a="wp" aria-label="Add one glass">+</button></div></div>`}
 function wremind(d){const gs=wgs(),w=S.wa[d]||0,r=S.wr,sc=wsched(),ti=(id,v)=>`<input id="${id}" type="time" value="${v}" style="width:auto;flex:1">`;
 return!r?`<div class="note info"><b class="sxt">🔔 Want water reminders?</b><div class="mut" style="margin:4px 0 8px">We can spread your glasses across your day.</div><div class="row"><button class="btn p" data-a="wry">Yes, remind me</button><button class="btn t" data-a="wrn">Not now</button></div></div>`
 :r.on&&(!r.wake||r.edit)?`<div class="note info"><b class="sxt">🌙 When do you usually sleep?</b><div class="row" style="margin:8px 0;flex-wrap:nowrap"><label class="f" style="margin:0">Wake up${ti('wwk',r.wake||'07:00')}</label><label class="f" style="margin:0">Bed time${ti('wbd',r.bed||'23:00')}</label></div><button class="btn p" data-a="wrs">Save schedule</button></div>`
