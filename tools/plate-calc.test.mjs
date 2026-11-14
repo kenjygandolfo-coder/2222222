@@ -30,4 +30,5 @@ t('kg needs micro',()=>{const nd=plateNeed(62,20,PLATE_KG,{1:1},true);assert.equ
 t('kg 1.25 plate is standard, not micro',()=>assert.equal(plateNeed(22.5,20,PLATE_KG,{},false).kind,'exact'));
 t('lb 1.25 per side is micro',()=>assert.equal(plateNeed(47.5,45,PLATE_LB,{1.25:1},true).kind,'micro'));
 t('below bar does not crash',()=>assert.equal(plateNeed(30,45,PLATE_LB,mic,true).kind,'exact'));
+t('gymapp kg (no micro inventory): remainder is missing',()=>{const nd=plateNeed(61,20,PLATE_KG,{},false);assert.equal(nd.kind,'missing');assert.equal(plateNoteTxt(nd,'kg'),'Missing 0.5 kg per side, need micro plates')});
 console.log(passed+' passed');
