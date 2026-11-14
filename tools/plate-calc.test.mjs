@@ -14,21 +14,35 @@ function plateNeed(total,bar,L,micro,hasMicro){const bk=plateBreakdown(total,bar
 let r=Math.round(bk.leftover*100);const used=[];if(hasMicro){for(const w of Object.keys(micro||{}).map(Number).sort((a,b)=>b-a)){const u=Math.round(w*100),have=Math.floor(micro[w]||0);if(!(u>0)||!(have>0))continue;const c=Math.min(have,Math.floor(r/u));if(c>0){r-=c*u;used.push({w,count:c})}}}
 return r>0?{kind:'missing',micro:used,missing:r/100}:{kind:'micro',micro:used,missing:0}}
 
-function plateNoteTxt(nd,u){if(nd.kind=='exact')return'';if(nd.kind=='micro')return'+'+nd.micro.map(m=>(m.count>1?m.count+'\u00d7':'')+m.w).join(' + ')+' '+u+' micro each side';return'Missing '+nd.missing+' '+u+' per side, need micro plates'}
+function plateNoteTxt(nd,u){return nd.kind=='missing'?'Missing '+nd.missing+' '+u+' per side, need micro plates':''}
+/* Pure: text under a per-set bar graphic listing the plates used per side (standard from the breakdown, micro from plateNeed). lang 'es' uses decimal commas. */
+function plateUsedTxt(bk,micro,u,lang){if(!bk||bk.under)return'';const es=lang=='es',f=x=>{x=Math.round(+x*100)/100;return Number.isFinite(x)?String(x).replace('.',es?',':'.'):''},o=[];for(const p of bk.perSide||[])o.push(p.count+' \u00d7 '+f(p.w));for(const m of micro||[])o.push(m.count+' \u00d7 micro '+f(m.w));const b=bk.bar>0?(es?'Barra ':'Bar ')+f(bk.bar)+' '+u+' \u00b7 ':'';return o.length?b+(es?'Por lado: ':'Per side: ')+o.join(' + ')+' '+u:(es?'Solo la barra':'Just the bar')}
 let passed=0;const t=(n,f)=>{f();passed++;console.log('ok  '+n)};
 const mic={1:2,0.5:2};
 t('exact standard build (lb)',()=>{const nd=plateNeed(135,45,PLATE_LB,mic,true);assert.equal(nd.kind,'exact');assert.equal(plateNoteTxt(nd,'lb'),'')});
 t('bar only is exact',()=>assert.equal(plateNeed(45,45,PLATE_LB,mic,true).kind,'exact'));
-t('needs micro: +1 lb each side',()=>{const nd=plateNeed(137,45,PLATE_LB,mic,true);assert.equal(nd.kind,'micro');assert.equal(plateNoteTxt(nd,'lb'),'+1 lb micro each side')});
-t('needs micro: combines sizes',()=>{const nd=plateNeed(138,45,PLATE_LB,mic,true);assert.equal(plateNoteTxt(nd,'lb'),'+1 + 0.5 lb micro each side')});
-t('uses several of one size',()=>{const nd=plateNeed(139,45,PLATE_LB,mic,true);assert.equal(plateNoteTxt(nd,'lb'),'+2\u00d71 lb micro each side')});
+t('needs micro: +1 lb each side',()=>{const nd=plateNeed(137,45,PLATE_LB,mic,true);assert.equal(nd.kind,'micro');assert.equal(plateNoteTxt(nd,'lb'),'')});
+t('needs micro: combines sizes',()=>{const nd=plateNeed(138,45,PLATE_LB,mic,true);assert.equal(plateNoteTxt(nd,'lb'),'')});
+t('uses several of one size',()=>{const nd=plateNeed(139,45,PLATE_LB,mic,true);assert.equal(plateNoteTxt(nd,'lb'),'')});
 t('missing even with micro',()=>{const nd=plateNeed(150.5,45,PLATE_LB,{1:1},true);assert.equal(nd.kind,'missing');assert.equal(nd.missing,0.25);assert.equal(plateNoteTxt(nd,'lb'),'Missing 0.25 lb per side, need micro plates')});
 t('no micro plates owned',()=>{const nd=plateNeed(137,45,PLATE_LB,{},true);assert.equal(nd.kind,'missing');assert.equal(nd.missing,1);assert.equal(plateNoteTxt(nd,'lb'),'Missing 1 lb per side, need micro plates')});
 t('hasMicro false ignores stock',()=>assert.equal(plateNeed(137,45,PLATE_LB,mic,false).kind,'missing'));
 t('kg exact',()=>assert.equal(plateNeed(60,20,PLATE_KG,{},false).kind,'exact'));
-t('kg needs micro',()=>{const nd=plateNeed(62,20,PLATE_KG,{1:1},true);assert.equal(plateNoteTxt(nd,'kg'),'+1 kg micro each side')});
+t('kg needs micro',()=>{const nd=plateNeed(62,20,PLATE_KG,{1:1},true);assert.equal(plateNoteTxt(nd,'kg'),'')});
 t('kg 1.25 plate is standard, not micro',()=>assert.equal(plateNeed(22.5,20,PLATE_KG,{},false).kind,'exact'));
 t('lb 1.25 per side is micro',()=>assert.equal(plateNeed(47.5,45,PLATE_LB,{1.25:1},true).kind,'micro'));
 t('below bar does not crash',()=>assert.equal(plateNeed(30,45,PLATE_LB,mic,true).kind,'exact'));
 t('gymapp kg (no micro inventory): remainder is missing',()=>{const nd=plateNeed(61,20,PLATE_KG,{},false);assert.equal(nd.kind,'missing');assert.equal(plateNoteTxt(nd,'kg'),'Missing 0.5 kg per side, need micro plates')});
+const used=(tot,bar,L,mic,hm,u,lg)=>{const bk=plateBreakdown(tot,bar,L),nd=plateNeed(tot,bar,L,mic,hm);return plateUsedTxt(bk,nd.micro,u,lg)};
+t('used: standard only (lb)',()=>assert.equal(used(135,45,PLATE_LB,mic,true,'lb','en'),'Bar 45 lb \u00b7 Per side: 1 \u00d7 45 lb'));
+t('used: several plates',()=>assert.equal(used(235,45,PLATE_LB,mic,true,'lb','en'),'Bar 45 lb \u00b7 Per side: 2 \u00d7 45 + 1 \u00d7 5 lb'));
+t('used: with micro',()=>assert.equal(used(147,45,PLATE_LB,mic,true,'lb','en'),'Bar 45 lb \u00b7 Per side: 1 \u00d7 45 + 1 \u00d7 5 + 1 \u00d7 micro 1 lb'));
+t('used: just the bar',()=>assert.equal(used(45,45,PLATE_LB,mic,true,'lb','en'),'Just the bar'));
+t('used: no bar weight',()=>assert.equal(used(90,0,PLATE_LB,{},false,'lb','en'),'Per side: 1 \u00d7 45 lb'));
+t('used: missing remainder lists standard only, note separate',()=>{assert.equal(used(137,45,PLATE_LB,{},true,'lb','en'),'Bar 45 lb \u00b7 Per side: 1 \u00d7 45 lb');assert.equal(plateNoteTxt(plateNeed(137,45,PLATE_LB,{},true),'lb'),'Missing 1 lb per side, need micro plates')});
+t('used: kg',()=>assert.equal(used(60,20,PLATE_KG,{},false,'kg','en'),'Bar 20 kg \u00b7 Per side: 1 \u00d7 20 kg'));
+t('used: kg with 1.25',()=>assert.equal(used(62.5,20,PLATE_KG,{},false,'kg','en'),'Bar 20 kg \u00b7 Per side: 1 \u00d7 20 + 1 \u00d7 1.25 kg'));
+t('used: ES decimal commas',()=>assert.equal(used(62.5,20,PLATE_KG,{},false,'kg','es'),'Barra 20 kg \u00b7 Por lado: 1 \u00d7 20 + 1 \u00d7 1,25 kg'));
+t('used: ES just the bar and micro',()=>{assert.equal(used(45,45,PLATE_LB,mic,true,'lb','es'),'Solo la barra');assert.equal(used(137,45,PLATE_LB,mic,true,'lb','es'),'Barra 45 lb \u00b7 Por lado: 1 \u00d7 45 + 1 \u00d7 micro 1 lb')});
+t('used: under bar / bad input never prints undefined or NaN',()=>{assert.equal(used(30,45,PLATE_LB,mic,true,'lb','en'),'');assert.equal(plateUsedTxt(null,[],'lb','en'),'');assert.ok(!/undefined|NaN/.test(plateUsedTxt(plateBreakdown(100,NaN,PLATE_LB),[],'lb','en')))});
 console.log(passed+' passed');
