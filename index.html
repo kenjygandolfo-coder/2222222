@@ -1153,7 +1153,7 @@ const toast=m=>{const t=$('#toast');t.textContent=m;t.className='on';clearTimeou
 /* ===== Build info: triple tap or long press on the Forma logo shows the last update time =====
    UPDATE BUILD_TS AND BUILD_VER ON EVERY CHANGE, together with the CACHE name in sw.js
    (BUILD_VER must equal sw.js CACHE). BUILD_TS is an ISO-8601 UTC string. */
-const BUILD_TS='2026-11-12T01:36:42Z',BUILD_VER='forma-v75';
+const BUILD_TS='2026-11-14T17:53:21Z',BUILD_VER='forma-v76';
 const buildMsg=(ts,ver,lang,lastMod)=>{const d=new Date(lastMod||ts),ok=!isNaN(d.getTime()),s=ok?d.toLocaleString(lang=='es'?'es':'en-US',{dateStyle:'medium',timeStyle:'short'}):String(ts);return(lang=='es'?'Última actualización: ':'Last updated: ')+s+' ('+ver+')'};
 function buildInfo(){const lg=typeof LANG!='undefined'?LANG:'en',show=lm=>toast(buildMsg(BUILD_TS,BUILD_VER,lg,lm));let done=0;const fin=lm=>{if(!done){done=1;show(lm)}};setTimeout(()=>fin(''),1500);try{fetch(location.pathname,{method:'HEAD',cache:'no-store'}).then(r=>fin(r.ok?r.headers.get('Last-Modified'):'')).catch(()=>fin(''))}catch(e){fin('')}}
 (function(){const h=document.querySelector('header h1');if(!h)return;h.style.cssText+=';user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;cursor:default';let n=0,tt=0,lp=0,fired=0;
@@ -2441,7 +2441,7 @@ ${tab=='routine'?gequipCard():`<div class="card" style="max-width:560px"><h3>�
 ${g.hasmicro?`<div class="note" style="margin-bottom:16px"><b class="sxt">Which microplates</b><div class="mut" style="margin:4px 0 8px">How many you own of each size (${GUNIT()}). One per side = that jump \u00d72.</div><div class="row" style="flex-wrap:wrap;gap:8px">${MICRO_SIZES[GUNIT()].map(sz=>`<label class="f" style="margin:0;min-width:72px">${sz} ${GUNIT()}<input type="number" min="0" max="20" step="1" inputmode="numeric" data-plate="${sz}" value="${(g.plates||{})[sz]||''}" placeholder="0"></label>`).join('')}</div>${gstep()?`<p class="cap" style="margin:8px 0 0"><span>Smallest jump</span>: <b>+${gstep()} ${GUNIT()}</b> <span>per session on platable lifts</span></p>`:'<p class="cap" style="margin:8px 0 0">Add at least one microplate above.</p>'}</div>`:''}
 <label class="f">Default progression</label><div class="seg" style="margin-bottom:4px">${Object.entries(INC).map(([k,v])=>{const lock=k=='micro'&&!gHasMicro();return`<button class="btn ${(g.inc||'equip')==k?'on':''}" data-a="sginc" data-v="${k}" ${lock?'disabled style="opacity:.45"':''}>${v[0]}</button>`}).join('')}</div>
 <p class="cap" style="margin:0 0 16px">${INC[g.inc||'equip'][1]} <span>Applied to every lift; you can override it per lift below.</span>${!gHasMicro()?' <span>Microplates needs plates registered above.</span>':''}</p>
-<button class="btn p" style="margin-top:8px" data-a="sgo">${first?'Create my routine':'Save and rebuild'}</button>
+<button class="btn p" style="margin-top:8px" data-a="gsgo">${first?'Create my routine':'Save and rebuild'}</button>
 ${first?'':'<button class="btn t" style="margin-left:8px" data-a="sgcancel">Cancel</button>'}</div>`}`}
 /* Per-exercise equipment + method editor, shown under the main setup card.
    Equipment is required before an exercise can be logged (unless its method is
@@ -3415,7 +3415,7 @@ else if(a=='cfmno'){$('#cfm').hidden=true;cfmCb=null;return}
 else if(a=='sgday'){const x=b.dataset.v,n=gdn(),cur=(S.gym.schedPick||gsched()).slice(),i=cur.indexOf(x);
 if(i>=0)cur.splice(i,1);else{if(cur.length>=n)return toast('You already picked '+n+' days — remove one first');cur.push(x)}
 S.gym.schedPick=cur}
-else if(a=='sgo'){const mi=$('#gmin'),m=Math.round(+(mi&&mi.value)||65),n=gdn(),days=(S.gym.schedPick||gsched()).slice().sort((a,b)=>DOWK.indexOf(a)-DOWK.indexOf(b));
+else if(a=='gsgo'){const mi=$('#gmin'),m=Math.round(+(mi&&mi.value)||65),n=gdn(),days=(S.gym.schedPick||gsched()).slice().sort((a,b)=>DOWK.indexOf(a)-DOWK.indexOf(b));
 if(!(m>=20&&m<=150))return toast('Enter minutes between 20 and 150');
 if(days.length!==n)return toast('Pick exactly '+n+' training days');
 if(!schedOK(days,n))return toast('Full body needs a rest day between sessions');
@@ -3523,7 +3523,7 @@ else if(a=='evedit'){const ev=S.events.find(x=>x.id==+b.dataset.id);if(!ev)retur
 else if(a=='evcancel'){evedit=null;render();return}
 else if(a=='evsave'){evcap();const title=(evdraft.title||'').trim();if(!title)return toast('Add a title');const fields={title,date:evdraft.date||today(),time:(evdraft.time||'').trim(),desc:(evdraft.desc||'').trim()};if(evedit=='new')S.events.push({id:S.nid++,...fields,created:Date.now()});else{const ev=S.events.find(x=>x.id==evedit);if(ev)Object.assign(ev,fields)}evedit=null;save();render();toast('Event saved');return}
 else if(a=='evdel'){S.events=S.events.filter(x=>x.id!=+b.dataset.id);evedit=null;save();render();toast('Event deleted');return}
-else return;save();if(['gsw','gpick','sgd','sgday','sgunit','sginc','sgmic','sgeq','sgmx','sgmj','sgwarm','sgprog','gmv','gaddclose','sgo','greconf','sgcancel','gcfgtab','gcal','gcalclose','gcalc','gcalcclose','gcalcgo','glogedit','gplo','gwcp','gwcx','gedx','gsx'].includes(a)&&$('#gout')){const y=scrollY;$('#gout').classList.add('q');gview();if(glg!=null)gdrestore();scrollTo(0,y);return}go(tab)});
+else return;save();if(['gsw','gpick','sgd','sgday','sgunit','sginc','sgmic','sgeq','sgmx','sgmj','sgwarm','sgprog','gmv','gaddclose','gsgo','greconf','sgcancel','gcfgtab','gcal','gcalclose','gcalc','gcalcclose','gcalcgo','glogedit','gplo','gwcp','gwcx','gedx','gsx'].includes(a)&&$('#gout')){const y=scrollY;$('#gout').classList.add('q');gview();if(glg!=null)gdrestore();scrollTo(0,y);return}go(tab)});
 function ap(){const r=document.documentElement;if(r.dataset.th)delete r.dataset.th;if(S.th){delete S.th;save()}if(S.mode)r.dataset.theme=S.mode}ap();thSync();
 let LANG='en',LOC='en-US',DOW='MTWTFSS',DWK='MON TUE WED THU FRI SAT SUN';
 const D={
