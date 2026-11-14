@@ -1153,7 +1153,7 @@ const toast=m=>{const t=$('#toast');t.textContent=m;t.className='on';clearTimeou
 /* ===== Build info: triple tap or long press on the Forma logo shows the last update time =====
    UPDATE BUILD_TS AND BUILD_VER ON EVERY CHANGE, together with the CACHE name in sw.js
    (BUILD_VER must equal sw.js CACHE). BUILD_TS is an ISO-8601 UTC string. */
-const BUILD_TS='2026-11-14T18:15:40Z',BUILD_VER='forma-v79';
+const BUILD_TS='2026-11-14T18:18:55Z',BUILD_VER='forma-v80';
 const buildMsg=(ts,ver,lang,lastMod)=>{const d=new Date(lastMod||ts),ok=!isNaN(d.getTime()),s=ok?d.toLocaleString(lang=='es'?'es':'en-US',{dateStyle:'medium',timeStyle:'short'}):String(ts);return(lang=='es'?'Última actualización: ':'Last updated: ')+s+' ('+ver+')'};
 function buildInfo(){const lg=typeof LANG!='undefined'?LANG:'en',show=lm=>toast(buildMsg(BUILD_TS,BUILD_VER,lg,lm));let done=0;const fin=lm=>{if(!done){done=1;show(lm)}};setTimeout(()=>fin(''),1500);try{fetch(location.pathname,{method:'HEAD',cache:'no-store'}).then(r=>fin(r.ok?r.headers.get('Last-Modified'):'')).catch(()=>fin(''))}catch(e){fin('')}}
 (function(){const h=document.querySelector('header h1');if(!h)return;h.style.cssText+=';user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;cursor:default';let n=0,tt=0,lp=0,fired=0;
@@ -1716,7 +1716,7 @@ return r>0?{kind:'missing',micro:used,missing:r/100}:{kind:'micro',micro:used,mi
 const microPerSide=()=>{const inv=S.gym.plates||{},o={};MICRO_SIZES[GUNIT()].forEach(z=>{const c=Math.floor((inv[z]||0)/2);if(c>0)o[z]=c});return o};
 function plateNoteTxt(nd,u){return nd.kind=='missing'?'Missing '+nd.missing+' '+u+' per side, need micro plates':''}
 /* Pure: text under a per-set bar graphic listing the plates used per side (standard from the breakdown, micro from plateNeed). lang 'es' uses decimal commas. */
-function plateUsedTxt(bk,micro,u,lang){if(!bk||bk.under)return'';const es=lang=='es',f=x=>{x=Math.round(+x*100)/100;return Number.isFinite(x)?String(x).replace('.',es?',':'.'):''},o=[];for(const p of bk.perSide||[])o.push(p.count+' \u00d7 '+f(p.w));for(const m of micro||[])o.push(m.count+' \u00d7 micro '+f(m.w));const b=bk.bar>0?(es?'Barra ':'Bar ')+f(bk.bar)+' '+u+' \u00b7 ':'';return o.length?b+(es?'Por lado: ':'Per side: ')+o.join(' + ')+' '+u:(es?'Solo la barra':'Just the bar')}
+function plateUsedTxt(bk,micro,u,lang,h){if(!bk||bk.under)return'';const es=lang=='es',f=x=>{x=Math.round(+x*100)/100;return Number.isFinite(x)?String(x).replace('.',es?',':'.'):''},o=[];for(const p of bk.perSide||[])o.push(p.count+' \u00d7 '+f(p.w));for(const m of micro||[])o.push(m.count+' \u00d7 micro '+f(m.w));const q=s=>h?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):String(s),bw=bk.bar>0?q(f(bk.bar)+' '+u):'',b=bw?(es?'Barra ':'Bar ')+(h?'<b>'+bw+'</b>':bw)+' \u00b7 ':'';return o.length?b+(es?'Por lado: ':'Per side: ')+q(o.join(' + ')+' '+u):(es?'Solo la barra':'Just the bar')}
 /* Compact inline SVG (PEQUEÑA, text SUPER small). Draws a short bar line and
    colored plate rectangles from the collar outward, largest nearest the collar;
    bigger plates drawn taller. Self-contained, no external assets. */
@@ -1771,7 +1771,7 @@ function gplatesHtml(w,b){const t=+w,bar=+b>=0?+b:0,txt=gplates(w,b);if(!(t>=bar
 let gpx={};
 const gbarGet=n=>{try{const v=JSON.parse(localStorage.getItem('formaBars')||'{}')[n];return v==null?'':''+v}catch(e){return''}};
 const gbarSet=(n,v)=>{try{const o=JSON.parse(localStorage.getItem('formaBars')||'{}');if(v==='')delete o[n];else o[n]=v;localStorage.setItem('formaBars',JSON.stringify(o))}catch(e){}};
-function gpgFill(el){const i=document.getElementById(el.dataset.pg),b=gbarGet(el.dataset.n),t=i?+i.value:0,bar=+b;if(b===''||!(t>0)||!(bar>=0)||t<bar){el.innerHTML='';return}const L=platesOf(),bk=plateBreakdown(t,bar,L),nd=plateNeed(t,bar,L,microPerSide(),gHasMicro()),u=GUNIT(),ut=plateUsedTxt(bk,nd.micro,u,LANG),nt=plateNoteTxt(nd,u);el.innerHTML=plateSvg(bk)+(ut?`<div class="pgn">${esc(ut)}</div>`:'')+(nt?`<div class="pgn">${esc(nt)}</div>`:'')}
+function gpgFill(el){const i=document.getElementById(el.dataset.pg),b=gbarGet(el.dataset.n),t=i?+i.value:0,bar=+b;if(b===''||!(t>0)||!(bar>=0)||t<bar){el.innerHTML='';return}const L=platesOf(),bk=plateBreakdown(t,bar,L),nd=plateNeed(t,bar,L,microPerSide(),gHasMicro()),u=GUNIT(),ut=plateUsedTxt(bk,nd.micro,u,LANG,1),nt=plateNoteTxt(nd,u);el.innerHTML=plateSvg(bk)+(ut?`<div class="pgn">${ut}</div>`:'')+(nt?`<div class="pgn">${esc(nt)}</div>`:'')}
 function gpgRefresh(){document.querySelectorAll('[data-pg]').forEach(gpgFill)}
 const gpcBtn=(n,j)=>`<button class="chip ${gpx[n]?'on':''}" style="flex:none" data-a="gplo" data-j="${j}" data-n="${esc(n)}">\u{1F9EE} Plate calculator</button>`;
 const gpcBox=(n,j)=>gpx[n]?`<div class="note" style="margin:8px 0 0"><input id="pb${j}" data-n="${esc(n)}" type="number" step="0.5" min="0" placeholder="Resistance and/or bar ${typeof GUNIT=='function'?GUNIT():'kg'}" value="${esc(gbarGet(n))}"></div>`:'';
