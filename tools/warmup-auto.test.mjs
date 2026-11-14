@@ -6,6 +6,7 @@ const src = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const a = src.indexOf('const WARM_RAMP='), b = src.indexOf('\n', src.indexOf('function warmFromWork'));
 const z = src.indexOf('\n', src.indexOf('const rd=x=>', a)); // end of function body line
 const warmFromWork = new Function(src.slice(a, z + 1) + 'return warmFromWork')();
+const warmOverwrite = new Function(src.slice(src.indexOf('const warmOverwrite='), src.indexOf('\n', src.indexOf('const warmOverwrite='))) + 'return warmOverwrite')();
 let n = 0; const t = (name, f) => { f(); n++; console.log('ok  ' + name); };
 const w = r => r.map(x => x[0]);
 t('3 warm-ups lb, bar 45, plate pair 5', () => {
@@ -25,4 +26,17 @@ t('monotonic and last equals work for every count', () => {
   }
 });
 t('invalid input gives empty', () => { assert.deepEqual(warmFromWork(0, 3, {}), []); assert.deepEqual(warmFromWork(NaN, 3, {}), []); assert.deepEqual(warmFromWork(100, 9, {}), []); });
+t('reps overwrite prefilled/previous values, ramp reps per count', () => {
+  const field = { value: '12', touched: false }; // prefilled from last session
+  const [, r] = warmFromWork(100, 3, { bar: 20, inc: 5 })[0];
+  if (warmOverwrite(field.touched, false)) field.value = r;
+  assert.equal(field.value, 8);
+  assert.deepEqual(warmFromWork(100, 4, { inc: 5 }).map(x => x[1]), [10, 8, 5, 2]);
+});
+t('typed reps are preserved', () => assert.equal(warmOverwrite(true, false), false));
+t('emptied reps field (flag cleared) is re-filled', () => {
+  const touched = new Set(['k']); touched.delete('k'); // input handler clears flag when value is ''
+  assert.equal(warmOverwrite(touched.has('k'), false), true);
+});
+t('read-only fields untouched', () => assert.equal(warmOverwrite(false, true), false));
 console.log(n + ' passed');
