@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import {loadFin} from './fin-extract.mjs';
 const F=loadFin('2026-11-14');
-const {finNorm,finBudgetCalc:calc,finGSort,finGCats,finGTotals,finIncomeByCat,finCatGroups,finOrderMove,finAddGroup,finAddCat,finCatMove,finDelCat,finDelGroup}=F;
+const {finNorm,finBudgetCalc:calc,finGSort,finGCats,finGTotals,finIncomeByCat,finCatGroups,finOrderMove,finAddGroup,finAddCat,finCatMove,finDelCat,finDelGroup,finCatGrpFor,finMgApply}=F;
 let passed=0;const t=(n,f)=>{f();passed++;console.log('ok  '+n)};
 const A=(o)=>Object.assign({id:1,name:'Main',type:'checking',onBudget:true,start:0,startDate:'2026-01-01'},o);
 const X=(id,date,cat,amt,acct=1)=>({id,acct,date,cat,amt});
@@ -74,9 +74,11 @@ t('delete category, uncategorize: tx kept, budget dropped, To budget consistent'
  assert.ok(finDelCat(f,gr.id,null));assert.equal(f.cats.some(c=>c.id==gr.id),false);assert.deepEqual(f.tx.map(x=>x.cat),[null,re.id,null]);assert.equal(f.budget['2026-04'],undefined);assert.deepEqual(f.budget['2026-03'],{[re.id]:500});
  const C=calc(f,'2026-03');assert.equal(C.cats[gr.id],undefined);assert.equal(C.uncat,-300);assert.equal(C.toBudget,100000-500-300);
  const g=finNorm(JSON.parse(JSON.stringify(f)));assert.deepEqual(g.budget,f.budget);assert.deepEqual(g.tx.map(x=>x.cat),f.tx.map(x=>x.cat));assert.deepEqual(calc(g,'2026-04'),calc(f,'2026-04'))});
-t('delete category, transfer: tx move to the target, budget of the deleted one dropped',()=>{
- const {f,gr,re}=delFix();assert.ok(finDelCat(f,gr.id,re.id));assert.deepEqual(f.tx.map(x=>x.cat),[re.id,re.id,re.id]);
- const C=calc(f,'2026-03');assert.equal(C.cats[re.id].activity,-500);assert.equal(C.cats[re.id].budgeted,500);assert.equal(C.toBudget,100000-500);assert.equal(C.uncat,0)});
+t('delete category, transfer: tx and budget move to the target month by month, To budget unchanged',()=>{
+ const {f,gr,re}=delFix();const b0=calc(f,'2026-03').toBudget,b1=calc(f,'2026-04').toBudget;assert.ok(finDelCat(f,gr.id,re.id));assert.deepEqual(f.tx.map(x=>x.cat),[re.id,re.id,re.id]);
+ assert.deepEqual(f.budget,{'2026-03':{[re.id]:1500},'2026-04':{[re.id]:400}});
+ const C=calc(f,'2026-03');assert.equal(C.cats[re.id].activity,-500);assert.equal(C.cats[re.id].budgeted,1500);assert.equal(C.toBudget,b0);assert.equal(calc(f,'2026-04').toBudget,b1);assert.equal(C.uncat,0);
+ assert.deepEqual(rt(f).budget,f.budget)});
 t('delete category: invalid, same-id or other-kind target means uncategorize; unknown id is a no-op',()=>{
  for(const to of [999,'x',undefined]){const {f,gr}=delFix();assert.ok(finDelCat(f,gr.id,to));assert.equal(f.tx[0].cat,null)}
  {const {f,gr}=delFix();assert.ok(finDelCat(f,gr.id,gr.id));assert.equal(f.tx[0].cat,null)}
@@ -96,4 +98,24 @@ t('delete group: income group, unknown group, bad mode or bad target are refused
  assert.equal(finDelGroup(f,inc,'del'),false);assert.equal(finDelGroup(f,999,'del'),false);assert.equal(finDelGroup(f,gr.group,'move',gr.group),false);assert.equal(finDelGroup(f,gr.group,'move',inc),false);assert.equal(finDelGroup(f,gr.group,'x'),false);assert.equal(JSON.stringify(f),snap)});
 t('deleting every expense group still loads: categories fall back to a recreated Other group',()=>{
  const f=finNorm({});for(const g of f.groups.filter(x=>!x.income))finDelGroup(f,g.id,'del');assert.equal(f.cats.length,1);const b=finNorm(JSON.parse(JSON.stringify(f)));assert.equal(b.groups.length,1);assert.ok(b.groups[0].income)});
+t('finAddCat with a kind refuses a group of the other kind',()=>{
+ const f=finNorm({});const food=f.groups.find(g=>g.name=='Food').id,inc=f.groups.find(g=>g.income).id,n=f.cats.length;
+ assert.equal(finAddCat(f,'Bonus',inc,false),null);assert.equal(finAddCat(f,'Snacks',food,true),null);assert.equal(f.cats.length,n);
+ assert.ok(finAddCat(f,'Snacks',food,false));assert.ok(finAddCat(f,'Bonus',inc,true).income)});
+t('tx editor new category: group follows the transaction kind, never crosses',()=>{
+ const f=finNorm({});const food=f.groups.find(g=>g.name=='Food').id,oth=f.groups.find(g=>g.name=='Other').id,inc=f.groups.find(g=>g.income).id,gr=byName(f,'Groceries').id,pay=byName(f,'Income').id;
+ assert.equal(finCatGrpFor(f,false,null,food),food);assert.equal(finCatGrpFor(f,false,null,inc),oth);assert.equal(finCatGrpFor(f,false,gr,inc),food);assert.equal(finCatGrpFor(f,false,null,999),oth);
+ assert.equal(finCatGrpFor(f,true,null,food),inc);assert.equal(finCatGrpFor(f,true,gr,null),inc);assert.equal(finCatGrpFor(f,true,pay,null),inc)});
+t('manager save: validation errors leave data unchanged',()=>{
+ const f=finNorm({});const snap=JSON.stringify(f),food=f.groups.find(g=>g.name=='Food').id,inc=f.groups.find(g=>g.income).id,gr=byName(f,'Groceries');
+ assert.equal(finMgApply(f,{t:'cat',id:'new',name:'  ',grp:food}),'Enter a category name.');assert.equal(finMgApply(f,{t:'grp',id:'new',name:''}),'Enter a group name.');
+ assert.equal(finMgApply(f,{t:'cat',id:'new',name:'groceries',grp:food}),'A category with that name already exists.');assert.equal(finMgApply(f,{t:'cat',id:gr.id,name:'Restaurants',grp:food}),'A category with that name already exists.');
+ assert.equal(finMgApply(f,{t:'grp',id:'new',name:'food'}),'A group with that name already exists.');assert.equal(finMgApply(f,{t:'cat',id:'new',name:'X',grp:999}),'Choose a group.');
+ assert.equal(finMgApply(f,{t:'cat',id:gr.id,name:'G2',grp:inc}),'Choose a group.');assert.equal(JSON.stringify(f),snap)});
+t('manager save: add, rename and move',()=>{
+ const f=finNorm({});const food=f.groups.find(g=>g.name=='Food').id,tr=f.groups.find(g=>g.name=='Transport').id,gr=byName(f,'Groceries');
+ assert.equal(finMgApply(f,{t:'cat',id:'new',name:' Pets ',grp:food}),'');assert.equal(byName(f,'Pets').group,food);
+ assert.equal(finMgApply(f,{t:'cat',id:gr.id,name:'Market',grp:tr}),'');assert.equal(gr.name,'Market');assert.equal(gr.group,tr);
+ assert.equal(finMgApply(f,{t:'grp',id:'new',name:'Fun'}),'');const g=f.groups.find(x=>x.name=='Fun');assert.ok(g&&!g.income);
+ assert.equal(finMgApply(f,{t:'grp',id:g.id,name:'Fun2'}),'');assert.equal(g.name,'Fun2');assert.equal(finMgApply(f,{t:'cat',id:gr.id,name:'market',grp:tr}),'')});
 console.log(passed+' passed');
