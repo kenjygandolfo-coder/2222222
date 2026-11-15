@@ -17,7 +17,7 @@ function konst(name) {
   if (!m) throw new Error('const not found: ' + name);
   return m[0];
 }
-const FNS = ['finCur','parseAmount','fmtMoney','accountBalance','finTotals','finDate','finIds','finNorm','finSortTx','finRunning','finRange','finFilter','finTxTotals','finPayeeRank','finMonth','finMonthAdd','finBudgetCalc','finBudgetCopy','finBudgetSpent','finBudgetAvg3','finGSort','finGCats','finGTotals','finIncomeByCat','finCatGroups','finXferKind','finXferOther','finXferCat','finXferApply','finXferMake','finXferSet','finXferDel','finXferUnlink','finDelAcct','finCardDue','finOrderMove','finAddGroup','finAddCat','finCatMove','finDelCat','finDelGroup','finCatGrpFor','finMgApply'];
+const FNS = ['finCur','parseAmount','fmtMoney','accountBalance','finTotals','finDate','finIds','finNorm','finSortTx','finRunning','finRange','finFilter','finTxTotals','finParts','finSplitRemain','finSplitValid','finSplitClear','finSplitSet','finSubsFor','finPayeeRank','finMonth','finMonthAdd','finBudgetCalc','finBudgetCopy','finBudgetSpent','finBudgetAvg3','finGSort','finGCats','finGTotals','finIncomeByCat','finCatGroups','finXferKind','finXferOther','finXferCat','finXferApply','finXferMake','finXferSet','finXferDel','finXferUnlink','finDelAcct','finCardDue','finOrderMove','finAddGroup','finAddCat','finCatMove','finDelCat','finDelGroup','finCatGrpFor','finMgApply'];
 /* todayStr is what today() returns inside finNorm */
 export function loadFin(todayStr = '2026-11-14') {
   const code = konst('FIN_TYPES') + '\n' + konst('FIN_CATS') + '\n' + konst('FIN_GROUPS') + '\nconst today=()=>' + JSON.stringify(todayStr) + ';\n' + FNS.map(fn).join('\n') + '\nreturn{' + FNS.join(',') + ',FIN_TYPES,FIN_CATS,FIN_GROUPS}';
