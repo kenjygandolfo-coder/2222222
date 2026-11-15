@@ -131,6 +131,7 @@ input:focus,select:focus,button:focus-visible{outline:0;border-color:var(--olv-t
 .bar{height:10px;border-radius:9px;background:var(--line);overflow:hidden;margin:4px 0 16px}
 .bar i{display:block;height:100%;border-radius:9px;background:var(--pri);transition:width .7s cubic-bezier(.2,.8,.2,1)}
 .bar.c i{background:var(--gold)}.bar.f i{background:var(--acc)}
+.fbr{display:grid;grid-template-columns:minmax(0,1.5fr) repeat(3,minmax(0,1fr));gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);text-align:right}.fbr .fbn{text-align:left;overflow-wrap:anywhere}.fbl{display:none;font-size:12px;opacity:.78}.fbb{background:none;border:0;color:inherit;font:inherit;padding:6px 0;cursor:pointer;min-height:32px;max-width:100%;text-align:inherit;overflow-wrap:anywhere}.fbn .fbb{text-align:left}.fbi{width:100%;min-width:0;box-sizing:border-box;text-align:right;padding:4px 6px;font:inherit}.fbx{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}.fbh{font-size:12px}@media(max-width:420px){.fbr{grid-template-columns:repeat(3,minmax(0,1fr))}.fbr .fbn{grid-column:1/-1}.fbl{display:block}.fbh{display:none}.fbr .fbc{text-align:left}}
 .li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
 .li:last-child{border:0}
 .ring{position:relative;width:150px;margin:auto}.ring b{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font:600 30px 'Cormorant Garamond',serif}
@@ -1153,7 +1154,7 @@ const toast=m=>{const t=$('#toast');t.textContent=m;t.className='on';clearTimeou
 /* ===== Build info: triple tap or long press on the Forma logo shows the last update time =====
    UPDATE BUILD_TS AND BUILD_VER ON EVERY CHANGE, together with the CACHE name in sw.js
    (BUILD_VER must equal sw.js CACHE). BUILD_TS is an ISO-8601 UTC string. */
-const BUILD_TS='2026-11-15T02:22:00Z',BUILD_VER='forma-v84';
+const BUILD_TS='2026-11-15T02:29:00Z',BUILD_VER='forma-v85';
 const buildMsg=(ts,ver,lang,lastMod)=>{const d=new Date(lastMod||ts),ok=!isNaN(d.getTime()),s=ok?d.toLocaleString(lang=='es'?'es':'en-US',{dateStyle:'medium',timeStyle:'short'}):String(ts);return(lang=='es'?'Última actualización: ':'Last updated: ')+s+' ('+ver+')'};
 function buildInfo(){const lg=typeof LANG!='undefined'?LANG:'en',show=lm=>toast(buildMsg(BUILD_TS,BUILD_VER,lg,lm));let done=0;const fin=lm=>{if(!done){done=1;show(lm)}};setTimeout(()=>fin(''),1500);try{fetch(location.pathname,{method:'HEAD',cache:'no-store'}).then(r=>fin(r.ok?r.headers.get('Last-Modified'):'')).catch(()=>fin(''))}catch(e){fin('')}}
 (function(){const h=document.querySelector('header h1');if(!h)return;h.style.cssText+=';user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;cursor:default';let n=0,tt=0,lp=0,fired=0;
@@ -1352,7 +1353,9 @@ let nid=Math.max(+f.nid||1,mx+1);for(const a of out)if(!a.id){a.id=nid++}
 /* categories: defaults when missing. group/income are kept for the later category-group step. */
 let cats=[];for(const c of Array.isArray(f.cats)?f.cats:[]){if(!c||typeof c!='object')continue;const name=String(c.name==null?'':c.name).trim().slice(0,40);if(!name)continue;cats.push({id:+c.id||0,name,group:typeof c.group=='string'||typeof c.group=='number'?c.group:null,income:!!c.income})}
 let ncat;if(!cats.length){cats=FIN_CATS.map((name,i)=>({id:i+1,name,group:null,income:name=='Income'}));ncat=FIN_CATS.length+1}else ncat=finIds(cats,f.ncat);
-const cset=new Set(cats.map(c=>c.id));
+const cset=new Set(cats.map(c=>c.id)),ecat=new Set(cats.filter(c=>!c.income).map(c=>c.id));
+/* budget: {'YYYY-MM':{catId:amountMinor}}. Keeps valid months, existing non-income categories, non-zero integers. */
+const bud={};if(f.budget&&typeof f.budget=='object')for(const m of Object.keys(f.budget).sort()){const src=f.budget[m];if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(m)||!src||typeof src!='object')continue;const o={};for(const k of Object.keys(src)){const id=+k,v=Math.round(+src[k]);if(!ecat.has(id)||!Number.isSafeInteger(v)||!v)continue;o[id]=v}if(Object.keys(o).length)bud[m]=o}
 /* payees: unique by name (case-insensitive), plus any name used by a transaction */
 const pays=[],pseen=new Set();for(const p of Array.isArray(f.payees)?f.payees:[]){if(!p||typeof p!='object')continue;const name=String(p.name==null?'':p.name).trim().slice(0,60),k=name.toLowerCase();if(!name||pseen.has(k))continue;pseen.add(k);pays.push({id:+p.id||0,name})}
 const aset=new Set(out.map(a=>a.id)),tx=[];
@@ -1360,7 +1363,7 @@ for(const t of Array.isArray(f.tx)?f.tx:[]){if(!t||typeof t!='object')continue;c
 tx.push({id:+t.id||0,acct,date:finDate(t.date)?t.date:today(),payee,cat:cset.has(+t.cat)?+t.cat:null,amt,notes:String(t.notes==null?'':t.notes).slice(0,500),cleared:!!t.cleared});
 const k=payee.toLowerCase();if(payee&&!pseen.has(k)){pseen.add(k);pays.push({id:0,name:payee})}}
 const ntx=finIds(tx,f.ntx),npay=finIds(pays,f.npay);
-return{cur:finCur(f.cur),accounts:out,nid,tx,payees:pays,cats,ntx,npay,ncat}}
+return{cur:finCur(f.cur),accounts:out,nid,tx,payees:pays,cats,ntx,npay,ncat,budget:bud}}
 S.fin=finNorm(S.fin);
 /* Transactions: pure helpers. Dates are 'YYYY-MM-DD' strings so they compare as text. */
 function finSortTx(list,desc){return list.slice().sort((x,y)=>(x.date<y.date?-1:x.date>y.date?1:x.id-y.id)*(desc?-1:1))}
@@ -1377,6 +1380,41 @@ function finPayeeRank(tx,payees,now,q){const st=new Map(),ms=s=>{const m=/^(\d{4
 for(const t of tx||[]){const nm=String(t.payee||'').trim();if(!nm)continue;const k=nm.toLowerCase();let s=st.get(k);if(!s){s={name:nm,c:0,d:''};st.set(k,s)}s.c++;if(t.date>s.d)s.d=t.date}
 const f=String(q||'').trim().toLowerCase(),sc=s=>{const dd=(n0-ms(s.d))/864e5;return s.c+(Number.isFinite(dd)?3/(1+Math.max(0,dd)/30):0)};
 return[...st.values()].filter(s=>!f||s.name.toLowerCase().includes(f)).sort((a,b)=>sc(b)-sc(a)||a.name.localeCompare(b.name)).map(s=>s.name)}
+/* Budget (envelope, Actual-style). Everything is derived from S.fin.budget plus transactions; nothing else is stored.
+   Rules, per expense (non-income) category and month: avail = carry + budgeted + activity.
+   - avail >= 0: the whole balance rolls over to the next month.
+   - avail < 0: the category shows the negative balance for that month only. Next month's carry is 0 and the
+     overspent amount (-avail) reduces next month's To budget (it is subtracted from every later month's total once).
+   Activity = signed sum of tx in that month and category, on-budget accounts only (closed accounts still count).
+   Income = tx in income categories on on-budget accounts, PLUS every on-budget account's starting balance counted
+   in its startDate month (earliest data month when startDate is missing; `now` month when there is no data at all).
+   Uncategorized = on-budget tx without a category: adds straight to available funds (outflows reduce To budget).
+   To budget(m) = sum income(<=m) + sum uncategorized(<=m) - sum budgeted(<=m) - sum overspent(months < m).
+   avail (Available funds) = toBudget + budgeted(m) + overspentPrev. Off-budget accounts and their tx are ignored.
+   Walk starts at the earliest relevant month (capped to 600 months before the target). Per-category rollover toggle: not implemented. */
+function finMonth(d){const m=/^(\d{4})-(0[1-9]|1[0-2])/.exec(String(d==null?'':d));return m?m[1]+'-'+m[2]:''}
+function finMonthAdd(s,n){const m=/^(\d{4})-(0[1-9]|1[0-2])$/.exec(String(s));if(!m)return'';const k=+m[1]*12+(+m[2]-1)+Math.round(+n||0);return String(Math.floor(k/12)).padStart(4,'0')+'-'+String(k%12+1).padStart(2,'0')}
+function finBudgetCalc(fin,month,now){const E={cats:{},income:0,uncat:0,budgeted:0,activity:0,balance:0,overspentPrev:0,avail:0,toBudget:0};fin=fin&&typeof fin=='object'?fin:{};
+const all=Array.isArray(fin.cats)?fin.cats.filter(c=>c):[],cats=all.filter(c=>!c.income),inc=new Set(all.filter(c=>c.income).map(c=>c.id)),ec=new Set(cats.map(c=>c.id)),bud=fin.budget&&typeof fin.budget=='object'?fin.budget:{};
+for(const c of cats)E.cats[c.id]={budgeted:0,activity:0,balance:0,carry:0};
+if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(String(month)))return E;
+const accts=(Array.isArray(fin.accounts)?fin.accounts:[]).filter(a=>a&&a.onBudget),onb=new Set(accts.map(a=>a.id)),act=new Map();let first='';
+const see=m=>{if(m&&(!first||m<first))first=m},slot=m=>{let x=act.get(m);if(!x){x=[0,0,{}];act.set(m,x)}return x};
+for(const t of Array.isArray(fin.tx)?fin.tx:[]){if(!t||!onb.has(t.acct))continue;const m=finMonth(t.date),v=Math.round(+t.amt);if(!m||!Number.isFinite(v))continue;see(m);const x=slot(m);if(inc.has(t.cat))x[0]+=v;else if(ec.has(t.cat))x[2][t.cat]=(x[2][t.cat]||0)+v;else x[1]+=v}
+for(const m of Object.keys(bud))if(/^\d{4}-(0[1-9]|1[0-2])$/.test(m))see(m);
+for(const a of accts)see(finMonth(a.startDate));
+if(!first)first=finMonth(now)||month;
+for(const a of accts){const v=Math.round(+a.start);if(Number.isFinite(v)&&v)slot(finMonth(a.startDate)||first)[0]+=v}
+let m=first<month?first:month;const lo=finMonthAdd(month,-599);if(m<lo)m=lo;
+const carry={};let cI=0,cU=0,cB=0,cO=0,pO=0;
+for(;;){const x=act.get(m)||[0,0,{}],bm=bud[m]&&typeof bud[m]=='object'?bud[m]:{};let b=0,a=0,bal=0,os=0;const rc={};
+for(const c of cats){const bv=Math.round(+bm[c.id])||0,av=x[2][c.id]||0,cr=carry[c.id]||0,tot=cr+bv+av;rc[c.id]={budgeted:bv,activity:av,balance:tot,carry:cr};carry[c.id]=tot>0?tot:0;if(tot<0)os-=tot;b+=bv;a+=av;bal+=tot}
+cI+=x[0];cU+=x[1];cB+=b;const tb=cI+cU-cB-cO;
+if(m==month){return{cats:rc,income:x[0],uncat:x[1],budgeted:b,activity:a,balance:bal,overspentPrev:pO,avail:tb+b+pO,toBudget:tb}}
+cO+=os;pO=os;m=finMonthAdd(m,1)}}
+function finBudgetCopy(fin,month){const src=((fin&&fin.budget)||{})[finMonthAdd(month,-1)];return Object.assign({},src&&typeof src=='object'?src:{})}
+function finBudgetSpent(fin,month,id,now){const c=finBudgetCalc(fin,month,now).cats[id];return c?Math.max(0,-c.activity):0}
+function finBudgetAvg3(fin,month,id,now){let n=0;for(let i=1;i<=3;i++)n+=finBudgetSpent(fin,finMonthAdd(month,-i),id,now);return Math.round(n/3)}
 let finEd=null,finTx=null,finDelArm=0,finClosed=false,finTxF={acct:0,cat:'',type:'all',range:'all',from:'',to:'',q:''},finTxLim=100;
 function finSorted(cl,ob){return S.fin.accounts.filter(a=>!!a.closed==cl&&(ob===undefined||a.onBudget==ob)).sort((x,y)=>x.order-y.order||x.id-y.id)}
 function finTypeLbl(t){return(FIN_TYPES.find(x=>x[0]==t)||FIN_TYPES[5])[1]}
@@ -1459,6 +1497,31 @@ function finCatSave(){finTxRead();const d=finTx,f=S.fin,name=d.catName.trim().sl
 if(!name){d.err='Enter a category name.'}else if(dup){if(d.catMode=='new'){d.cat=dup.id;d.err='';d.catMode=''}else d.err='A category with that name already exists.'}
 else{d.err='';if(d.catMode=='new'){const c={id:f.ncat++,name,group:null,income:false};f.cats.push(c);d.cat=c.id}else{const c=f.cats.find(x=>x.id==d.cat);if(c)c.name=name}save();d.catMode=''}
 finMount(true,true);if(d.catMode){const x=document.getElementById('fin_tcn');if(x)x.focus()}}
+
+/* Finance > Budget UI. finBM = month shown (YYYY-MM); finBE = category id being edited inline; finBX = row expanded for quick-fill buttons. */
+let finBM=today().slice(0,7),finBE=null,finBX=null,finBCopyArm=0;
+function finBFmt(n,cur){return fmtMoney(n,cur).replace(/^(-?)(?:US)?\$ /,'$1')}
+function finBSet(id,n){const f=S.fin,b=f.budget=f.budget||{},o=b[finBM]=b[finBM]||{};if(n)o[id]=n;else delete o[id];if(!Object.keys(o).length)delete b[finBM];save()}
+function finBRow(id,name,c,cur,editable){const col=c.balance<0?'var(--warn-fg)':'var(--ok-fg)',ed=finBE==id&&editable;
+const bud=!editable?'<span>-</span>':ed?`<input id="fin_be" class="fbi" inputmode="decimal" autocomplete="off" aria-label="Budgeted" value="${esc(c.budgeted?finBFmt(c.budgeted,cur):'')}" data-id="${id}">`:`<button type="button" class="fbb" data-a="finbedit" data-id="${id}" aria-label="Edit budget">${fmtMoney(c.budgeted,cur)}</button>`;
+const bal=editable?`<b style="color:${col}">${fmtMoney(c.balance,cur)}</b>`:'<span>-</span>';
+let h=`<div class="fbr"><span class="fbn">${editable?`<button type="button" class="fbb" data-a="finbx" data-id="${id}" aria-expanded="${finBX==id}">${esc(name)}</button>`:esc(name)}</span><span class="fbc"><span class="fbl">Budgeted</span>${bud}</span><span class="fbc"><span class="fbl">Spent</span><button type="button" class="fbb" data-a="finbsee" data-id="${id}" aria-label="See transactions">${fmtMoney(-c.activity,cur)}</button></span><span class="fbc"><span class="fbl">Balance</span>${bal}</span></div>`;
+if(editable&&finBX==id){const l=finBudgetSpent(S.fin,finBM,id,today().slice(0,7)),a=finBudgetAvg3(S.fin,finBM,id,today().slice(0,7));h+=`<div class="fbx"><button class="btn s" data-a="finblast" data-id="${id}">Last month's spent</button><span class="mut">${fmtMoney(l,cur)}</span><button class="btn s" data-a="finbavg" data-id="${id}">3-month average</button><span class="mut">${fmtMoney(a,cur)}</span></div>`}
+return h}
+function finBudgetView(){const f=S.fin,cur=f.cur,now=today().slice(0,7);
+if(!f.accounts.length)return`<div class="card" style="margin-bottom:12px"><h3>Budget</h3><p class="mut">No accounts yet. Add an account to start budgeting.</p><button class="btn p" data-a="finadd">Add account</button></div>`;
+if(!f.accounts.some(a=>a.onBudget))return`<div class="card" style="margin-bottom:12px"><h3>Budget</h3><p class="mut">No on-budget accounts. Mark an account as on budget to start budgeting.</p><button class="btn p" data-a="finadd">Add account</button></div>`;
+if(!/^\d{4}-\d{2}$/.test(finBM))finBM=now;
+const C=finBudgetCalc(f,finBM,now),ym=finBM.split('-'),lbl=new Date(+ym[0],+ym[1]-1,1).toLocaleDateString(LOC,{month:'long',year:'numeric'}),neg=C.toBudget<0;
+const nav=`<div class="card" style="margin-bottom:12px"><div class="row" style="justify-content:space-between;align-items:center"><button class="btn s" style="flex:none" data-a="finbm" data-v="-1" aria-label="Previous month">\u2039</button><b style="text-transform:capitalize">${esc(lbl)}</b><button class="btn s" style="flex:none" data-a="finbm" data-v="1" aria-label="Next month">\u203a</button></div>${finBM!=now?`<div class="row" style="justify-content:center;margin-top:8px"><button class="btn s t" style="flex:none" data-a="finbm" data-v="now">This month</button></div>`:''}</div>`;
+const ban=`<div class="card" style="margin-bottom:12px"><div class="mut">To budget</div><div class="kpi"><span class="big" style="color:${neg?'var(--warn-fg)':'var(--ok-fg)'}">${fmtMoney(C.toBudget,cur)}</span></div>${neg?'<div style="color:var(--warn-fg);font-weight:600">Overbudgeted</div>':''}
+<div class="li"><span class="mut">Available funds</span><b>${fmtMoney(C.avail,cur)}</b></div><div class="li"><span class="mut">Overspent last month</span><b>${fmtMoney(-C.overspentPrev,cur)}</b></div><div class="li"><span class="mut">Budgeted</span><b>${fmtMoney(-C.budgeted,cur)}</b></div></div>`;
+const sum=`<div class="card" style="margin-bottom:12px"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><div><div class="mut">Budgeted</div><b>${fmtMoney(C.budgeted,cur)}</b></div><div><div class="mut">Spent</div><b>${fmtMoney(-C.activity,cur)}</b></div><div><div class="mut">Balance</div><b>${fmtMoney(C.balance,cur)}</b></div><div><div class="mut">Income</div><b>${fmtMoney(C.income,cur)}</b></div></div></div>`;
+const rows=f.cats.filter(c=>!c.income).sort((a,b)=>a.id-b.id).map(c=>finBRow(c.id,c.name,C.cats[c.id],cur,true)).join('')+(C.uncat?finBRow('none','Uncategorized',{budgeted:0,activity:C.uncat,balance:0},cur,false):'');
+const arm=finBCopyArm;
+const list=`<div class="card" style="margin-bottom:12px"><div class="fbr fbh"><span class="fbn"><b>Category</b></span><span class="fbc mut">Budgeted</span><span class="fbc mut">Spent</span><span class="fbc mut">Balance</span></div>${rows}<div class="row" style="margin-top:10px"><button class="btn s" style="flex:none" data-a="finbcopy">${arm?"Replace this month's budget?":"Copy last month's budget"}</button></div></div>`;
+const incm=`<div class="card" style="margin-bottom:12px"><h3>Income</h3><div class="li"><span>Income this month</span><b>${fmtMoney(C.income,cur)}</b></div></div>`;
+return nav+ban+sum+list+incm}
 
 const V={
 today(){const hb=hab(day),d=day,c=calc(),dg=dayGoal(d),t=tot(d),bud=dg.k,left=Math.round(bud-t.k),pr=bud?Math.min(1,t.k/bud):(t.k?1:0),over=left<0,goal={cut:'Losing fat',maint:'Maintaining',bulk:'Building muscle'}[S.p.goal],nb='style="min-width:48px;flex:none"';
@@ -3340,7 +3403,7 @@ person:'<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" strok
 /* section key -> {label, icon, subs:[[subKey, EnglishLabel]], view:fn for single-screen} */
 const SECTIONS=[
 ['health','Health',ICO.heart,[['today','Today'],['tracking','Tracking'],['gym','Gym'],['stats','Stats']]],
-['finance','Finance',ICO.wallet,[['accounts','Accounts'],['transactions','Transactions']]],
+['finance','Finance',ICO.wallet,[['accounts','Accounts'],['transactions','Transactions'],['budget','Budget']]],
 ['study','Study',ICO.book,null],
 ['planner','Planner',ICO.list,[['dashboard','Dashboard'],['tasks','Tasks'],['notes','Notes'],['habits','Habits'],['journal','Journal'],['bookmarks','Bookmarks'],['calendar','Calendar']]],
 ['profile','Profile',ICO.person,null]];
@@ -3368,7 +3431,7 @@ else if(sec=='health'){
 if(foodsMode){legacy='foods';body=V.foods()}
 else{const sub=subOf.health=='week'?'stats':(subOf.health||'today');legacy=sub;const vk={today:'today',tracking:'tracking',gym:'gym',stats:'stats'}[sub]||'today';body=subRow(info.subs,sub)+V[vk]()}}
 else if(sec=='planner'){const sub=subOf.planner||'dashboard';legacy=sub;body=subRow(info.subs,sub)+(sub=='dashboard'?V.dashboard():sub=='notes'?V.notes():sub=='habits'?V.habits():sub=='journal'?V.journal():sub=='bookmarks'?V.bookmarks():sub=='calendar'?V.calendar():V.tasks())}
-else if(sec=='finance'){const sub=subOf.finance=='transactions'?'transactions':'accounts';legacy=sub;body=subRow(info.subs,sub)+`<div class="row" style="justify-content:flex-end;margin:0 0 8px"><button class="btn p s" style="flex:none" data-a="txadd" aria-label="Add transaction">+</button></div>`+(sub=='transactions'?finTxView():finView())}
+else if(sec=='finance'){const sub=['transactions','budget'].includes(subOf.finance)?subOf.finance:'accounts';legacy=sub;body=subRow(info.subs,sub)+(sub=='budget'?'':`<div class="row" style="justify-content:flex-end;margin:0 0 8px"><button class="btn p s" style="flex:none" data-a="txadd" aria-label="Add transaction">+</button></div>`)+(sub=='transactions'?finTxView():sub=='budget'?finBudgetView():finView())}
 else{/* provisional */const line=SOON[sec]||'';body=`<div class="cs"><div class="csi" aria-hidden="true">${info.icon}</div><h2>${info.label}</h2><div class="cst">Coming soon</div><p>${line}</p></div>`}
 tab=legacy;
 m.innerHTML=body.replace(/>\s*(?:undefined|null)\s*</g,"><");if(!$('#gout')&&glgHtml){glg=null;glgClear()}m.classList.toggle('wide',legacy=='stats');m.style.animation='none';m.offsetHeight;m.style.animation='';
@@ -3526,6 +3589,12 @@ else if(a=='txclr'){finTxF={acct:finTxF.acct,cat:'',type:'all',range:'all',from:
 else if(a=='txmore'){finTxLim+=100;render();return}
 else if(a=='finup'||a=='findn'){finMove(+b.dataset.id,a=='finup'?-1:1);return}
 else if(a=='fincl'){finClosed=!finClosed;render();return}
+else if(a=='finbm'){const v=b.dataset.v;finBM=v=='now'?today().slice(0,7):finMonthAdd(finBM,+v)||finBM;finBE=null;finBX=null;finBCopyArm=0;render();return}
+else if(a=='finbedit'){finBE=b.dataset.id;finBCopyArm=0;render();const x=document.getElementById('fin_be');if(x){x.focus();x.select()}return}
+else if(a=='finbx'){finBX=finBX==b.dataset.id?null:b.dataset.id;render();return}
+else if(a=='finbcopy'){const f=S.fin,src=finBudgetCopy(f,finBM);if(!Object.keys(src).length){toast('Nothing to copy from last month');finBCopyArm=0;return}if(f.budget&&f.budget[finBM]&&!finBCopyArm){finBCopyArm=1;render();return}finBCopyArm=0;f.budget=f.budget||{};f.budget[finBM]=src;save();render();return}
+else if(a=='finblast'||a=='finbavg'){const id=+b.dataset.id,now=today().slice(0,7);finBSet(id,a=='finblast'?finBudgetSpent(S.fin,finMonthAdd(finBM,-1),id,now):finBudgetAvg3(S.fin,finBM,id,now));render();return}
+else if(a=='finbsee'){const m=/^(\d{4})-(\d{2})$/.exec(finBM);if(!m)return;const id=b.dataset.id;finTxF={acct:0,cat:id=='none'?'none':+id,type:'all',range:'custom',from:finBM+'-01',to:finBM+'-'+String(new Date(+m[1],+m[2],0).getDate()).padStart(2,'0'),q:''};finTxLim=100;goSub('transactions');scrollTo(0,0);return}
 else if(a=='fincur'){const c=finCur(b.dataset.v);if(c!=S.fin.cur){S.fin.cur=c;save();render();toast('Currency changed. Amounts are not converted.')}return}
 else if(a=='npdel'){delete (S.nap??={})[day];toast('Nap cleared')}
 else if(a=='del'){lgEd=null;ateShift(day,+b.dataset.i);S.log[day].splice(+b.dataset.i,1)}
@@ -3713,7 +3782,7 @@ const D={
 "bar only":"solo la barra","Smith / resistance profile":"Barra Smith / máquina","Bar weight (lb)":"Peso de la barra (lb)","weight":"peso",
 "👟 Steps":"👟 Pasos","Target 8,000–10,000 steps/day":"Meta: 8.000–10.000 pasos al día","Not logged yet":"Aún sin registrar","Keep walking":"Sigue caminando","In the target range ✅":"En el rango objetivo ✅","Above target 🔥":"Por encima de la meta 🔥","Steps today":"Pasos de hoy","Total steps":"Pasos totales","Save":"Guardar","Last 7 days":"Últimos 7 días","Avg":"Prom.","Walking burns fat without taxing your muscle recovery or nervous system.":"Caminar quema grasa sin comprometer la recuperación muscular ni el sistema nervioso.","😴 Sleep & recovery":"😴 Sueño y recuperación","Target 7–9 hours of quality sleep":"Meta: 7–9 horas de sueño de calidad","Under-recovered ⚠️":"Recuperación insuficiente ⚠️","Almost there":"Casi en la meta","In the zone ✅":"En la zona ✅","Long sleep":"Sueño largo","Hours slept":"Horas dormidas","e.g. 7.5":"p. ej. 7,5","Stress today":"Estrés de hoy","1 = calm · 5 = very stressed":"1 = tranquilo · 5 = muy estresado","Low sleep or high stress: consider trimming volume or intensity today.":"Poco sueño o mucho estrés: considera reducir el volumen o la intensidad hoy.","Sleep and stress set how much training volume you can tolerate and how well you build muscle.":"El sueño y el estrés determinan cuánto volumen de entrenamiento toleras y qué tan bien ganas músculo.","💊 Creatine":"💊 Creatina","Mark as taken":"Marcar como tomada","Taken today ✅":"Tomada hoy ✅","Day streak":"Días seguidos","This week":"Esta semana","Creatine monohydrate, 3–5 g daily. Consistency matters more than timing.":"Monohidrato de creatina, 3–5 g al día. La constancia importa más que el horario.","Steps saved":"Pasos guardados","Steps added":"Pasos sumados","Enter your steps":"Ingresa tus pasos","Sleep saved":"Sueño guardado","Sleep cleared":"Sueño borrado","Enter hours between 0 and 24":"Ingresa horas entre 0 y 24","Creatine logged":"Creatina registrada","Creatine unmarked":"Creatina desmarcada",
 "Burgundy theme":"Tema vino","Olive theme":"Tema oliva","Cream theme":"Tema crema","Toggle light or dark":"Cambiar claro u oscuro","Language":"Idioma",
-"Accounts":"Cuentas","Net worth":"Patrimonio neto","On budget":"Dentro del presupuesto","Off budget":"Fuera del presupuesto","Cash":"Efectivo","Checking":"Cuenta corriente","Savings":"Ahorros","Credit card":"Tarjeta de crédito","Investment":"Inversión","Close account":"Cerrar cuenta","Reopen account":"Reabrir cuenta","Delete account":"Eliminar cuenta","Tap again to delete":"Toca de nuevo para eliminar","Add account":"Agregar cuenta","New account":"Nueva cuenta","Edit account":"Editar cuenta","Account name":"Nombre de la cuenta","Type":"Tipo","Currency":"Moneda","COP · Colombian peso":"COP · Peso colombiano","USD · US dollar":"USD · Dólar estadounidense","Save account":"Guardar cuenta","Account saved":"Cuenta guardada","Account closed":"Cuenta cerrada","Account reopened":"Cuenta reabierta","Account deleted":"Cuenta eliminada","Closed accounts":"Cuentas cerradas","Untitled":"Sin título","Balance date":"Fecha del saldo","Enter an account name.":"Escribe un nombre para la cuenta.","Enter a valid amount.":"Escribe un monto válido.","For a credit card, enter the amount you owe. It is counted as debt.":"Para una tarjeta de crédito, escribe lo que debes. Se cuenta como deuda.","No accounts yet. Add your bank accounts, cash and cards to see your net worth.":"Aún no hay cuentas. Agrega tus cuentas bancarias, efectivo y tarjetas para ver tu patrimonio neto.","Currency changed. Amounts are not converted.":"Moneda cambiada. Los montos no se convierten.","Move up":"Subir","Move down":"Bajar",
+"Accounts":"Cuentas","Net worth":"Patrimonio neto","On budget":"Dentro del presupuesto","Off budget":"Fuera del presupuesto","Cash":"Efectivo","Checking":"Cuenta corriente","Savings":"Ahorros","Credit card":"Tarjeta de crédito","Investment":"Inversión","Close account":"Cerrar cuenta","Reopen account":"Reabrir cuenta","Delete account":"Eliminar cuenta","Tap again to delete":"Toca de nuevo para eliminar","Add account":"Agregar cuenta","New account":"Nueva cuenta","Edit account":"Editar cuenta","Account name":"Nombre de la cuenta","Type":"Tipo","Currency":"Moneda","COP · Colombian peso":"COP · Peso colombiano","USD · US dollar":"USD · Dólar estadounidense","Save account":"Guardar cuenta","Account saved":"Cuenta guardada","Account closed":"Cuenta cerrada","Account reopened":"Cuenta reabierta","Account deleted":"Cuenta eliminada","Closed accounts":"Cuentas cerradas","Untitled":"Sin título","Balance date":"Fecha del saldo","Enter an account name.":"Escribe un nombre para la cuenta.","Enter a valid amount.":"Escribe un monto válido.","For a credit card, enter the amount you owe. It is counted as debt.":"Para una tarjeta de crédito, escribe lo que debes. Se cuenta como deuda.","No accounts yet. Add your bank accounts, cash and cards to see your net worth.":"Aún no hay cuentas. Agrega tus cuentas bancarias, efectivo y tarjetas para ver tu patrimonio neto.","Currency changed. Amounts are not converted.":"Moneda cambiada. Los montos no se convierten.","To budget":"Por asignar","Overbudgeted":"Sobreasignado","Available funds":"Fondos disponibles","Overspent last month":"Sobregirado el mes pasado","Budgeted":"Asignado","Spent":"Gastado","Income this month":"Ingresos del mes","Edit budget":"Editar presupuesto","See transactions":"Ver transacciones","Copy last month's budget":"Copiar presupuesto del mes pasado","Replace this month's budget?":"¿Reemplazar el presupuesto de este mes?","Nothing to copy from last month":"No hay nada que copiar del mes pasado","Last month's spent":"Gastado el mes pasado","3-month average":"Promedio de 3 meses","No accounts yet. Add an account to start budgeting.":"Aún no hay cuentas. Agrega una cuenta para empezar a presupuestar.","No on-budget accounts. Mark an account as on budget to start budgeting.":"No hay cuentas dentro del presupuesto. Marca una cuenta como dentro del presupuesto para empezar a presupuestar.","Move up":"Subir","Move down":"Bajar",
 "Health":"Salud","Finance":"Finanzas","Study":"Estudios","Planner":"Planner","Profile":"Perfil","Coming soon":"Próximamente","Track your finances and control spending.":"Medir tus finanzas y controlar gastos.","Manage everything academic.":"Gestionar todo lo académico.","Tasks, notes, reminders and a habit routine.":"Tareas, notas, recordatorios y rutina de hábitos.",
 "Tasks":"Tareas","New task":"Nueva tarea","Edit task":"Editar tarea","Title":"Título","Description":"Descripción","Priority":"Prioridad","Low":"Baja","Medium":"Media","High":"Alta","Due date":"Fecha límite","Reminder":"Recordatorio","Subtasks":"Subtareas","Add subtask":"Agregar subtarea","Completed":"Completadas","Pending":"Pendientes","No tasks yet":"Aún no hay tareas","Save task":"Guardar tarea","Task saved":"Tarea guardada","Task deleted":"Tarea eliminada","Add a title":"Agrega un título","What needs doing?":"¿Qué hay que hacer?","New subtask":"Nueva subtarea","Subtask":"Subtarea","Pick a date above to set a due date (optional).":"Elige una fecha arriba para poner una fecha límite (opcional).","Toggle subtask":"Alternar subtarea","Toggle task complete":"Alternar tarea completada","Remove subtask":"Quitar subtarea","Reminder date and time":"Fecha y hora del recordatorio","Clear date":"Quitar fecha","No due date":"Sin fecha límite",
 "Habits":"Hábitos","New habit":"Nuevo hábito","Edit habit":"Editar hábito","Habit name":"Nombre del hábito","Icon":"Icono","Done today":"Hecho hoy","Mark done":"Marcar hecho","Streak":"Racha","Best":"Mejor","Current streak":"Racha actual","Best streak":"Mejor racha","Current streak · Best streak":"Racha actual · Mejor racha","No habits yet":"Aún no hay hábitos","Save habit":"Guardar hábito","Habit saved":"Hábito guardado","Habit deleted":"Hábito eliminado","Toggle habit for today":"Alternar hábito de hoy","Mark day":"Marcar día","Add a name":"Agrega un nombre",
@@ -3845,7 +3914,8 @@ new MutationObserver(rs=>{for(const r of rs){if(r.type=='characterData')tr(r.tar
 document.addEventListener('input',e=>{if(e.target.id!='fin_q')return;finTxF.q=e.target.value;finTxLim=100;const l=document.getElementById('fin_list');if(l)l.innerHTML=finTxList()});
 document.addEventListener('change',e=>{const id=e.target.id,F=finTxF;if(id=='fin_fa')F.acct=+e.target.value||0;else if(id=='fin_fc')F.cat=e.target.value;else if(id=='fin_ft')F.type=e.target.value;else if(id=='fin_f1')F.from=e.target.value;else if(id=='fin_f2')F.to=e.target.value;
 else if(id=='fin_tp'&&finTx){const k=e.target.value.trim().toLowerCase(),c=document.getElementById('fin_tc');if(k&&c&&c.value===''){const t=finSortTx(S.fin.tx.filter(x=>x.cat!=null&&(x.payee||'').toLowerCase()==k),true)[0];if(t)c.value=String(t.cat)}return}else return;finTxLim=100;render()});
-document.addEventListener('keydown',e=>{if(e.key!='Enter')return;const m={stv:'stset',slv:'slset',npv:'npset',fin_name:'finsave',fin_start:'finsave',fin_tam:'txsave'}[e.target.id];if(m){e.preventDefault();const b=document.querySelector('[data-a="'+m+'"]');if(b)b.click()}});
+document.addEventListener('focusout',e=>{if(e.target.id!='fin_be'||finBE==null)return;const id=finBE;finBE=null;const raw=e.target.value.trim(),n=raw===''?0:parseAmount(raw,S.fin.cur);if(n===null||n<0)toast('Enter a valid amount.');else finBSet(id,n);if(!e.relatedTarget)render()});
+document.addEventListener('keydown',e=>{if(e.target.id=='fin_be'){if(e.key=='Enter'){e.preventDefault();e.target.blur()}else if(e.key=='Escape'){finBE=null;render()}return}if(e.key!='Enter')return;const m={stv:'stset',slv:'slset',npv:'npset',fin_name:'finsave',fin_start:'finsave',fin_tam:'txsave'}[e.target.id];if(m){e.preventDefault();const b=document.querySelector('[data-a="'+m+'"]');if(b)b.click()}});
 setInterval(wtick,20000);subOf.health='today';goSection('health');if(!S.done){$('#ob').hidden=false;obr()}else{mprompt();wprompt()}
 
 /* ---- PWA: installable, offline-first ------------------------------------

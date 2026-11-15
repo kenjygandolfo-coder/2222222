@@ -17,7 +17,7 @@ function konst(name) {
   if (!m) throw new Error('const not found: ' + name);
   return m[0];
 }
-const FNS = ['finCur','parseAmount','fmtMoney','accountBalance','finTotals','finDate','finIds','finNorm','finSortTx','finRunning','finRange','finFilter','finTxTotals','finPayeeRank'];
+const FNS = ['finCur','parseAmount','fmtMoney','accountBalance','finTotals','finDate','finIds','finNorm','finSortTx','finRunning','finRange','finFilter','finTxTotals','finPayeeRank','finMonth','finMonthAdd','finBudgetCalc','finBudgetCopy','finBudgetSpent','finBudgetAvg3'];
 /* todayStr is what today() returns inside finNorm */
 export function loadFin(todayStr = '2026-11-14') {
   const code = konst('FIN_TYPES') + '\n' + konst('FIN_CATS') + '\nconst today=()=>' + JSON.stringify(todayStr) + ';\n' + FNS.map(fn).join('\n') + '\nreturn{' + FNS.join(',') + ',FIN_TYPES,FIN_CATS}';
