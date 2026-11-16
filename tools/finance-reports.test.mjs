@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import {loadFin} from './fin-extract.mjs';
 const F=loadFin('2026-11-14');
-const {finNorm,finRepRange,finRepMonths,finRepFlow,finRepRate,finRepSeries,finRepRank,finRepPrev,finRepDelta,finRepCmp,finRepNetWorth,finRepThin,finRepCompact,accountBalance,finTotals,finSplitSet}=F;
+const {finNorm,finRepRange,finRepMonths,finRepFlow,finRepRate,finRepSeries,finRepRank,finRepPrev,finRepCap,finRepDelta,finRepCmp,finRepNetWorth,finRepThin,finRepCompact,accountBalance,finTotals,finSplitSet}=F;
 let passed=0;const t=(n,f)=>{f();passed++;console.log('ok  '+n)};
 const NOW='2026-11-14';
 const A=(o)=>Object.assign({id:1,name:'Main',onBudget:true,start:0,startDate:'2026-01-01'},o);
@@ -130,4 +130,18 @@ t('group delta',()=>{
  const cu=finRepFlow(f,{from:'2026-11-01',to:'2026-11-30'}),pr=finRepFlow(f,{from:'2026-10-01',to:'2026-10-31'});
  const rows=finRepCmp(finRepRank(cu.exp,f,8,'group'),finRepRank(cu.exp,f,1e5,'group'),finRepRank(pr.exp,f,1e5,'group'));
  assert.equal(rows.length,1);assert.equal(rows[0].id,'g1');assert.deepEqual(rows[0].d,{amt:100,pct:50,kind:'up'})});
+
+t('month-to-date cap and same-span previous range',()=>{
+ const m={from:'2026-11-01',to:'2026-11-30'};
+ assert.deepEqual(finRepCap(m,NOW,'this'),{from:'2026-11-01',to:'2026-11-14'});
+ assert.deepEqual(finRepCap(finRepRange('l3',NOW,[]),NOW,'l3'),{from:'2026-09-01',to:'2026-11-14'});
+ assert.deepEqual(finRepCap(m,'2026-11-30','this'),m);
+ assert.deepEqual(finRepCap(m,NOW,'custom'),m);
+ assert.deepEqual(finRepCap(m,NOW,'all'),m);
+ assert.deepEqual(finRepCap({from:'2026-10-01',to:'2026-10-31'},NOW,'last'),{from:'2026-10-01',to:'2026-10-31'});
+ assert.deepEqual(finRepPrev(m,NOW),{from:'2026-10-01',to:'2026-10-14'});
+ assert.deepEqual(finRepPrev({from:'2026-03-01',to:'2026-03-31'},'2026-03-30'),{from:'2026-02-01',to:'2026-02-28'});
+ assert.deepEqual(finRepPrev({from:'2026-09-01',to:'2026-11-30'},NOW),{from:'2026-06-01',to:'2026-08-14'});
+ assert.deepEqual(finRepPrev(m,'2026-12-05'),{from:'2026-10-01',to:'2026-10-31'});
+ assert.deepEqual(finRepPrev(m),{from:'2026-10-01',to:'2026-10-31'})});
 console.log('\n'+passed+' passed');
