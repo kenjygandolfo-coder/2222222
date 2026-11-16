@@ -89,4 +89,17 @@ t('fast-forward walk gives the same dates as a full walk',()=>{const rules=[{fre
 t('post twice returns null the second time (UI shows Already posted) and still advances last',()=>{const f=base(),s=add(f,{});const d='2026-01-05';assert.ok(post(f,s,d));s.last=null;assert.equal(post(f,s,d),null);assert.equal(s.last,d);assert.equal(f.tx.filter(x=>x.sched==s.id).length,1)});
 t('skip then pending moves on and skip is idempotent',()=>{const f=base(),s=add(f,{});assert.equal(F.finSchedPending(s),'2026-01-05');assert.equal(skip(f,s,'2026-01-05'),true);skip(f,s,'2026-01-05');assert.deepEqual(s.skipped,['2026-01-05']);assert.equal(F.finSchedPending(s),'2026-02-05')});
 t('finScRule validates the editor input',()=>{const ok={start:'2026-01-05',freq:'month',n:'1',dom:'5',end:'never',skipWeekend:'none'};assert.equal(F.finScRule(ok).err,undefined);assert.ok(F.finScRule({...ok,start:'nope'}).err);assert.ok(F.finScRule({...ok,n:'0'}).err);assert.ok(F.finScRule({...ok,end:'on',edate:'2025-01-01'}).err)});
+t('finSchedDel removes the schedule, keeps its posted tx and strips the links',()=>{const f=base(),s=add(f,{}),o=add(f,{name:'Other',start:'2026-02-05'});assert.ok(post(f,s,'2026-01-05'));assert.ok(post(f,o,'2026-02-05'));const n=f.tx.length;
+ assert.equal(F.finSchedDel(f,s.id),true);assert.equal(f.sched.length,1);assert.equal(f.sched[0].id,o.id);assert.equal(f.tx.length,n,'past tx kept');
+ const g=f.tx.filter(x=>x.sched==null);assert.equal(g.length,1);assert.ok(!('schedDate' in g[0]));assert.equal(f.tx.filter(x=>x.sched==o.id).length,1,'other schedule links kept');
+ assert.equal(F.finSchedDel(f,s.id),false,'second delete is a no-op');const r=rt(f);assert.equal(r.tx.length,n);assert.ok(r.tx.every(x=>x.sched==null||x.sched==o.id))});
+t('a deleted card schedule is not recreated by an unrelated card edit and the button can add it again',()=>{const f=finNorm({accounts:[AC(1,'Bank',true,{start:1000000}),AC(2,'Visa',true,{type:'credit',limit:5000000,payDay:10,cutDay:3})],tx:[],ntx:1});
+ const c=f.accounts[1],sc=F.finCardSchedMake(f,c,'2026-11-14',{from:1,pfx:'Pay'});assert.ok(sc&&F.finCardSched(f,2));assert.equal(F.finSchedDel(f,sc.id),true);assert.equal(F.finCardSched(f,2),null);
+ const pv={name:c.name,payDay:c.payDay,closed:c.closed,wasCr:true};c.name='Visa Gold';assert.equal(F.finCardSchedSync(f,c,pv,'2026-11-14'),false);assert.equal(f.sched.length,0);
+ assert.equal(F.finCardSchedDup(f,2,0),false);assert.ok(F.finCardSchedMake(f,c,'2026-11-14',{from:1,pfx:'Pay'}),'can be added again')});
+t('a deleted debt schedule leaves the debt usable and can be recreated',()=>{const f=finNorm({accounts:[AC(1,'Bank',true,{start:1000000})],tx:[],ntx:1});
+ const d=F.finDebtNorm({dir:'owe',method:'french',principal:1200000,ea:0.12,termMonths:12,payDay:5,firstDue:'2026-12-05',paid:0,extra:'term',remindDays:3});f.accounts.push({id:5,name:'Loan',type:'loan',onBudget:false,start:-1200000,startDate:'2026-11-01',order:5,closed:false,debt:d});f.nid=6;
+ const sc=F.finDebtSchedMake(f,f.accounts[1],'2026-11-14',{from:1,mode:'remind',pfx:'Pay'});assert.ok(sc&&sc.debt==5);assert.equal(F.finSchedDel(f,sc.id),true);assert.equal(F.finDebtSched(f,5),null);
+ assert.equal(F.finDebtSchedSync(f,f.accounts[1],{name:'Loan',closed:false},'2026-11-14'),false);assert.ok(Number.isFinite(F.finDebtDue(f,f.accounts[1])));assert.equal(F.finSchedExp(f,{amtDyn:'debtDue',debt:5})>=0,true);assert.equal(f.sched.length,0);
+ assert.ok(F.finDebtSchedMake(f,f.accounts[1],'2026-11-14',{from:1,mode:'remind',pfx:'Pay'}),'recreate')});
 console.log(passed+' tests passed');
