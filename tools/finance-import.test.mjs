@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import {loadFin} from './fin-extract.mjs';
 const F=loadFin('2026-11-14');
-const {finNorm,finCsvDecode,finCsvParse,finCsvDelim,finCsvAuto,finCsvHead,finCsvGuess,finCsvAmt,finCsvDec,finCsvDate,finCsvDateFmt,finCsvRows,finCsvHash,finCsvReview,finCsvCommit,finCsvMapNorm,finClr,finRulesNew}=F;
+const {finNorm,finCsvDecode,finCsvParse,finCsvDelim,finCsvAuto,finCsvHead,finCsvGuess,finCsvAmt,finCsvDec,finCsvDate,finCsvDateFmt,finCsvRows,finCsvHash,finCsvReview,finCsvCommit,finCsvMapNorm,finCsvFits,finClr,finRulesNew}=F;
 let passed=0;const t=(n,f)=>{f();passed++;console.log('ok  '+n)};
 const rt=f=>finNorm(JSON.parse(JSON.stringify(f)));
 const AC=(id,name,o)=>Object.assign({id,name,type:'checking',onBudget:true,start:0,startDate:'2026-01-01'},o);
@@ -104,4 +104,14 @@ t('csvMap and tx.imp are validated by finNorm, idempotently',()=>{
  assert.deepEqual(f.accounts[0].csvMap,ok);for(const i of[1,2,3,4])assert.ok(!('csvMap' in f.accounts[i]),'account '+i);
  assert.deepEqual(f.accounts[5].csvMap,{date:1,payee:-1,notes:-1,amt:-1,out:3,in:4,inv:false,hdr:false,fmt:'ymd'});assert.deepEqual(f.accounts[6].csvMap,{date:0,payee:-1,notes:-1,amt:2,out:-1,in:-1,inv:false,hdr:false,fmt:'auto'});
  assert.deepEqual(f.tx.map(x=>x.imp),['abc123',undefined,undefined,undefined]);const g=rt(f);assert.deepEqual(g,f);assert.deepEqual(rt(g),g);assert.deepEqual(finCsvMapNorm(ok),{csvMap:ok});assert.deepEqual(finCsvMapNorm(null),{})});
+t('fuzzy duplicates can be forced; rows past 300 are real, selectable items',()=>{
+ const f=base([TX(1,1,'2026-11-01',-500000,{payee:'Rent'})]);
+ const it=run(f,'Date,Desc,Amt\n2026-11-02,Other shop,-5000\n',M(),1);assert.equal(it[0].st,'dup');assert.ok(it[0].fz);assert.equal(it[0].sel,false);
+ assert.equal(finCsvCommit(f,1,it),0);it[0].sel=true;assert.equal(finCsvCommit(f,1,it),1);assert.equal(f.tx.length,2);
+ const g=base([]);let csv='Date,Desc,Amt\n';for(let i=0;i<350;i++)csv+='2026-01-01,P'+i+',-'+(i+1)+'\n';
+ const r=run(g,csv,M(),1);assert.equal(r.length,350);assert.ok(r.every(x=>x.st=='new'&&x.sel));for(let i=300;i<350;i++)r[i].sel=false;assert.equal(finCsvCommit(g,1,r),300)});
+t('saved map shortcut needs same header presence, columns in range and parseable rows',()=>{
+ const rows=finCsvParse('Date,Description,Amount\n2026-11-01,A,-5\n2026-11-02,B,-6\n',','),hd=finCsvHead(rows),sv={date:0,payee:1,notes:-1,amt:2,out:-1,in:-1,inv:false,hdr:true,fmt:'auto'};
+ assert.ok(finCsvFits(sv,hd,rows));assert.ok(!finCsvFits(null,hd,rows));assert.ok(!finCsvFits(Object.assign({},sv,{hdr:false}),hd,rows));assert.ok(!finCsvFits(sv,null,rows));
+ assert.ok(!finCsvFits(Object.assign({},sv,{amt:5}),hd,rows));assert.ok(!finCsvFits(Object.assign({},sv,{date:1}),hd,rows))});
 console.log(passed+' passed');
