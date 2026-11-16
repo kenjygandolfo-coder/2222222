@@ -1155,7 +1155,7 @@ const toast=m=>{const t=$('#toast');t.textContent=m;t.className='on';clearTimeou
 /* ===== Build info: triple tap or long press on the Forma logo shows the last update time =====
    UPDATE BUILD_TS AND BUILD_VER ON EVERY CHANGE, together with the CACHE name in sw.js
    (BUILD_VER must equal sw.js CACHE). BUILD_TS is an ISO-8601 UTC string. */
-const BUILD_TS='2026-11-16T17:40:34Z',BUILD_VER='forma-v95';
+const BUILD_TS='2026-11-16T18:20:00Z',BUILD_VER='forma-v96';
 const buildMsg=(ts,ver,lang,lastMod)=>{const d=new Date(lastMod||ts),ok=!isNaN(d.getTime()),s=ok?d.toLocaleString(lang=='es'?'es':'en-US',{dateStyle:'medium',timeStyle:'short'}):String(ts);return(lang=='es'?'Última actualización: ':'Last updated: ')+s+' ('+ver+')'};
 function buildInfo(){const lg=typeof LANG!='undefined'?LANG:'en',show=lm=>toast(buildMsg(BUILD_TS,BUILD_VER,lg,lm));let done=0;const fin=lm=>{if(!done){done=1;show(lm)}};setTimeout(()=>fin(''),1500);try{fetch(location.pathname,{method:'HEAD',cache:'no-store'}).then(r=>fin(r.ok?r.headers.get('Last-Modified'):'')).catch(()=>fin(''))}catch(e){fin('')}}
 (function(){const h=document.querySelector('header h1');if(!h)return;h.style.cssText+=';user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;cursor:default';let n=0,tt=0,lp=0,fired=0;
@@ -1808,7 +1808,7 @@ ${d.err?`<div class="note" role="alert">${esc(d.err)}</div>`:''}
 <div class="row" style="margin-top:8px"><button class="btn p" data-a="finsave">Save account</button><button class="btn t" data-a="finx">Cancel</button></div>
 ${nw||!S.fin.tx.some(t=>t.acct==d.id)?'':'<p class="cap">Deleting an account also deletes its transactions.</p>'}
 ${nw?'':`<div class="row" style="margin-top:8px"><button class="btn s t" data-a="finclose">${d.closed?'Reopen account':'Close account'}</button><button class="btn s t" data-a="findel">${finDelArm?'Tap again to delete':'Delete account'}</button></div>`}</div></div>`}
-function finMount(on,force){const r=document.getElementById('finroot');if(!r)return;if(!on){finEd=null;finTx=null;finMg=null;finSc=null;finRl=null;finRc=null;finIm=null;finDelArm=0}if((finEd||finTx||finMg||finSc||finRl||finRc||finIm)&&!force&&r.querySelector('.glgm'))return;const m=r.querySelector('.glgm'),t=m?m.scrollTop:0;r.innerHTML=finEd?finHtml():finTx?finTxHtml():finMg?finMgHtml():finSc?finScHtml():finRl?finRlHtml():finRc?finRcHtml():finIm?finImHtml():'';const n=r.querySelector('.glgm');if(n&&m)n.scrollTop=t;lockSync()}
+function finMount(on,force){const r=document.getElementById('finroot');if(!r)return;if(!on){finEd=null;finTx=null;finMg=null;finSc=null;finRl=null;finRc=null;finIm=null;finDelArm=0}if((finEd||finTx||finMg||finSc||finRl||finRc||finIm)&&!force&&r.querySelector('.glgm'))return;const m=r.querySelector('.glgm'),t=m?m.scrollTop:0;r.innerHTML=finEd?finHtml():finTx?finTxHtml():finMg?finMgHtml():finSc?finScHtml():finRl?finRlHtml():finRc?finRcHtml():finIm?finImHtml():'';dd();const n=r.querySelector('.glgm');if(n&&m)n.scrollTop=t;lockSync()}
 /* auto-post due schedules; toast only when something was posted. launch=true also nudges once per launch about manual schedules that are due. */
 let finSchedNag=false;
 function finSchedRun(launch){const f=S.fin,n=finSchedAuto(f,today());if(n){save();toast(n==1?'1 scheduled transaction posted':n+' scheduled transactions posted');return n}

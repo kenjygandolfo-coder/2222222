@@ -1,5 +1,6 @@
 /* Dev-only test for Finance transfers (pure logic), extracted from index.html by tools/fin-extract.mjs.
    Run: node tools/finance-transfer.test.mjs */
+import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {loadFin} from './fin-extract.mjs';
 const F=loadFin('2026-11-14');
@@ -66,4 +67,8 @@ t('account deletion converts the surviving side to a normal tx',()=>{const f=bas
  assert.equal(f.accounts.length,4);assert.equal(f.tx.length,2);const s=f.tx.find(x=>x.id==o.id);assert.equal('xfer'in s,false);assert.equal(s.amt,-40000);assert.equal(s.notes,'keep');assert.equal(s.payee,'');assert.equal(s.cat,g);assert.ok(!f.tx.some(x=>x.id==i.id));assert.deepEqual(rt(f),f);
  assert.equal(B(f).cats[g].activity,-40000)});
 t('finNorm is idempotent with transfers and orphans',()=>{const f=base();mk(f,1,2,1);mk(f,1,3,2,{cat:cid(f,'Other')});mk(f,3,1,3);mk(f,5,1,4);f.tx.push({id:f.ntx++,acct:2,date:'2026-11-05',payee:'',cat:null,amt:-8,notes:'',xfer:77});const a=rt(f);assert.deepEqual(rt(a),a);assert.deepEqual(rt(rt(a)),a)});
+t('transfer between two non-default accounts out of three, then change both accounts',()=>{const f=base(),[o,i]=mk(f,2,5,30000);
+ assert.equal(o.acct,2);assert.equal(i.acct,5);assert.ok(finXferSet(f,o.id,{from:3,to:2,amt:30000,date:'2026-11-05'}));assert.equal(o.acct,3);assert.equal(i.acct,2);assert.deepEqual(rt(f),f)});
+t('finMount rebuilds the custom dropdowns (select is display:none) so From/To/Account are visible',()=>{
+ const src=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8'),m=/function finMount\([^)]*\)\{[^\n]*/.exec(src)[0];assert.ok(/finImHtml\(\):'';dd\(\);/.test(m));assert.ok(/^select\{display:none\}/m.test(src))});
 console.log(passed+' tests passed');
