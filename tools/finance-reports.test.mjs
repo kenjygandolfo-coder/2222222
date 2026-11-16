@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import {loadFin} from './fin-extract.mjs';
 const F=loadFin('2026-11-14');
-const {finNorm,finRepRange,finRepMonths,finRepFlow,finRepRate,finRepSeries,finRepRank,finRepNetWorth,finRepThin,finRepCompact,accountBalance,finTotals,finSplitSet}=F;
+const {finNorm,finRepRange,finRepMonths,finRepFlow,finRepRate,finRepSeries,finRepRank,finRepPrev,finRepDelta,finRepCmp,finRepNetWorth,finRepThin,finRepCompact,accountBalance,finTotals,finSplitSet}=F;
 let passed=0;const t=(n,f)=>{f();passed++;console.log('ok  '+n)};
 const NOW='2026-11-14';
 const A=(o)=>Object.assign({id:1,name:'Main',onBudget:true,start:0,startDate:'2026-01-01'},o);
@@ -86,4 +86,48 @@ t('compact formatter',()=>{
  assert.equal(c(0),'0');assert.equal(c(NaN),'0');assert.equal(c(40),'0');assert.equal(c(95000),'950');assert.equal(c(120000),'1,2k');assert.equal(c(25000000),'250k');
  assert.equal(c(99995000),'1M');assert.equal(c(150000000),'1,5M');assert.equal(c(-150000000),'-1,5M');assert.equal(c(1000000000),'10M');assert.equal(c(20000000000),'200M');assert.equal(c(1e12),'10B');assert.equal(c(25e13),'2500B');
  assert.equal(finRepCompact(123456,'USD'),'1.2k');assert.equal(finRepCompact(-5000,'USD'),'-50');assert.equal(finRepCompact(100000,'USD'),'1k');assert.equal(finRepCompact(99999,'USD'),'1k')});
+t('previous period: whole months',()=>{
+ assert.deepEqual(finRepPrev({from:'2026-11-01',to:'2026-11-30'}),{from:'2026-10-01',to:'2026-10-31'});
+ assert.deepEqual(finRepPrev({from:'2026-01-01',to:'2026-01-31'}),{from:'2025-12-01',to:'2025-12-31'});
+ assert.deepEqual(finRepPrev({from:'2026-03-01',to:'2026-03-31'}),{from:'2026-02-01',to:'2026-02-28'});
+ assert.deepEqual(finRepPrev({from:'2028-03-01',to:'2028-03-31'}),{from:'2028-02-01',to:'2028-02-29'});
+ assert.deepEqual(finRepPrev({from:'2026-09-01',to:'2026-11-30'}),{from:'2026-06-01',to:'2026-08-31'});
+ assert.deepEqual(finRepPrev({from:'2026-01-01',to:'2026-03-31'}),{from:'2025-10-01',to:'2025-12-31'});
+ assert.deepEqual(finRepPrev({from:'2025-12-01',to:'2026-11-30'}),{from:'2024-12-01',to:'2025-11-30'});
+ assert.deepEqual(finRepPrev({from:'2026-01-01',to:'2026-11-30'}),{from:'2025-02-01',to:'2025-12-31'});
+ assert.deepEqual(finRepPrev(finRepRange('l6',NOW,[])),{from:'2025-12-01',to:'2026-05-31'})});
+t('previous period: custom spans',()=>{
+ assert.deepEqual(finRepPrev({from:'2026-03-10',to:'2026-03-16'}),{from:'2026-03-03',to:'2026-03-09'});
+ assert.deepEqual(finRepPrev({from:'2026-01-05',to:'2026-01-14'}),{from:'2025-12-26',to:'2026-01-04'});
+ assert.deepEqual(finRepPrev({from:'2026-03-01',to:'2026-03-10'}),{from:'2026-02-19',to:'2026-02-28'});
+ assert.deepEqual(finRepPrev({from:'2028-03-02',to:'2028-03-02'}),{from:'2028-03-01',to:'2028-03-01'});
+ assert.deepEqual(finRepPrev({from:'2026-02-15',to:'2026-04-14'}),{from:'2025-12-18',to:'2026-02-14'});
+ assert.equal(finRepPrev(null),null);assert.equal(finRepPrev({from:'x',to:'2026-01-01'}),null);assert.equal(finRepPrev({from:'2026-02-01',to:'2026-01-01'}),null)});
+t('delta kinds',()=>{
+ assert.deepEqual(finRepDelta(120,100),{amt:20,pct:20,kind:'up'});
+ assert.deepEqual(finRepDelta(75,100),{amt:-25,pct:-25,kind:'down'});
+ assert.deepEqual(finRepDelta(100,100),{amt:0,pct:0,kind:'same'});
+ assert.deepEqual(finRepDelta(50,0),{amt:50,pct:null,kind:'new'});
+ assert.equal(finRepDelta(1,3).pct,-66.7)});
+t('per-category delta against the previous period',()=>{
+ const f=mk({tx:[X(1,'2026-10-05',1,-100),X(2,'2026-10-06',2,-500),X(3,'2026-10-07',4,-40),X(4,'2026-11-05',1,-150),X(5,'2026-11-06',2,-500),X(6,'2026-11-07',3,900),X(7,'2026-11-08',null,-30)]});
+ const rg={from:'2026-11-01',to:'2026-11-30'},pv=finRepPrev(rg);
+ const cu=finRepFlow(f,{from:rg.from,to:rg.to}),pr=finRepFlow(f,{from:pv.from,to:pv.to});
+ const rk=finRepRank(cu.exp,f,8,'cat'),rows=finRepCmp(rk,finRepRank(cu.exp,f,1e5,'cat'),finRepRank(pr.exp,f,1e5,'cat'));
+ const g=id=>rows.find(r=>r.id==id);
+ assert.deepEqual(g(1).d,{amt:50,pct:50,kind:'up'});assert.equal(g(1).prev,100);
+ assert.equal(g(2).d.kind,'same');
+ assert.equal(g('none').d.kind,'new');assert.equal(g('none').prev,0);
+ assert.equal(g(4),undefined)});
+t('delta of the Other row uses the hidden categories',()=>{
+ const f=mk({cats:cats.concat([{id:5,name:'Gym',group:null}]),tx:[X(1,'2026-10-05',1,-10),X(2,'2026-10-06',2,-20),X(3,'2026-10-07',4,-30),X(4,'2026-11-05',1,-100),X(5,'2026-11-06',2,-200),X(6,'2026-11-07',4,-300),X(7,'2026-11-08',5,-50)]});
+ const cu=finRepFlow(f,{from:'2026-11-01',to:'2026-11-30'}),pr=finRepFlow(f,{from:'2026-10-01',to:'2026-10-31'});
+ const rk=finRepRank(cu.exp,f,2,'cat'),rows=finRepCmp(rk,finRepRank(cu.exp,f,1e5,'cat'),finRepRank(pr.exp,f,1e5,'cat')),o=rows.find(r=>r.id=='other');
+ assert.deepEqual(rows.map(r=>r.id),[4,2,'other']);assert.equal(o.amt,150);assert.equal(o.prev,10);assert.equal(o.d.kind,'up');assert.equal(rows[0].prev,30);
+ assert.deepEqual(finRepCmp({rows:[]},null,null),[])});
+t('group delta',()=>{
+ const f=mk({groups:[{id:1,name:'Home',order:0}],cats:[{id:1,name:'Food',group:1},{id:2,name:'Rent',group:1},{id:3,name:'Pay',group:null,income:true},{id:4,name:'Fun',group:null}],tx:[X(1,'2026-10-05',1,-100),X(2,'2026-10-06',2,-100),X(3,'2026-11-05',1,-150),X(4,'2026-11-06',2,-150)]});
+ const cu=finRepFlow(f,{from:'2026-11-01',to:'2026-11-30'}),pr=finRepFlow(f,{from:'2026-10-01',to:'2026-10-31'});
+ const rows=finRepCmp(finRepRank(cu.exp,f,8,'group'),finRepRank(cu.exp,f,1e5,'group'),finRepRank(pr.exp,f,1e5,'group'));
+ assert.equal(rows.length,1);assert.equal(rows[0].id,'g1');assert.deepEqual(rows[0].d,{amt:100,pct:50,kind:'up'})});
 console.log('\n'+passed+' passed');
