@@ -8,7 +8,7 @@ let passed=0;const t=(n,f)=>{f();passed++;console.log('ok  '+n)};
 const rt=f=>finNorm(JSON.parse(JSON.stringify(f)));
 const AC=(id,name,onBudget,o)=>Object.assign({id,name,type:'checking',onBudget,start:0,startDate:'2026-01-01'},o);
 const base=()=>finNorm({accounts:[AC(1,'Bank',true,{start:1000000}),AC(2,'Cash',true)],tx:[],ntx:1});
-const S=(o)=>{const s=Object.assign({id:0,name:'Rent',acct:1,payee:'Landlord',cat:null,amt:-500000,amtOp:'is',notes:'',start:'2026-01-05',rule:{freq:'month',n:1,dom:5},end:{type:'never'},auto:false,skipWeekend:'none',skipped:[],paused:false},o);s.mode=s.mode||(s.auto?'auto':'manual');s.remindDays=0;return s};
+const S=(o)=>{const s=Object.assign({id:0,name:'Rent',acct:1,payee:'Landlord',cat:null,amt:-500000,amtOp:'is',notes:'',start:'2026-01-05',rule:{freq:'month',n:1,dom:5},end:{type:'never'},auto:false,skipWeekend:'none',skipped:[],paused:false,kind:'tx'},o);s.mode=s.mode||(s.auto?'auto':'manual');s.remindDays=0;return s};
 const add=(f,o)=>{const s=S(o);s.id=f.nsch||1;f.nsch=s.id+1;f.sched.push(s);return s};
 
 t('daily and every N days',()=>{assert.deepEqual(occ(S({start:'2026-02-27',rule:{freq:'day',n:1}}),'2026-02-27','2026-03-02'),['2026-02-27','2026-02-28','2026-03-01','2026-03-02']);
