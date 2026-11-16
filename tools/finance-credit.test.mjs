@@ -1,0 +1,20 @@
+/* Dev-only test for credit card limit / used / due-day helpers. Run: node tools/finance-credit.test.mjs */
+import assert from 'node:assert/strict';
+import {loadFin} from './fin-extract.mjs';
+const {finCardNorm,finCardUse,finCardStart,finCardNext,finNorm,accountBalance}=loadFin();
+let passed=0;const t=(n,f)=>{f();passed++;console.log('ok  '+n)};
+t('use: low/mid/high levels',()=>{let u=finCardUse({limit:1000},-200);assert.deepEqual([u.used,u.avail,u.pct,u.lvl,u.over],[200,800,20,'ok',false]);u=finCardUse({limit:1000},-300);assert.equal(u.lvl,'mid');u=finCardUse({limit:1000},-800);assert.equal(u.lvl,'mid');u=finCardUse({limit:1000},-801);assert.equal(u.lvl,'hi')});
+t('use: over the limit',()=>{const u=finCardUse({limit:1000},-1500);assert.equal(u.avail,-500);assert.equal(u.overBy,500);assert.ok(u.over);assert.equal(u.lvl,'hi')});
+t('use: no limit, zero, overpaid, junk',()=>{for(const a of [{},{limit:0},null,{limit:'x'}]){const u=finCardUse(a,-50);assert.equal(u.has,false);assert.equal(u.used,50);assert.equal(u.pct,0);assert.equal(u.over,false)}assert.equal(finCardUse({limit:100},500).used,0);assert.equal(finCardUse({limit:100},NaN).used,0)});
+t('start: new card stores -used',()=>{assert.equal(finCardStart(250000,true,0,0),-250000);assert.equal(finCardStart(0,true,0,0),0);assert.equal(finCardStart(-5,true),0);assert.ok(!Object.is(finCardStart(0,true),-0))});
+t('start: existing card shifts start so used matches',()=>{const a={id:1,type:'credit',start:-1000},tx=[{acct:1,amt:-400},{acct:1,amt:100}];const b=accountBalance(a,tx);assert.equal(b,-1300);const s=finCardStart(2000,false,a.start,b);assert.equal(s,-1700);assert.equal(accountBalance({id:1,start:s},tx),-2000);assert.equal(finCardStart(1300,false,a.start,b),-1000)});
+t('next due: today, later, past',()=>{assert.deepEqual(finCardNext(20,'2026-11-16'),{date:'2026-11-20',days:4});assert.deepEqual(finCardNext(16,'2026-11-16'),{date:'2026-11-16',days:0});assert.deepEqual(finCardNext(10,'2026-11-16'),{date:'2026-12-10',days:24})});
+t('next due: year rollover',()=>assert.equal(finCardNext(5,'2026-12-20').date,'2027-01-05'));
+t('next due: month-end clamp and leap years',()=>{assert.equal(finCardNext(31,'2026-11-16').date,'2026-11-30');assert.equal(finCardNext(31,'2027-02-10').date,'2027-02-28');assert.equal(finCardNext(31,'2028-02-10').date,'2028-02-29');assert.equal(finCardNext(30,'2028-02-10').date,'2028-02-29');assert.equal(finCardNext(29,'2027-02-10').date,'2027-02-28');assert.equal(finCardNext(31,'2026-11-30').days,0);assert.equal(finCardNext(31,'2026-01-31').date,'2026-01-31');assert.equal(finCardNext(15,'2027-01-31').date,'2027-02-15');assert.equal(finCardNext(31,'2027-02-28').days,0);assert.equal(finCardNext(1,'2026-12-31').date,'2027-01-01')});
+t('next due: invalid',()=>{for(const d of [0,32,1.5,'x',null,undefined])assert.equal(finCardNext(d,'2026-11-16'),null);assert.equal(finCardNext(5,'bad'),null)});
+t('finNorm keeps valid card fields',()=>{const f=finNorm({accounts:[{id:1,type:'credit',limit:500000000,payDay:'15',cutDay:5,start:-1}]});const a=f.accounts[0];assert.deepEqual([a.limit,a.payDay,a.cutDay],[500000000,15,5])});
+t('finNorm drops invalid values',()=>{const a=finNorm({accounts:[{id:1,type:'credit',limit:-5,payDay:0,cutDay:32},{id:2,type:'credit',limit:'x',payDay:1.5,cutDay:null},{id:3,type:'credit',limit:0}]}).accounts;for(const x of a){assert.ok(!('limit' in x));assert.ok(!('payDay' in x));assert.ok(!('cutDay' in x))}});
+t('finNorm strips card fields from other types',()=>{const a=finNorm({accounts:[{id:1,type:'checking',limit:100,payDay:5,cutDay:6}]}).accounts[0];assert.ok(!('limit' in a)&&!('payDay' in a)&&!('cutDay' in a))});
+t('finNorm idempotent',()=>{const f=finNorm({accounts:[{id:1,type:'credit',limit:100,payDay:31,start:-5},{id:2,type:'cash',limit:3}]});assert.deepEqual(finNorm(JSON.parse(JSON.stringify(f))),f)});
+t('finCardNorm',()=>{assert.deepEqual(finCardNorm({type:'credit',limit:10.4,payDay:3}),{limit:10,payDay:3});assert.deepEqual(finCardNorm({type:'savings',limit:10}),{});assert.deepEqual(finCardNorm(null),{})});
+console.log(passed+' passed');
