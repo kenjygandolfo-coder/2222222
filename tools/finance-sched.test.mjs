@@ -1,0 +1,83 @@
+/* Dev-only test for Finance schedules (pure logic), extracted from index.html by tools/fin-extract.mjs.
+   Run: node tools/finance-sched.test.mjs */
+import assert from 'node:assert/strict';
+import {loadFin} from './fin-extract.mjs';
+const F=loadFin('2026-11-14');
+const {finNorm,finSchedOccur:occ,finSchedNext,finSchedShift,finSchedStatus:status,finSchedDue,finSchedPost:post,finSchedSkip:skip,finSchedAuto:auto,finSchedDesc:desc,finDelAcct,finDelCat}=F;
+let passed=0;const t=(n,f)=>{f();passed++;console.log('ok  '+n)};
+const rt=f=>finNorm(JSON.parse(JSON.stringify(f)));
+const AC=(id,name,onBudget,o)=>Object.assign({id,name,type:'checking',onBudget,start:0,startDate:'2026-01-01'},o);
+const base=()=>finNorm({accounts:[AC(1,'Bank',true,{start:1000000}),AC(2,'Cash',true)],tx:[],ntx:1});
+const S=(o)=>Object.assign({id:0,name:'Rent',acct:1,payee:'Landlord',cat:null,amt:-500000,amtOp:'is',notes:'',start:'2026-01-05',rule:{freq:'month',n:1,dom:5},end:{type:'never'},auto:false,skipWeekend:'none',skipped:[],paused:false},o);
+const add=(f,o)=>{const s=S(o);s.id=f.nsch||1;f.nsch=s.id+1;f.sched.push(s);return s};
+
+t('daily and every N days',()=>{assert.deepEqual(occ(S({start:'2026-02-27',rule:{freq:'day',n:1}}),'2026-02-27','2026-03-02'),['2026-02-27','2026-02-28','2026-03-01','2026-03-02']);
+ assert.deepEqual(occ(S({start:'2026-01-01',rule:{freq:'day',n:10}}),'2026-01-05','2026-02-05'),['2026-01-11','2026-01-21','2026-01-31'])});
+t('weekly multi weekday and every 2 weeks',()=>{/* 2026-11-02 is a Monday */
+ assert.deepEqual(occ(S({start:'2026-11-02',rule:{freq:'week',n:1,wd:[3,1]}}),'2026-11-01','2026-11-15'),['2026-11-02','2026-11-04','2026-11-09','2026-11-11']);
+ assert.deepEqual(occ(S({start:'2026-11-02',rule:{freq:'week',n:2,wd:[1,3]}}),'2026-11-01','2026-12-05'),['2026-11-02','2026-11-04','2026-11-16','2026-11-18','2026-11-30','2026-12-02']);
+ assert.deepEqual(occ(S({start:'2026-11-04',rule:{freq:'week',n:1,wd:[1,3]}}),'2026-11-01','2026-11-10'),['2026-11-04','2026-11-09'],'weekdays before start are skipped');
+ assert.deepEqual(occ(S({start:'2026-11-04',rule:{freq:'week',n:1}}),'2026-11-01','2026-11-20'),['2026-11-04','2026-11-11','2026-11-18'],'default weekday is the start day')});
+t('monthly day 31 clamps in short months, leap years and 30-day months',()=>{const s=S({start:'2026-01-31',rule:{freq:'month',n:1,dom:31}});
+ assert.deepEqual(occ(s,'2026-01-01','2026-05-31'),['2026-01-31','2026-02-28','2026-03-31','2026-04-30','2026-05-31']);
+ assert.deepEqual(occ(S({start:'2028-01-31',rule:{freq:'month',n:1,dom:31}}),'2028-02-01','2028-02-29'),['2028-02-29']);
+ assert.deepEqual(occ(S({start:'2026-01-30',rule:{freq:'month',n:1,dom:30}}),'2026-02-01','2026-04-30'),['2026-02-28','2026-03-30','2026-04-30']);
+ assert.deepEqual(occ(S({start:'2026-01-29',rule:{freq:'month',n:1,dom:29}}),'2026-02-01','2026-02-28'),['2026-02-28'])});
+t('every N months and a start after the day of month',()=>{assert.deepEqual(occ(S({start:'2026-01-05',rule:{freq:'month',n:3,dom:5}}),'2026-01-01','2026-12-31'),['2026-01-05','2026-04-05','2026-07-05','2026-10-05']);
+ assert.deepEqual(occ(S({start:'2026-01-20',rule:{freq:'month',n:1,dom:5}}),'2026-01-01','2026-03-31'),['2026-02-05','2026-03-05'])});
+t('yearly, Feb 29 falls back to Feb 28',()=>{const s=S({start:'2024-02-29',rule:{freq:'year',n:1}});assert.deepEqual(occ(s,'2024-01-01','2029-12-31'),['2024-02-29','2025-02-28','2026-02-28','2027-02-28','2028-02-29','2029-02-28']);
+ assert.deepEqual(occ(S({start:'2026-03-05',rule:{freq:'year',n:2}}),'2026-01-01','2031-01-01'),['2026-03-05','2028-03-05','2030-03-05'])});
+t('end on a date and after N times',()=>{assert.deepEqual(occ(S({end:{type:'on',date:'2026-03-05'}}),'2026-01-01','2026-12-31'),['2026-01-05','2026-02-05','2026-03-05']);
+ assert.deepEqual(occ(S({end:{type:'on',date:'2026-03-04'}}),'2026-01-01','2026-12-31'),['2026-01-05','2026-02-05']);
+ assert.deepEqual(occ(S({end:{type:'after',count:2}}),'2026-01-01','2026-12-31'),['2026-01-05','2026-02-05']);
+ assert.deepEqual(occ(S({end:{type:'after',count:3}}),'2026-02-01','2026-12-31'),['2026-02-05','2026-03-05'],'N counts from start, not from the range');
+ assert.deepEqual(occ(S({start:'2026-11-02',rule:{freq:'week',n:1,wd:[1,3]},end:{type:'after',count:3}}),'2026-01-01','2026-12-31'),['2026-11-02','2026-11-04','2026-11-09'])});
+t('weekend shift before and after',()=>{/* 2026-11-07 Sat, 2026-11-08 Sun */
+ assert.equal(finSchedShift('2026-11-07','before'),'2026-11-06');assert.equal(finSchedShift('2026-11-08','before'),'2026-11-06');assert.equal(finSchedShift('2026-11-07','after'),'2026-11-09');assert.equal(finSchedShift('2026-11-08','after'),'2026-11-09');
+ assert.equal(finSchedShift('2026-11-06','before'),'2026-11-06');assert.equal(finSchedShift('2026-11-07','none'),'2026-11-07');
+ const m=o=>S(Object.assign({start:'2026-11-07',rule:{freq:'month',n:1,dom:7}},o));
+ assert.deepEqual(occ(m({skipWeekend:'before'}),'2026-11-01','2026-12-31'),['2026-11-06','2026-12-07']);
+ assert.deepEqual(occ(m({skipWeekend:'after'}),'2026-11-01','2026-12-31'),['2026-11-09','2026-12-07']);
+ assert.deepEqual(occ(S({start:'2026-11-05',rule:{freq:'day',n:1},skipWeekend:'before'}),'2026-11-05','2026-11-10'),['2026-11-05','2026-11-06','2026-11-09','2026-11-10'],'no duplicate dates');
+ assert.deepEqual(occ(m({skipWeekend:'after',end:{type:'after',count:1}}),'2026-11-01','2026-12-31'),['2026-11-09'])});
+t('status: upcoming, due, overdue, paid, completed, paused',()=>{const s=S({start:'2026-11-20',rule:{freq:'month',n:1,dom:20}}),T='2026-11-14';
+ assert.deepEqual(status(s,T),{st:'due',next:'2026-11-20'});assert.equal(status(s,'2026-11-13').st,'due');assert.equal(status(s,'2026-11-12').st,'upcoming');assert.equal(status(s,'2026-11-10').st,'upcoming');
+ assert.equal(status(s,'2026-11-21').st,'overdue');assert.equal(status(s,'2026-11-20').st,'due');
+ s.last='2026-11-20';assert.deepEqual(status(s,'2026-11-21'),{st:'upcoming',next:'2026-12-20'});
+ const e=S({start:'2026-01-05',end:{type:'after',count:2},last:'2026-02-05'});assert.deepEqual(status(e,T),{st:'completed',next:null});
+ const p=S({start:'2026-11-01',rule:{freq:'month',n:1,dom:1},paused:true});assert.equal(status(p,T).st,'paused');assert.equal(status(S({start:'2026-11-14',rule:{freq:'month',n:1,dom:14}}),T,0).st,'due');assert.equal(finSchedNext(s,'2026-12-01'),'2026-12-20')});
+t('post now creates a tx with sched/schedDate and advances last',()=>{const f=base(),s=add(f,{cat:f.cats[0].id});const x=post(f,s,'2026-01-05');assert.ok(x);assert.equal(x.sched,s.id);assert.equal(x.schedDate,'2026-01-05');assert.equal(x.date,'2026-01-05');assert.equal(x.amt,-500000);assert.equal(x.payee,'Landlord');assert.equal(x.cat,f.cats[0].id);assert.equal(x.cleared,false);
+ assert.equal(s.last,'2026-01-05');assert.equal(f.tx.length,1);assert.ok(f.payees.some(p=>p.name=='Landlord'));assert.deepEqual(rt(f),f);
+ assert.equal(status(s,'2026-01-10').next,'2026-02-05')});
+t('double-post guard: posting twice makes one tx',()=>{const f=base(),s=add(f);assert.ok(post(f,s,'2026-01-05'));assert.equal(post(f,s,'2026-01-05'),null);assert.equal(f.tx.length,1);
+ s.last=undefined;delete s.last;assert.equal(post(f,s,'2026-01-05'),null);assert.equal(f.tx.length,1);assert.equal(s.last,'2026-01-05')});
+t('skip adds to skipped and advances last without a tx',()=>{const f=base(),s=add(f);assert.ok(skip(f,s,'2026-01-05'));assert.deepEqual(s.skipped,['2026-01-05']);assert.equal(s.last,'2026-01-05');assert.equal(f.tx.length,0);assert.equal(status(s,'2026-01-06').next,'2026-02-05');assert.deepEqual(rt(f),f)});
+t('auto-post: runs twice posts once, never future, only auto and not paused',()=>{const f=base(),a=add(f,{auto:true,start:'2026-09-05'}),m=add(f,{auto:false,start:'2026-09-05'}),p=add(f,{auto:true,paused:true,start:'2026-09-05'});
+ assert.equal(auto(f,'2026-11-14'),3);assert.deepEqual(f.tx.map(x=>x.schedDate),['2026-09-05','2026-10-05','2026-11-05']);assert.ok(f.tx.every(x=>x.sched==a.id));assert.equal(auto(f,'2026-11-14'),0);assert.equal(f.tx.length,3);
+ assert.equal(auto(f,'2026-12-04'),0,'Dec 5 is in the future');assert.equal(auto(f,'2026-12-05'),1);assert.equal(m.last,undefined);assert.equal(p.last,undefined);assert.deepEqual(rt(f),f)});
+t('auto-post never posts into a closed account',()=>{const f=base();f.accounts[0].closed=true;add(f,{auto:true,start:'2026-10-05'});assert.equal(auto(f,'2026-11-14'),0)});
+t('auto-post catch-up cap is 24 per run',()=>{const f=base(),s=add(f,{auto:true,start:'2026-01-01',rule:{freq:'day',n:1}});assert.equal(auto(f,'2026-11-14'),24);assert.equal(s.last,'2026-01-24');assert.equal(auto(f,'2026-11-14',5),5);assert.equal(f.tx.length,29)});
+t('deleting a posted tx does not re-post it',()=>{const f=base();add(f,{auto:true,start:'2026-10-05'});assert.equal(auto(f,'2026-11-14'),2);f.tx=f.tx.filter(x=>x.schedDate!='2026-10-05');assert.equal(auto(f,'2026-11-14'),0);assert.equal(f.tx.length,1)});
+t('due list: unhandled up to today, not paused',()=>{const f=base();const s=add(f,{start:'2026-09-05'});add(f,{start:'2026-09-05',paused:true});assert.deepEqual(finSchedDue(f,'2026-11-14').map(x=>x.date),['2026-09-05','2026-10-05','2026-11-05']);post(f,s,'2026-09-05');skip(f,s,'2026-10-05');assert.deepEqual(finSchedDue(f,'2026-11-14').map(x=>x.date),['2026-11-05'])});
+t('edit affects only the future',()=>{const f=base(),s=add(f,{auto:true,start:'2026-09-05'});auto(f,'2026-10-20');assert.equal(f.tx.length,2);const old=JSON.stringify(f.tx);
+ s.amt=-600000;s.rule={freq:'month',n:1,dom:10};assert.equal(JSON.stringify(f.tx),old,'posted tx untouched');assert.equal(auto(f,'2026-11-14'),2);assert.deepEqual(f.tx.slice(2).map(x=>x.schedDate),['2026-10-10','2026-11-10']);assert.equal(f.tx[3].amt,-600000);assert.equal(f.tx[0].amt,-500000);assert.equal(f.tx[1].schedDate,'2026-10-05');
+ assert.equal(s.last,'2026-11-10')});
+t('edit: unhandled past occurrences follow the new rule',()=>{const f=base(),s=add(f,{start:'2026-09-05',last:'2026-09-05'});s.rule={freq:'month',n:1,dom:20};assert.deepEqual(finSchedDue(f,'2026-11-14').map(x=>x.date),['2026-09-20','2026-10-20'].filter(d=>d>'2026-09-05'))});
+t('description',()=>{assert.equal(desc(S({rule:{freq:'month',n:1,dom:5}})),'Monthly on day 5');assert.equal(desc(S({rule:{freq:'month',n:3,dom:31}})),'Every 3 months on day 31');assert.equal(desc(S({start:'2026-11-02',rule:{freq:'week',n:2,wd:[3,1]}})),'Every 2 weeks on Mon, Wed');
+ assert.equal(desc(S({start:'2026-11-04',rule:{freq:'week',n:1,wd:[0,6]}})),'Weekly on Sat, Sun');assert.equal(desc(S({rule:{freq:'day',n:1}})),'Daily');assert.equal(desc(S({rule:{freq:'day',n:3}})),'Every 3 days');assert.equal(desc(S({start:'2026-03-05',rule:{freq:'year',n:1}})),'Yearly on Mar 5')});
+
+/* finNorm */
+const raw=()=>({accounts:[AC(1,'Bank',true),AC(2,'Cash',true)],tx:[],ntx:1,sched:[]});
+const N=(o,keep)=>{const f=raw();f.sched=[Object.assign(S({id:1}),o)];const r=finNorm(f);assert.deepEqual(finNorm(JSON.parse(JSON.stringify(r))),r,'idempotent');return r};
+t('finNorm: data without sched loads unchanged and gets sched/nsch',()=>{const f=finNorm({accounts:[AC(1,'Bank',true)]});assert.deepEqual(f.sched,[]);assert.equal(f.nsch,1);assert.deepEqual(rt(f),f);const g=base();assert.deepEqual(rt(g),g)});
+t('finNorm: drops unknown account, bad start, bad rule, zero or non-integer amount',()=>{assert.equal(N({acct:9}).sched.length,0);assert.equal(N({start:'2026-02-30'}).sched.length,0);assert.equal(N({start:'x'}).sched.length,0);assert.equal(N({rule:null}).sched.length,0);assert.equal(N({rule:{freq:'hour',n:1}}).sched.length,0);assert.equal(N({rule:{freq:'day',n:0}}).sched.length,0);assert.equal(N({rule:{freq:'day',n:'x'}}).sched.length,0);assert.equal(N({amt:0}).sched.length,0);assert.equal(N({amt:'abc'}).sched.length,0);assert.equal(N({}).sched.length,1);assert.equal(N({amt:12.6}).sched[0].amt,13)});
+t('finNorm: unknown cat, amtOp, skipWeekend, end, skipped, last',()=>{const f0=raw();const s=N({cat:99,amtOp:'weird',skipWeekend:'x',end:{type:'on',date:'bad'},skipped:['2026-02-05','2026-02-05','bad','2026-01-05'],last:'bad',paused:1,auto:1}).sched[0];assert.equal(s.cat,null);assert.equal(s.amtOp,'is');assert.equal(s.skipWeekend,'none');assert.deepEqual(s.end,{type:'never'});assert.deepEqual(s.skipped,['2026-01-05','2026-02-05']);assert.equal('last' in s,false);assert.equal(s.paused,true);assert.equal(s.auto,true);
+ assert.deepEqual(N({end:{type:'after',count:0}}).sched[0].end,{type:'never'});assert.deepEqual(N({end:{type:'after',count:'3'}}).sched[0].end,{type:'after',count:3});assert.deepEqual(N({end:{type:'on',date:'2026-12-31'}}).sched[0].end,{type:'on',date:'2026-12-31'});assert.equal(N({last:'2026-03-05'}).sched[0].last,'2026-03-05');assert.equal(N({amtOp:'approx'}).sched[0].amtOp,'approx');assert.equal(N({skipWeekend:'after'}).sched[0].skipWeekend,'after');void f0});
+t('finNorm: rule repair (weekly days, monthly dom, interval cap)',()=>{assert.deepEqual(N({start:'2026-11-04',rule:{freq:'week',n:1,wd:[9,'x']}}).sched[0].rule,{freq:'week',n:1,wd:[3]});assert.deepEqual(N({rule:{freq:'week',n:2,wd:[5,1,1]}}).sched[0].rule,{freq:'week',n:2,wd:[1,5]});assert.deepEqual(N({start:'2026-01-17',rule:{freq:'month',n:1}}).sched[0].rule,{freq:'month',n:1,dom:17});assert.deepEqual(N({rule:{freq:'month',n:1,dom:40}}).sched[0].rule,{freq:'month',n:1,dom:5});assert.equal(N({rule:{freq:'day',n:100000}}).sched[0].rule.n,999);assert.deepEqual(N({rule:{freq:'day',n:2,wd:[1],dom:3}}).sched[0].rule,{freq:'day',n:2})});
+t('finNorm: ids assigned from nsch, duplicates repaired',()=>{const f=raw();f.nsch=5;f.sched=[S({id:0}),S({id:2}),S({id:2}),S({id:7})];const r=finNorm(f);assert.deepEqual(r.sched.map(x=>x.id).sort((a,b)=>a-b),[2,7,8,9]);assert.equal(r.nsch,10);assert.deepEqual(finNorm(JSON.parse(JSON.stringify(r))),r)});
+t('finNorm: tx sched fields kept for known schedules, stripped otherwise',()=>{const f=raw();f.sched=[S({id:3})];const mk=(id,o)=>Object.assign({id,acct:1,date:'2026-01-05',payee:'',cat:null,amt:-5,notes:'',cleared:false},o);f.tx=[mk(1,{sched:3,schedDate:'2026-01-05'}),mk(2,{sched:4,schedDate:'2026-01-05'}),mk(3,{sched:3,schedDate:'nope'}),mk(4,{})];const r=finNorm(f);
+ assert.equal(r.tx[0].sched,3);assert.equal(r.tx[0].schedDate,'2026-01-05');for(const i of[1,2,3]){assert.equal('sched' in r.tx[i],false);assert.equal('schedDate' in r.tx[i],false)}assert.deepEqual(finNorm(JSON.parse(JSON.stringify(r))),r)});
+t('deleting a schedule keeps its tx and finNorm strips the link',()=>{const f=base(),s=add(f,{auto:true,start:'2026-10-05'});auto(f,'2026-11-14');f.sched=f.sched.filter(x=>x!==s);const r=rt(f);assert.equal(r.tx.length,2);assert.ok(r.tx.every(x=>!('sched' in x)))});
+t('account delete removes its schedules only',()=>{const f=base();add(f,{acct:1});add(f,{acct:2,name:'Gym'});finDelAcct(f,1);assert.deepEqual(f.sched.map(x=>x.name),['Gym']);assert.deepEqual(rt(f),f);const g=base();add(g,{acct:1});finDelAcct(g,2);assert.equal(g.sched.length,1)});
+t('category delete moves or clears schedule categories',()=>{const f=base(),a=f.cats[0].id,b=f.cats[1].id;add(f,{cat:a});add(f,{cat:b});finDelCat(f,a,b);assert.deepEqual(f.sched.map(x=>x.cat),[b,b]);finDelCat(f,b,null);assert.deepEqual(f.sched.map(x=>x.cat),[null,null])});
+console.log(passed+' tests passed');
