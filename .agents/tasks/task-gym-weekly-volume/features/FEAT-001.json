@@ -1,0 +1,22 @@
+{
+ "id": "FEAT-001",
+ "type": "chore",
+ "description": "Baseline: confirm the repo is green before changes and learn how the render harness works.",
+ "status": "completed",
+ "steps": [
+  "Run bash /projects/sandbox/_h/chk.sh",
+  "Run every tools/*.test.mjs and record that all pass",
+  "Read /projects/sandbox/_h/g.mjs and one h*.mjs that renders a view, to learn how to call run(state, now) and obtain HTML of the Gym tab",
+  "Record in findings: harness usage, the gym render function name, and the click-dispatch location"
+ ],
+ "acceptance_criteria": [
+  "chk.sh prints 'syntax ok'",
+  "all tools/*.test.mjs exit 0"
+ ],
+ "verification": [
+  "bash /projects/sandbox/_h/chk.sh",
+  "for f in tools/*.test.mjs; do node $f || exit 1; done"
+ ],
+ "blocked_reason": null,
+ "findings": "Baseline green: chk.sh prints 'syntax ok'; all 35 tools/*.test.mjs exit 0. Harness: _h/g.mjs exports run(state,now) which evals the largest inline script of index.html with a stub DOM and returns an object of exposed names from a hard-coded return list (finance only). A new harness must copy g.mjs/h9.mjs and change that return list to include gym functions (e.g. gviewImpl, gMuscleSets, muscleOf, S:()=>S, eval:x=>eval(x)). h9.mjs has a fuller stub with per-id elements (els map) so #gout innerHTML can be read after calling gview(). Sample state: /projects/sandbox/forma-backup-3dias.json. Gym render: gview() (index.html ~3805) wraps gviewImpl() (~3808), which writes `$('#gout').innerHTML=` at ~3832 (Gym stats card, h3 with 'Gym stats'); insert new cards near there. Click dispatcher: document click handler with `else if(a=='gdlon')` chain at ~4875 (data-a actions). Only .kiro/ is untracked; nothing committed."
+}

@@ -667,6 +667,18 @@ justify-content:flex-start;align-items:stretch;align-self:stretch;gap:10px;paddi
 .card.goal-done,.bento .card.goal-done{background:color-mix(in srgb,var(--olv-t) 34%,var(--card));box-shadow:inset 8px 0 0 var(--olv-t),inset 0 0 0 2px var(--olv-t),0 0 0 3px color-mix(in srgb,var(--olv-t) 25%,transparent)}
 .goal-done h3{font-weight:700}
 .goal-done h3::after{content:'\2713';display:inline-block;flex:none;margin-left:8px;padding:1px 8px;border-radius:999px;background:var(--olv-t);color:var(--card);font:700 11px Montserrat,system-ui,sans-serif;vertical-align:middle}
+.hst.ok{background:color-mix(in srgb,var(--ok) 18%,var(--card));color:var(--ok-fg)}
+.gvt{display:flex;gap:8px;align-items:center;margin:0 0 8px}.gvt .btn{flex:none;margin:0}
+.gvw{border-top:1px solid var(--line)}.gvw:first-of-type{border-top:0}
+.gvr{all:unset;box-sizing:border-box;display:block;width:100%;padding:8px 0 6px;cursor:pointer}.gvr:focus-visible{outline:2px solid var(--olv-t);outline-offset:2px;border-radius:8px}
+.gvh{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.gvh b{font-size:15px;min-width:0}
+.gvr .bar{display:block;position:relative;margin:4px 0 6px}.gvr .bar i{background:var(--olv-t);position:relative;z-index:1}.gvr .bar i.w{background:var(--gold)}.gvr .bar i.r{background:var(--warn-fg)}
+.gvbd{position:absolute;top:0;bottom:0;z-index:2;background:color-mix(in srgb,var(--ink) 22%,transparent);border-left:1px solid var(--mut);border-right:1px solid var(--mut)}.gvpl{z-index:3;background:var(--ink)!important}
+.hst.r{background:color-mix(in srgb,var(--warn-fg) 22%,var(--card));color:var(--warn-fg);box-shadow:inset 0 0 0 1px var(--warn-fg)}
+.gvd{padding:2px 0 8px}.gvx{padding:6px 0;border-top:1px dashed var(--line)}.gvxn{font-size:14px;overflow-wrap:anywhere}.gvxv{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center}.gvp{margin:0 0 0 auto;padding:4px 10px;min-height:0}
+.gvm{font-size:14px;padding:2px 0}.gvu{margin:8px 0 0;padding-left:20px}.gvu li{font-size:14px;margin:2px 0}
+.cap{font-size:12px;line-height:1.5;color:var(--mut);margin:8px 0 0}
+.bar.tg{position:relative}.bar.tg .tk{position:absolute;top:0;bottom:0;width:2px;background:var(--gold);opacity:.9}
 </style></head><body>
 <header><h1>Forma</h1><div class="hd"><div class="lgw"><button class="btn s lgb" data-lg="en" aria-label="English">EN</button><button class="btn s lgb" data-lg="es" aria-label="Español">ES</button></div><button class="btn s" id="th" aria-label="Toggle light or dark">🌗</button></div></header>
 <nav id="nav"></nav><main id="main"></main><div id="glgroot"></div><div id="lgmroot"></div><div id="toast"></div><div class="mdl" id="wdl" hidden role="dialog" aria-modal="true"><div class="card" style="position:relative"><button class="gx" data-a="wx" aria-label="Close" style="position:absolute;top:10px;right:10px">✕</button><div style="font-size:44px">⚖️</div><h3>Daily weigh-in</h3><p class="mut">You have not logged your weight today.</p><div class="row" style="flex-wrap:wrap"><button class="btn p" data-a="wgo">Log now</button><button class="btn t" data-a="wlater">Later</button><button class="btn t" data-a="wskip">Not weighing today</button></div></div></div><div class="mdl" id="sdl" hidden role="dialog" aria-modal="true"><div class="card" style="position:relative"><button class="gx" data-a="sx" aria-label="Close" style="position:absolute;top:10px;right:10px">✕</button><div style="font-size:44px">😴</div><h3>Sleep log</h3><p class="mut">You have not logged last night's sleep.</p><div class="row" style="flex-wrap:wrap"><button class="btn p" data-a="sgo">Log now</button><button class="btn t" data-a="slater">Later</button><button class="btn t" data-a="sskip">Didn't track sleep</button></div></div></div><div class="mdl" id="cdl" hidden role="dialog" aria-modal="true"><div class="card" style="position:relative"><button class="gx" data-a="cx" aria-label="Close" style="position:absolute;top:10px;right:10px">✕</button><div style="font-size:44px">💊</div><h3>Creatine</h3><p class="mut">You have not marked your creatine today.</p><div class="row" style="flex-wrap:wrap"><button class="btn p" data-a="cgo">Mark as taken</button><button class="btn t" data-a="clater">Later</button><button class="btn t" data-a="cskip">Not taking it today</button></div></div></div><div class="mdl" id="wadl" hidden role="dialog" aria-modal="true"><div class="card" style="position:relative"><button class="gx" data-a="wax" aria-label="Close" style="position:absolute;top:10px;right:10px">✕</button><div style="font-size:44px">💧</div><h3>💧 Water</h3><p class="mut"><span id="wapv"></span> <span>glasses</span> <span id="wapm"></span></p><div class="row" style="flex-wrap:wrap"><button class="btn p" data-a="wago">+1 glass</button><button class="btn t" data-a="walater">Later</button></div></div></div><div class="mdl" id="stdl" hidden role="dialog" aria-modal="true"><div class="card" style="position:relative"><button class="gx" data-a="stx" aria-label="Close" style="position:absolute;top:10px;right:10px">✕</button><div style="font-size:44px">👟</div><h3>👟 Steps</h3><p class="mut"><span id="stpv"></span> <span>steps</span> <span id="stpm"></span></p><div class="row" style="flex-wrap:wrap"><button class="btn p" data-a="stq" data-v="1000">+1,000</button><button class="btn p" data-a="stq" data-v="2000">+2,000</button><button class="btn p" data-a="stq" data-v="5000">+5,000</button><button class="btn t" data-a="stlater">Later</button><button class="btn t" data-a="stskip" style="padding:10px 12px;font-size:13px">Not counting steps today</button></div></div></div><div class="mdl" id="bkdl" hidden role="dialog" aria-modal="true"><div class="card" style="position:relative"><button class="gx" data-a="bkx" aria-label="Close" style="position:absolute;top:10px;right:10px">✕</button><div style="font-size:44px">💾</div><h3>Back up your data</h3><p class="mut">Your data lives only in this browser. If it's cleared you lose your history.</p><p class="mut" id="bkdt"></p><div class="row" style="flex-wrap:wrap"><button class="btn p" data-a="bkgo">Back up now</button><button class="btn t" data-a="bklater">Later</button><button class="btn t" data-a="bktom">Remind me tomorrow</button><button class="btn t" data-a="bksh" id="bksh" style="display:none">Share</button></div></div></div><div class="mdl" id="mdl" hidden><div class="card"><div style="font-size:44px">📏</div><h3>Monthly measurements</h3><p class="mut" id="mdt2"></p><div class="row" style="flex-wrap:nowrap"><button class="btn p" data-a="mgo">Measure now</button><button class="btn t" data-a="mlater">Tomorrow</button></div></div></div>
@@ -687,7 +699,7 @@ const toast=m=>{const t=$('#toast');t.textContent=m;t.className='on';clearTimeou
 /* ===== Build info: triple tap or long press on the Forma logo shows the last update time =====
    UPDATE BUILD_TS AND BUILD_VER ON EVERY CHANGE, together with the CACHE name in sw.js
    (BUILD_VER must equal sw.js CACHE). BUILD_TS is an ISO-8601 UTC string. */
-const BUILD_TS='2026-11-17T02:33:28Z',BUILD_VER='forma-v104';
+const BUILD_TS='2026-11-17T03:11:07Z',BUILD_VER='forma-v105';
 const buildMsg=(ts,ver,lang,lastMod)=>{const d=new Date(lastMod||ts),ok=!isNaN(d.getTime()),s=ok?d.toLocaleString(lang=='es'?'es':'en-US',{dateStyle:'medium',timeStyle:'short'}):String(ts);return(lang=='es'?'Última actualización: ':'Last updated: ')+s+' ('+ver+')'};
 function buildInfo(){const lg=typeof LANG!='undefined'?LANG:'en',show=lm=>toast(buildMsg(BUILD_TS,BUILD_VER,lg,lm));let done=0;const fin=lm=>{if(!done){done=1;show(lm)}};setTimeout(()=>fin(''),1500);try{fetch(location.pathname,{method:'HEAD',cache:'no-store'}).then(r=>fin(r.ok?r.headers.get('Last-Modified'):'')).catch(()=>fin(''))}catch(e){fin('')}}
 (function(){const h=document.querySelector('header h1');if(!h)return;h.style.cssText+=';user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;cursor:default';let n=0,tt=0,lp=0,fired=0;
@@ -943,6 +955,193 @@ function galhtml(){const dl=gdl();if(dl)return`<div class="note al"><b>🔄 Delo
 const A=galert();if(!A)return'';
 return`<div class="note al ${A.lv}"><b>${A.lv=='high'?'⚠️ Possible recovery issue':'👀 Strength is stalling'}</b><div style="margin:8.0px 0 8px">${A.it.slice(0,4).map(x=>`<div class="it"><b>${esc(x.n)}</b> · <span class="mut">${x.t=='dec'?'dropping across '+x.c+' sessions':'no new best in '+x.c+' sessions'}</span><div class="mut"><span>Estimated 1RM</span>: <span>${x.a.join(' → ')} kg</span></div></div>`).join('')}</div><p style="margin:0 0 8.0px">${A.lv=='high'?'Your numbers are trending down. Plan a deload week: about half the sets, weights around 10% lighter, and every set 3–4 reps from failure. If that feels like too much, drop 1 set from every exercise for the next two weeks.':'Try cutting 1–2 sets from the stalled lifts next session, hit your RIR targets and protect your sleep. If it continues, take a deload.'}</p>${A.rc.sl&&A.rc.sl<6.5?`<p class="mut" style="margin:0 0 8.0px">Your sleep averaged ${A.rc.sl} h this week, below the 7–9 h target.</p>`:''}${A.rc.sr>=3.5?`<p class="mut" style="margin:0 0 8.0px">Your stress averaged ${A.rc.sr} out of 5 this week.</p>`:''}${A.hf?'<p class="mut" style="margin:0 0 8.0px">Your heavy lifts are being taken to failure, which adds fatigue.</p>':''}<div class="row" style="margin-top:8px"><button class="btn ${A.lv=='high'?'p':''}" data-a="gdlon">Start deload week</button><button class="btn t" data-a="gadis">Dismiss</button></div></div>`}
 function galmini(){if(gdl())return'';const A=galert();if(!A)return'';return`<div class="note al ${A.lv}" style="margin:16.0px 0 0;display:flex;gap:16px;align-items:center;justify-content:space-between"><div><b>${A.lv=='high'?'⚠️ Possible recovery issue':'👀 Strength is stalling'}</b><div class="mut">Open the Gym tab to see what to do.</div></div><button class="btn s" data-t="gym" style="flex:none">View</button></div>`}
+const MUSG=['chest','lats','upper back','front delts','side delts','rear delts','biceps','triceps','quads','hamstrings','glutes','calves','abs'];
+const MUSL={chest:'pecho',lats:'dorsales','upper back':'espalda alta','front delts':'deltoides anterior','side delts':'deltoides lateral','rear delts':'deltoides posterior',biceps:'bíceps',triceps:'tríceps',quads:'cuádriceps',hamstrings:'isquios',glutes:'glúteos',calves:'gemelos',abs:'abdomen'};
+/* Resolve a (already name-resolved) exercise to its target muscles.
+   Mirrors the gkind pattern: an explicit per-name override table (MMAP) first,
+   then a regex/keyword fallback (MRX) seeded from the GRP movement clusters.
+   Returns {p:primary|null, s:[secondary...]}; the compute step skips a null
+   primary. KB effective-set weights: isolation = 1 to its one target; compound
+   (e.k=='H') = 1 to primary + 0.5 to each secondary; myo = 3 to primary + 1.5
+   to each secondary. Key off the RESOLVED name (what gnm() returns) so swaps
+   change the mapping with the displayed lift. */
+const MMAP={
+/* squats / leg press -> quads (glutes) */
+'Hack squat':{p:'quads',s:['glutes']},'Pendulum squat':{p:'quads',s:['glutes']},'Smith squat':{p:'quads',s:['glutes']},'Leg press (deep)':{p:'quads',s:['glutes']},'Hack or pendulum squat':{p:'quads',s:['glutes']},'Pendulum, Hack or Smith squat':{p:'quads',s:['glutes']},'Squat (free or hack)':{p:'quads',s:['glutes']},'Barbell back squat':{p:'quads',s:['glutes']},
+/* RDL -> hamstrings (glutes); hip thrust -> glutes (hamstrings); combined
+   names hit both, so prefer glutes primary + hamstrings secondary. */
+'Romanian deadlift':{p:'hamstrings',s:['glutes']},'Dumbbell Romanian deadlift':{p:'hamstrings',s:['glutes']},
+'Hip thrust':{p:'glutes',s:['hamstrings']},'Hip thrust or Romanian deadlift':{p:'glutes',s:['hamstrings']},'Romanian deadlift or hip thrust':{p:'glutes',s:['hamstrings']},
+/* conventional deadlift -> hamstrings (glutes + upper back) */
+'Conventional deadlift':{p:'hamstrings',s:['glutes','upper back']},
+/* presses / chest machines -> chest (triceps + front delts) */
+'Bench press':{p:'chest',s:['triceps','front delts']},'Flat bench press':{p:'chest',s:['triceps','front delts']},'Flat bench press (barbell or machine)':{p:'chest',s:['triceps','front delts']},'Flat dumbbell press':{p:'chest',s:['triceps','front delts']},'Flat machine press':{p:'chest',s:['triceps','front delts']},'Dumbbell bench press':{p:'chest',s:['triceps','front delts']},'Machine chest press':{p:'chest',s:['triceps','front delts']},
+'Incline press':{p:'chest',s:['triceps','front delts']},'Incline press (dumbbell or Smith)':{p:'chest',s:['triceps','front delts']},'Incline dumbbell press':{p:'chest',s:['triceps','front delts']},'Incline Smith press':{p:'chest',s:['triceps','front delts']},'Incline machine press':{p:'chest',s:['triceps','front delts']},
+/* chest isolation (fly / pec deck) -> chest only */
+'Pec deck':{p:'chest',s:[]},'Flat press or machine fly':{p:'chest',s:['triceps','front delts']},
+/* vertical pulls -> lats (biceps) */
+'Lat pulldown':{p:'lats',s:['biceps']},'Neutral-grip pulldown':{p:'lats',s:['biceps']},'Lat pulldown (neutral or wide)':{p:'lats',s:['biceps']},'Lat pulldown or pull-ups':{p:'lats',s:['biceps']},'Pull-ups or pulldown':{p:'lats',s:['biceps']},'Assisted pull-up':{p:'lats',s:['biceps']},'Weighted pull-ups':{p:'lats',s:['biceps']},
+/* rows -> upper back (lats + biceps + rear delts) */
+'T-bar row':{p:'upper back',s:['lats','biceps','rear delts']},'T-bar row or Gironda row':{p:'upper back',s:['lats','biceps','rear delts']},'Gironda row':{p:'upper back',s:['lats','biceps','rear delts']},'Chest-supported row':{p:'upper back',s:['lats','biceps','rear delts']},'Chest-supported row (elbows out)':{p:'upper back',s:['lats','biceps','rear delts']},'Seated cable row':{p:'upper back',s:['lats','biceps','rear delts']},'Open-elbow row':{p:'upper back',s:['lats','biceps','rear delts']},
+/* pullover / straight-arm -> lats isolation */
+'Pullover':{p:'lats',s:[]},'Straight-arm pulldown':{p:'lats',s:[]},
+/* lateral raises -> side delts isolation */
+'Lateral raise':{p:'side delts',s:[]},'Cable lateral raise':{p:'side delts',s:[]},'Cable lateral raise (+ drop set last)':{p:'side delts',s:[]},'Dumbbell lateral raise':{p:'side delts',s:[]},'Lateral raise (cable or dumbbell)':{p:'side delts',s:[]},
+/* quad / hamstring isolation */
+'Leg extension':{p:'quads',s:[]},'Leg extension (pause when squeezed)':{p:'quads',s:[]},
+'Leg curl':{p:'hamstrings',s:[]},'Seated leg curl':{p:'hamstrings',s:[]},
+/* biceps / triceps isolation */
+'Incline biceps curl':{p:'biceps',s:[]},'Incline bench biceps curl':{p:'biceps',s:[]},'EZ-bar curl':{p:'biceps',s:[]},
+'Overhead triceps extension':{p:'triceps',s:[]},'Cable triceps extension':{p:'triceps',s:[]},'High-cable triceps extension':{p:'triceps',s:[]},'Rope overhead extension':{p:'triceps',s:[]},'Cable pushdown':{p:'triceps',s:[]},
+/* calves / abs isolation */
+'Standing calf raise':{p:'calves',s:[]},'Cable crunch':{p:'abs',s:[]}};
+/* Keyword fallback for names not in MMAP (swapped-in GRP variants, free text).
+   Order matters: more specific patterns first. */
+const MRX=[
+[/hip thrust/i,{p:'glutes',s:['hamstrings']}],
+[/romanian|\brdl\b/i,{p:'hamstrings',s:['glutes']}],
+[/deadlift/i,{p:'hamstrings',s:['glutes','upper back']}],
+[/squat|leg press/i,{p:'quads',s:['glutes']}],
+[/leg extension/i,{p:'quads',s:[]}],
+[/leg curl|nordic/i,{p:'hamstrings',s:[]}],
+[/calf/i,{p:'calves',s:[]}],
+[/crunch|knee raise|ab /i,{p:'abs',s:[]}],
+[/lateral raise/i,{p:'side delts',s:[]}],
+[/rear delt|reverse fly|face pull/i,{p:'rear delts',s:[]}],
+[/pullover|straight-arm/i,{p:'lats',s:[]}],
+[/row/i,{p:'upper back',s:['lats','biceps','rear delts']}],
+[/pulldown|pull-?ups|chin-?ups/i,{p:'lats',s:['biceps']}],
+[/fly|pec deck/i,{p:'chest',s:[]}],
+/* overhead / shoulder / military / Arnold press: front delts first, BEFORE the chest-press rule */
+[/(overhead|shoulder|military|arnold) press/i,{p:'front delts',s:['side delts','triceps']}],
+[/bench|chest press|incline.*press|flat.*press/i,{p:'chest',s:['triceps','front delts']}],
+[/biceps|curl/i,{p:'biceps',s:[]}],
+[/triceps|pushdown|pressdown|overhead.*extension/i,{p:'triceps',s:[]}],
+/* any other press: chest fallback, last so leg press / squat / shoulder rules win */
+[/press/i,{p:'chest',s:['triceps','front delts']}]];
+/* Spanish exercise names (custom or pasted routines). Tested FIRST, on the name lowercased with
+   accents stripped, so 'Curl femoral' is hamstrings (not the generic curl -> biceps). Plain 'curl' and
+   'biceps' / 'triceps' are left to MRX (also matches English). */
+const MRX_ES=[
+[/curl (femoral|de isquio)|isquio|femoral/,{p:'hamstrings',s:[]}],
+[/peso muerto rumano|rumano/,{p:'hamstrings',s:['glutes']}],
+[/peso muerto/,{p:'hamstrings',s:['glutes','upper back']}],
+[/empuje de cadera|hip thrust/,{p:'glutes',s:['hamstrings']}],
+[/\bremo\b/,{p:'upper back',s:['lats','biceps','rear delts']}],
+[/jalon|dominada/,{p:'lats',s:['biceps']}],
+[/extension de (cuadriceps|pierna)/,{p:'quads',s:[]}],
+[/sentadilla|prensa de pierna/,{p:'quads',s:['glutes']}],
+[/gemelo|pantorrilla/,{p:'calves',s:[]}],
+[/elevacion(es)? lateral(es)?/,{p:'side delts',s:[]}],
+[/pajaros|deltoide posterior|deltoides posterior/,{p:'rear delts',s:[]}],
+[/press militar|press de hombro|press arnold/,{p:'front delts',s:['side delts','triceps']}],
+[/\bfondos\b|press frances/,{p:'triceps',s:[]}],
+[/abdominal|plancha/,{p:'abs',s:[]}],
+[/press banca|press inclinado|press plano|aperturas/,{p:'chest',s:['triceps','front delts']}]];
+const gvNorm=n=>String(n).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+function muscleOf(name){if(!name)return{p:null,s:[]};if(MMAP[name])return{p:MMAP[name].p,s:[...MMAP[name].s]};const q=gvNorm(name),r=MRX_ES.find(x=>x[0].test(q))||MRX.find(x=>x[0].test(name));return r?{p:r[1].p,s:[...r[1].s]}:{p:null,s:[]}}
+/* ---- Weekly volume + recovery (effective sets per muscle per ISO week) ------
+   Pure helpers first (no S access, everything passed in so they are testable),
+   thin wrappers that read S after them, then the two Gym cards.
+   GV holds every threshold:
+     band      weekly target per muscle, effective sets (KB: 10-14)
+     sessMax   more than this many effective sets for a muscle in ONE session is excessive (KB: 5-7 ideal)
+     exMax     more than this many exercises with the muscle as PRIMARY in one session is excessive
+     effRir    a set counts only at RIR <= 4 (RIR 5+ is junk volume); blank RIR counts
+     myoPrimary / myoSecondary  a myo-rep lift credits a FIXED 3 / 1.5 sets whatever the mini-set count
+     secWeight indirect credit per set for secondary muscles of compound lifts (isolation = none)
+     coverMin  front / rear delts need no direct work: with 0 direct sets and at least this many indirect
+               sets (presses / rows) they show 'Covered indirectly'
+     red       above this weekly total the 'above target' status turns red instead of amber
+   Display groups merge lats + upper back into 'back'. Adductors are not modelled. */
+const GV={band:[10,14],sessMax:7,exMax:2,effRir:4,myoPrimary:3,myoSecondary:1.5,secWeight:.5,coverMin:6,red:18};
+const GVUP=['chest','back','side delts','front delts','rear delts','biceps','triceps'],GVLO=['quads','hamstrings','glutes','calves','abs'];
+/* [English, Spanish] labels. Looked up in code (like MUSL in gMuscleSummary) because the shared ES
+   dictionary already maps 'Back' to 'Atrás' (navigation). */
+const GVL={chest:['Chest','Pecho'],back:['Back','Espalda'],lats:['Lats','Dorsales'],'upper back':['Upper back','Espalda alta'],'side delts':['Lateral delts','Hombro lateral'],'front delts':['Front delts','Hombro frontal'],'rear delts':['Rear delts','Hombro posterior'],biceps:['Biceps','Bíceps'],triceps:['Triceps','Tríceps'],quads:['Quads','Cuádriceps'],hamstrings:['Hamstrings','Isquios'],glutes:['Glutes','Glúteos'],calves:['Calves','Gemelos'],abs:['Abs','Abdomen']};
+const gvLbl=g=>(GVL[g]||[g,g])[LANG=='es'?1:0],gvGrp=m=>m=='lats'||m=='upper back'?'back':m;
+const gvDay=(ds,n)=>{const[y,m,d]=ds.split('-').map(Number);return fmt(new Date(y,m-1,d+n))};
+const gvMon=ds=>{if(!/^\d{4}-\d\d-\d\d/.test(ds||''))return'';const[y,m,d]=ds.slice(0,10).split('-').map(Number);return gvDay(ds.slice(0,10),-((new Date(y,m-1,d).getDay()+6)%7))};
+/* S.gym.musc[name]=<MUSG key> overrides the mapping: that muscle becomes the only (direct) target. */
+const gvMus=(n,ov)=>{const o=ov&&ov[n];return MUSG.includes(o)?{p:o,s:[]}:muscleOf(n)};
+/* Credits for one lift: [{m:muscle,w:effective sets,dir:1 direct|0 indirect}]. `sets` = effective sets done. */
+function gvCredit(name,kind,myo,sets,ov){const m=gvMus(name,ov);if(!m.p)return[];
+if(myo)return[{m:m.p,w:GV.myoPrimary,dir:1},...m.s.map(x=>({m:x,w:GV.myoSecondary,dir:0}))];
+return[{m:m.p,w:sets,dir:1},...(kind==H?m.s.map(x=>({m:x,w:sets*GV.secWeight,dir:0})):[])]}
+/* Effective working sets in [[w,reps,rir],...]: RIR <= effRir counts; a blank RIR counts. */
+const gvSets=rows=>(Array.isArray(rows)?rows:[]).filter(r=>Array.isArray(r)&&(r[2]==null||r[2]===''||!(+r[2]>GV.effRir))).length;
+/* Add one lift's credits to a per-group map {sets,dir,ind,ex:[{n,dir,ind}]}. An indirect credit that lands
+   in the same display group as the lift's direct one (row: upper back + lats) is dropped to avoid double counting. */
+function gvAdd(by,name,cr){const dg=new Set(cr.filter(c=>c.dir).map(c=>gvGrp(c.m)));cr.forEach(c=>{const g=gvGrp(c.m);if(!c.dir&&dg.has(g))return;
+const o=by[g]??={sets:0,dir:0,ind:0,ex:[]};o.sets+=c.w;o[c.dir?'dir':'ind']+=c.w;let x=o.ex.find(y=>y.n==name);if(!x)o.ex.push(x={n:name,dir:0,ind:0});x[c.dir?'dir':'ind']+=c.w})}
+const gvAgg=ss=>{const by={};ss.forEach(s=>{for(const g in s.byMus){const a=s.byMus[g],o=by[g]??={sets:0,dir:0,ind:0,ex:[]};o.sets+=a.sets;o.dir+=a.dir;o.ind+=a.ind;a.ex.forEach(x=>{let y=o.ex.find(z=>z.n==x.n);if(!y)o.ex.push(y={n:x.n,dir:0,ind:0});y.dir+=x.dir;y.ind+=x.ind})}});return by};
+/* Logged sessions of ISO week `week` (Monday). ctx={ov:override map, mx:method map, kindOf:name->'H'|'I'}.
+   Kind comes from the workout's own snapshot (sn.items[].e.k), so later routine edits do not rewrite history. */
+function gvLog(wl,week,ctx){const ss=[];Object.keys(wl||{}).sort().forEach(k=>{const w=wl[k];if(!w||!w.ex||gvMon(w.d)!=week)return;
+const it=(w.sn&&w.sn.items)||[],by={};Object.keys(w.ex).forEach(n=>{const eff=gvSets(w.ex[n]),it1=it.find(x=>x.n==n),kind=it1&&it1.e&&it1.e.k?it1.e.k:ctx.kindOf(n),pr=!!(w.prime&&w.prime[n]),myo=pr||(ctx.mx||{})[n]=='myo';
+if(myo&&!(pr||eff>=1))return;if(!myo&&!eff)return;gvAdd(by,n,gvCredit(n,kind,myo,eff,ctx.ov))});
+ss.push({t:w.t,d:w.d,byMus:by})});return{byMus:gvAgg(ss),sessions:ss}}
+/* Planned week from the live routine. sess=[{t,ex:[{n,k,s,myo}]}] with the AUTHORED sets (not the deload-halved gsets). */
+function gvPlan(sess,ov){const ss=sess.map(x=>{const by={};x.ex.forEach(e=>gvAdd(by,e.n,gvCredit(e.n,e.k,e.myo,e.s,ov)));return{t:x.t,byMus:by}});return{byMus:gvAgg(ss),sessions:ss}}
+/* Weekly status for a group: k low|ok|high|red|cover|none, cls = pill class. */
+function gvStatus(g,sets,dir,ind){const[lo,hi]=GV.band;if(g=='front delts'||g=='rear delts'){if(!dir&&ind>=GV.coverMin)return{k:'cover',cls:'ok'};}
+if(!(sets>0))return{k:'none',cls:''};if(sets<lo)return{k:'low',cls:'w'};if(sets<=hi)return{k:'ok',cls:'ok'};return sets>GV.red?{k:'red',cls:'r'}:{k:'high',cls:'w'}}
+/* Per-session flags: >sessMax weighted sets, or >exMax exercises where the group is the primary target. */
+function gvFlags(ss){const o=[];ss.forEach(s=>{for(const g in s.byMus){const a=s.byMus[g],n=a.ex.filter(x=>x.dir>0).length;if(a.sets>GV.sessMax)o.push({t:s.t,grp:g,type:'sets',v:a.sets});if(n>GV.exMax)o.push({t:s.t,grp:g,type:'ex',v:n})}});return o}
+/* Ratio rules from the KB: biceps total <= back total; triceps total <= chest + shoulders. */
+const gvRatio=t=>{const v=g=>(t&&t[g])||0;return{bi:v('biceps')>v('back'),tri:v('triceps')>v('chest')+v('front delts')+v('side delts')+v('rear delts')}};
+/* Readiness from the last 7 days. inp={sl:[sleep hours],sr:[stress 1-5],mo:[mood 1-5],dec:lifts dropping,stall:lifts stalling,dl:deload active,dleDays:days since the last deload ended|null}.
+   Points: sleep avg (3+ days) <7h 1, <6.5h 2 | stress avg (2+ days) >=3 1, >=3.5 2 | mood (3+ days, low = 1-2) low days >=2 1, half or more 2
+   | lifts dropping >=2 2, 1 dropping or >=2 stalling 1. 0 ok, 1-2 watch, 3+ deload (watch if a deload ended within 7 days). */
+function gvReady(i){if(i.dl)return{k:'dl',pts:0,why:[]};const A=a=>a.reduce((p,q)=>p+q,0)/a.length,why=[];let pts=0,data=false;
+const sl=(i.sl||[]).filter(x=>x>0),sr=(i.sr||[]).filter(x=>x>0),mo=(i.mo||[]).filter(x=>x>=1&&x<=5),dec=i.dec||0,st=i.stall||0;
+if(sl.length>=3){data=true;const a=A(sl),p=a<6.5?2:a<7?1:0;if(p){pts+=p;why.push('Sleep averaged '+r1(a)+' h')}}
+if(sr.length>=2){data=true;const a=A(sr),p=a>=3.5?2:a>=3?1:0;if(p){pts+=p;why.push('Stress averaged '+r1(a)+' out of 5')}}
+if(mo.length>=3){data=true;const lo=mo.filter(x=>x<=2).length,p=lo/mo.length>=.5?2:lo>=2?1:0;if(p){pts+=p;why.push('Mood low '+lo+' of '+mo.length+' days')}}
+if(dec||st)data=true;if(dec>=2){pts+=2}else if(dec==1||st>=2){pts+=1}
+if(dec)why.push(dec+(dec==1?' lift dropping':' lifts dropping'));if(st)why.push(st+(st==1?' lift stalling':' lifts stalling'));
+if(!data)return{k:'none',pts:0,why:[]};let k=pts>=3?'deload':pts>=1?'watch':'ok';
+if(k=='deload'&&i.dleDays!=null&&i.dleDays>=0&&i.dleDays<=7){k='watch';why.push('You finished a deload in the last 7 days')}
+return{k,pts,why}}
+/* ---- wrappers that read S ---- */
+let gvOff=0,gvOpen=null,gvPick=null;
+const gvCtx=()=>({ov:S.gym.musc||{},mx:{},kindOf:gkind});
+const gvPlanItems=()=>GR[gdn()].map((dy,i)=>({t:dy[1],ex:dy[2].map((e,j)=>({n:gnm(i,j,e),k:e.k,s:e.s,myo:false}))}));
+/* Lifts dropping / stalling, same rules and 28 day recency as galert(). */
+function gvPerf(){const o=gses();let dec=0,stall=0;for(const n in o){const a=o[n],s=gstat(a);if(!s)continue;if((Date.now()-new Date(a[a.length-1].d+'T00:00'))/864e5>28)continue;if(s.dec>=2)dec++;else if(s.since>=3)stall++}return{dec,stall}}
+function gvInputs(){const ds=[...Array(7)].map((_,i)=>{const x=new Date();x.setDate(x.getDate()-i);return fmt(x)}),P=gvPerf(),de=S.gym.dle,dl=!!gdl();
+let dleDays=null;if(de){const a=de.split('-').map(Number),b=today().split('-').map(Number);dleDays=Math.round((Date.UTC(b[0],b[1]-1,b[2])-Date.UTC(a[0],a[1]-1,a[2]))/864e5)}
+return{sl:ds.map(d=>(S.slp||{})[d]).filter(x=>x>0),sr:ds.map(d=>(S.str||{})[d]).filter(x=>x>0),mo:ds.map(d=>((S.journal||{})[d]||{}).mood).filter(x=>x>=1&&x<=5),dec:P.dec,stall:P.stall,dl,dleDays}}
+/* Data for the viewed week (off 0 = this week, negative = past). Planned always comes from the live routine. */
+function gvWeekState(off){const week=gvDay(gvMon(today()),7*off),log=gvLog(S.gym.wl,week,gvCtx()),plan=gvPlan(gvPlanItems(),S.gym.musc||{}),cur=off==0;
+const basis={};[...GVUP,...GVLO].forEach(g=>{const d=log.byMus[g],p=plan.byMus[g];basis[g]=cur&&p&&p.sets>0?p:d||{sets:0,dir:0,ind:0,ex:[]}});
+const tot={};for(const g in basis)tot[g]=basis[g].sets;
+const fl=[...gvFlags(log.sessions),...(cur?gvFlags(plan.sessions):[])],seen=new Set(),flags=fl.filter(f=>{const k=f.grp+f.type;if(seen.has(k))return false;seen.add(k);return true});
+return{week,off,cur,log,plan,basis,flags,ratio:gvRatio(tot)}}
+const gvN=n=>{const r=Math.round(n*10)/10;return r%1===0?''+r:r.toFixed(1)};
+function gvolCard(){let st;try{st=gvWeekState(gvOff)}catch(e){return''}
+const[lo,hi]=GV.band,mx=Math.max(16,...Object.values(st.basis).map(b=>b.sets),...Object.values(st.log.byMus).map(b=>b.sets)),pc=v=>Math.min(100,v/mx*100).toFixed(1),
+lab=st.cur?'This week':'Week of '+new Date(st.week+'T00:00').toLocaleDateString(LOC,{month:'short',day:'numeric'}),
+row=g=>{const d=st.log.byMus[g]||{sets:0,dir:0,ind:0,ex:[]},p=st.plan.byMus[g]||{sets:0,dir:0,ind:0,ex:[]},b=st.basis[g],s=gvStatus(g,b.sets,b.dir,b.ind);
+if(!(d.sets>0||p.sets>0)&&(!st.cur||g=='front delts'||g=='rear delts'))return'';
+const txt={low:'Below target',ok:'On target',high:'Above target, recovery cost',red:'Above target, recovery cost',cover:'Covered indirectly',none:'No sets'}[s.k],
+o=gvOpen==g,fc=s.cls=='r'?'r':s.cls=='w'?'w':'';
+const det=o?`<div class="gvd">${b.ex.length?b.ex.map(x=>`<div class="gvx"><div class="gvxn">${esc(x.n)}</div><div class="gvxv"><span class="mut"><span>Direct</span> ${gvN(x.dir)}</span><span class="mut"><span>Indirect</span> ${gvN(x.ind)}</span><button type="button" class="btn s gvp" data-a="gvmu" data-n="${esc(x.n)}">✎ Muscle</button></div>${gvPick==x.n?`<div class="chips" style="margin:6px 0 0"><button type="button" class="chip ${(S.gym.musc||{})[x.n]?'':'on'}" data-a="gvmp" data-n="${esc(x.n)}" data-v="auto">Auto</button>${MUSG.map(m=>`<button type="button" class="chip ${(S.gym.musc||{})[x.n]==m?'on':''}" data-a="gvmp" data-n="${esc(x.n)}" data-v="${m}">${esc(gvLbl(m))}</button>`).join('')}</div>`:''}</div>`).join(''):'<div class="mut">No exercises counted yet.</div>'}</div>`:'';
+return`<div class="gvw"><button type="button" class="gvr" data-a="gvm" data-m="${g}" aria-expanded="${o}"><span class="gvh"><b>${esc(gvLbl(g))}</b><span class="mut gvn">${st.cur?gvN(d.sets)+' / '+gvN(p.sets):gvN(d.sets)+(p.sets>0?' ('+gvN(p.sets)+')':'')}</span></span><span class="bar tg"><span class="gvbd" style="left:${pc(lo)}%;width:${(pc(hi)-pc(lo)).toFixed(1)}%"></span><i class="${fc}" style="width:${pc(d.sets)}%"></i>${st.cur&&p.sets>0?`<span class="tk gvpl" style="left:${pc(p.sets)}%"></span>`:''}</span><span class="hst ${s.cls}">${txt}</span></button>${det}</div>`},
+sect=(h,l)=>{const r=l.map(row).join('');return r?`<div class="mt" style="margin:12px 0 4px">${h}</div>${r}`:''},
+msgs=[...st.flags.map(f=>f.type=='sets'?'More than '+GV.sessMax+' sets for '+GVL[f.grp][0].toLowerCase()+' in one session':'More than '+GV.exMax+' exercises for '+GVL[f.grp][0].toLowerCase()+' in one session'),...(st.ratio.bi?['Biceps exceed back']:[]),...(st.ratio.tri?['Triceps exceed chest and shoulders']:[])];
+return`<div class="card gvc" style="margin-bottom:16px"><h3>📈 Weekly volume</h3>
+<div class="gvt"><button type="button" class="btn s" data-a="gvw" data-v="-1" aria-label="Previous week">‹</button><button type="button" class="btn s" data-a="gvw" data-v="0" style="flex:1">${lab}</button><button type="button" class="btn s" data-a="gvw" data-v="1" ${st.cur?'disabled':''} aria-label="Next week">›</button></div>
+<p class="cap" style="margin:0">${st.cur?'Effective sets done / planned. Target '+lo+'-'+hi+' per muscle per week.':'Effective sets done (planned for reference). Target '+lo+'-'+hi+' per muscle per week.'}</p>
+${sect('Upper',GVUP)}${sect('Lower',GVLO)}
+${msgs.length?`<div class="note al" style="margin:12px 0 0;padding:10px 12px">${msgs.map(m=>`<div class="gvm">${m}</div>`).join('')}</div>`:''}
+<p class="cap" style="margin:12px 0 0">Sets at 5+ reps from failure do not count. Indirect sets from presses and rows count half. Tap a muscle for details.</p></div>`}
+function grecCard(){let r,i;try{i=gvInputs();r=gvReady(i)}catch(e){return''}
+const T={ok:['Recovery OK','ok'],watch:['Watch recovery','w'],deload:['Consider a deload week','w'],none:['Not enough data yet',''],dl:['Deload week in progress','ok']}[r.k];
+return`<div class="card" style="margin-bottom:16px"><h3>🔋 Recovery</h3><div><span class="hst ${T[1]}">${T[0]}</span></div>
+${r.why.length?`<ul class="gvu">${r.why.map(w=>`<li>${w}</li>`).join('')}</ul>`:r.k=='ok'?'<p class="mut" style="margin:8px 0 0">Nothing is flagging in the last 7 days.</p>':r.k=='none'?'<p class="mut" style="margin:8px 0 0">Log sleep on 3 days, plus stress or mood, or train a few weeks, to get a reading.</p>':''}
+${r.k=='deload'?'<div class="row" style="margin-top:12px"><button type="button" class="btn s" data-a="gdlon" style="flex:none">Start deload</button></div>':''}
+<p class="cap" style="margin:12px 0 0">Based on the last 7 days of sleep, stress, mood and how your lifts are trending. A guide, not a diagnosis.</p></div>`}
 let glgHtml='';
 function glgMount(){const r=document.getElementById('glgroot');if(!r)return;const m=r.querySelector('.glgm'),t=m?m.scrollTop:0;r.innerHTML=glgHtml;gpgRefresh();const n=r.querySelector('.glgm');if(n&&m)n.scrollTop=t;lockSync()}
 function glgClear(){glgHtml='';glgMount()}
@@ -953,7 +1152,7 @@ function gviewImpl(){const g=S.gym,d=gdn(),P=GR[d],A=INC[g.inc||'std'];gMigWl();
 if(glg!=null)gdraft();
 const wlE=glk&&(g.wl||{})[glk]&&g.wl[glk].sn?g.wl[glk]:null,lp=glg!=null&&(P[glg]||wlE)?`<div class="glgm" role="dialog" aria-modal="true"><div class="card glgc"><button class="gx" data-a="gcancel" aria-label="Close">✕</button><h3>📝 Log workout: ${esc(wlE?wlE.sn.t:P[glg][1])}</h3>${gdl()?'<div class="note" style="margin-bottom:16px">Deload week: about half the sets, lighter weights, stop 3–4 reps short of failure.</div>':''}<div class="row" style="justify-content:space-between;margin-bottom:4px"><span class="mut" style="flex:1">RIR is required for every set.</span><div class="chips" style="margin:0;flex:none"><button class="chip ${g.auto===false?'':'on'}" data-a="gauto">⏱ Auto-start rest</button></div></div>${gcur().map(({e,j,n})=>{const hv=e.k==H,dn=!!gsd[j],lq=glast(n),gv=(id,k,f)=>{const v=gdr[id];if(v!==undefined)return v;return lq&&lq[k]?lq[k][f]:''};return`<div class="glx ${dn?'done':''}"><div class="row" style="flex-wrap:wrap;align-items:center"><div class="mt" style="margin:0">${esc(n)}</div>${dn?'<span class="chip">Done</span>':''}${gpcBtn(n,j)}<button class="btn s" style="flex:none;min-width:0" data-a="rts" data-j="${j}">⏱ ${hv?'3:30':'2:00'}</button></div>${gpcBox(n,j)}<div class="mut" style="margin-bottom:0">${gnx(n,e)}</div><div class="mut" style="margin-bottom:8px"><span>Target RIR ${grirT(e)}</span> · <span>${hv?'Heavy compound':'Isolation lift'}</span></div><div class="row" style="gap:8px">${Array.from({length:gsets(e)},(_,k)=>`<div style="min-width:70px"><div class="mut" style="text-align:center;font-size:11px">${k+1}</div><input id="lw${j}_${k}" type="number" step="0.25" placeholder="kg" value="${esc(''+gv('lw'+j+'_'+k,k,0))}" style="padding:8.0px"${dn?' disabled':''}><input id="lr${j}_${k}" type="number" placeholder="reps" value="${esc(''+gv('lr'+j+'_'+k,k,1))}" style="padding:8.0px;margin-top:4px"${dn?' disabled':''}><input class="lx" id="lx${j}_${k}" type="number" min="0" max="5" step="1" inputmode="numeric" placeholder="RIR" value="${esc(''+(gdr['lx'+j+'_'+k]??''))}" style="padding:8.0px;margin-top:4px"${dn?' disabled':''}>${gpgDiv(n,'lw'+j+'_'+k)}</div>`).join('')}</div><div class="mut" id="rh${j}" style="margin-top:8px;min-height:1.4em"></div><div class="row" style="margin-top:8px"><button class="btn t" data-a="gedx" data-j="${j}"${dn?'':' disabled'}>Edit</button><button class="btn p" data-a="gsx" data-j="${j}"${dn?' disabled':''}>Save exercise</button></div></div>`}).join('')}<div class="row" style="margin-top:16px"><button class="btn t" data-a="gcancel">Close</button></div></div></div>`:'';
 const hs=Object.keys(g.wl||{}).sort().reverse().slice(0,8),wd='Mon Tue Wed Thu Fri Sat Sun'.split(' ');
-$('#gout').innerHTML=`${galhtml()}<div class="card" style="margin-bottom:16px"><h3>📅 Workout calendar</h3>${gcal()}</div><div class="card" style="margin-bottom:16px"><h3>📊 Gym stats</h3>${(()=>{const W=Object.values(g.wl||{}),vol=W.reduce((a,w)=>a+Object.values(w.ex||{}).flat().reduce((b,x)=>b+(+x[0]||0)*(+x[1]||0),0),0),mk=today().slice(0,7),mo=W.filter(w=>(w.d||'').slice(0,7)==mk).length,lw=W.map(w=>w.d).sort().pop();return`<div class="gst"><div><b>${W.length}</b><span>Sessions</span></div><div><b>${mo}</b><span>This month</span></div><div><b>${Math.round(vol).toLocaleString('en-US')}</b><span>Volume (kg)</span></div><div><b>${lw||'-'}</b><span>Last workout</span></div></div>`})()}<div id="gch">${gcharts()}</div></div><div class="note"><b>📆 Main structure: Upper / Lower, 4 days a week</b><div class="mut" style="margin:4px 0 8px">Two hits per muscle a week. Pick 3 days if that is all you have, or 5 for strength plus hypertrophy (PHAT). You are on ${d}.</div><div class="chips" style="margin:0">${[3,4,5].map(n=>`<button class="chip ${d==n?'on':''}" data-a="gdays" data-v="${n}">${n}${n==4?' ⭐':''}</button>`).join('')}</div></div>
+$('#gout').innerHTML=`${galhtml()}<div class="card" style="margin-bottom:16px"><h3>📅 Workout calendar</h3>${gcal()}</div><div class="card" style="margin-bottom:16px"><h3>📊 Gym stats</h3>${(()=>{const W=Object.values(g.wl||{}),vol=W.reduce((a,w)=>a+Object.values(w.ex||{}).flat().reduce((b,x)=>b+(+x[0]||0)*(+x[1]||0),0),0),mk=today().slice(0,7),mo=W.filter(w=>(w.d||'').slice(0,7)==mk).length,lw=W.map(w=>w.d).sort().pop();return`<div class="gst"><div><b>${W.length}</b><span>Sessions</span></div><div><b>${mo}</b><span>This month</span></div><div><b>${Math.round(vol).toLocaleString('en-US')}</b><span>Volume (kg)</span></div><div><b>${lw||'-'}</b><span>Last workout</span></div></div>`})()}<div id="gch">${gcharts()}</div></div>${gvolCard()}${grecCard()}<div class="note"><b>📆 Main structure: Upper / Lower, 4 days a week</b><div class="mut" style="margin:4px 0 8px">Two hits per muscle a week. Pick 3 days if that is all you have, or 5 for strength plus hypertrophy (PHAT). You are on ${d}.</div><div class="chips" style="margin:0">${[3,4,5].map(n=>`<button class="chip ${d==n?'on':''}" data-a="gdays" data-v="${n}">${n}${n==4?' ⭐':''}</button>`).join('')}</div></div>
 <div class="g"><div class="card"><h3>${GN[d]}</h3><div class="chips">${wd.map(x=>{const f=P.find(y=>y[0]==x);return`<span class="chip ${f?'on':''}">${x}${f?'':' · rest'}</span>`}).join('')}</div><p class="mut" style="margin:0">Heavy compounds stay 1–2 reps from failure with 3–4 min rest. Isolation and machine work goes to failure with 2 min rest. Warm-up sets do not count.</p><div class="chips" style="margin:8px 0 0"><button class="chip" data-a="rtq" data-v="H">⏱ Heavy 3:30</button><button class="chip" data-a="rtq" data-v="I">⏱ Isolation 2:00</button></div></div>
 <div class="card"><h3>⬆️ Progression</h3><div class="chips" style="margin-bottom:8.0px">${Object.entries(INC).map(([k,v])=>`<button class="chip ${(g.inc||'std')==k?'on':''}" data-a="ginc" data-v="${k}">${v[0]}</button>`).join('')}</div><p style="margin:0">${A[1]}</p></div></div>
 <div class="g" style="margin-top:16.0px">${P.map((dy,i)=>`<div class="card"><div class="row" style="flex-wrap:wrap;justify-content:space-between"><h3 style="margin:0">${dy[0]} · ${dy[1]}</h3></div><div class="mut" style="margin:0 0 8px">About ${gmins(dy[2])} min</div>${dy[2].map((e,j)=>{const n=gnm(i,j,e);return`<div class="li"><div>${esc(n)}${e.x?' <span class="chip">optional</span>':''}<div class="mut">${e.s} × ${e.r} · RIR ${grirT(e)} · rest ${grest(e)}${e.k==H?' · never to failure':''}</div><div class="mut">${gnx(n,e)}</div>${gopen==i+':'+j?`<div class="mut" style="margin-top:8.0px">Same movement pattern. Your pick is saved:</div><div class="chips" style="margin-top:8px">${gopts(e).map(o=>`<button class="chip ${o==n?'on':''}" data-a="gpick" data-k="${i}:${j}" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>`:''}</div>${gopts(e).length>1?`<button class="btn s" data-a="gsw" data-k="${i}:${j}" aria-label="Swap exercise" title="Swap exercise">↻</button>`:''}</div>`}).join('')}</div>`).join('')}</div>
@@ -1218,6 +1417,10 @@ else if(a=='gplo'){gdraft();gpx[b.dataset.n]=!gpx[b.dataset.n]}
 else if(a=='gcp'||a=='gcx'){const n=new Date();gcm??={y:n.getFullYear(),m:n.getMonth()};const x=new Date(gcm.y,gcm.m+(a=='gcx'?1:-1),1);gcm={y:x.getFullYear(),m:x.getMonth()}}
 else if(a=='gedx'){delete gsd[+b.dataset.j]}
 else if(a=='gsx'){const it=gcur().find(x=>x.j==+b.dataset.j);if(!it)return;const j=it.j,e=it.e,dlk=!!gdl(),q=[],T=grir(e);let bad=null,off=0;document.querySelectorAll('.lx.err').forEach(x=>x.classList.remove('err'));for(let k=0;k<gsets(e);k++){const w=parseFloat($('#lw'+j+'_'+k).value)||0,r=parseInt($('#lr'+j+'_'+k).value)||0,rx=$('#lx'+j+'_'+k),rv=rx.value.trim();if(r>0){if(rv===''||!Number.isInteger(+rv)||+rv<0||+rv>5){rx.classList.add('err');bad=bad||rx;continue}if(+rv<T[0]||+rv>T[1])off++;q.push([w,r,+rv])}}if(bad){bad.focus();return toast('Enter RIR (0–5) for every set')}if(!q.length)return toast('Enter at least one set');const W=(S.gym.wl??={});if(!glk||!W[glk]){glk=(glgD||today())+'#'+Date.now();W[glk]=Object.assign({d:glgD||today(),t:GR[gdn()][glg][1],sn:gSnapDay(glg),ex:{}},dlk?{dl:1}:{})}W[glk].ex[it.n]=q;gsd[j]=1;toast(off?'Exercise saved · some sets were off the RIR target':'Exercise saved')}
+else if(a=='gvw'){const x=+b.dataset.v;gvOff=x==0?0:Math.min(0,gvOff+x);gvOpen=null;gvPick=null}
+else if(a=='gvm'){gvOpen=gvOpen==b.dataset.m?null:b.dataset.m;gvPick=null}
+else if(a=='gvmu'){gvPick=gvPick==b.dataset.n?null:b.dataset.n}
+else if(a=='gvmp'){const n=b.dataset.n,m=b.dataset.v,o=(S.gym.musc??={});if(m=='auto')delete o[n];else if(MUSG.includes(m))o[n]=m;gvPick=null}
 else if(a=='gdlon'){const x=new Date();x.setDate(x.getDate()+6);S.gym.dl={s:today(),e:fmt(x)};glg=null;toast('Deload week started')}
 else if(a=='gdloff'){if(S.gym.dl){S.gym.dle=today();delete S.gym.dl}toast('Deload ended')}
 else if(a=='gadis'){S.gym.adis=Object.keys(S.gym.wl||{}).sort().pop()||''}
@@ -1228,7 +1431,7 @@ else if(a=='slq'){(S.slp??={})[day]=+b.dataset.v;toast('Sleep saved')}
 else if(a=='slst'){const s=(S.str??={}),x=+b.dataset.v;if(s[day]==x)delete s[day];else s[day]=x}
 else if(a=='crtog'||a=='cgo'){const c=(S.cre??={}),k=a=='cgo'?today():day;if(a=='cgo'){c[k]=1;cclose()}else if(c[k])delete c[k];else c[k]=1;toast(c[k]?'Creatine logged':'Creatine unmarked')}
 else if(a=='wkp'||a=='wkx'){const x=new Date(wk0+'T00:00');x.setDate(x.getDate()+(a=='wkx'?7:-7));wk0=fmt(x)}
-else return;save();if(['gsw','gpick','gdays','ginc','gplo','gcp','gcx','gedx','gsx'].includes(a)&&$('#gout')){const y=scrollY;$('#gout').classList.add('q');gview();ghints();scrollTo(0,y);return}go(tab)});
+else return;save();if(['gsw','gpick','gdays','ginc','gplo','gcp','gcx','gedx','gsx','gvw','gvm','gvmu','gvmp'].includes(a)&&$('#gout')){const y=scrollY;$('#gout').classList.add('q');gview();ghints();scrollTo(0,y);return}go(tab)});
 function ap(){const r=document.documentElement;if(r.dataset.th)delete r.dataset.th;if(S.th){delete S.th;save()}if(S.mode)r.dataset.theme=S.mode}ap();
 let LANG='en',LOC='en-US',DOW='MTWTFSS',DWK='MON TUE WED THU FRI SAT SUN';
 const D={
@@ -1325,6 +1528,7 @@ const D={
 "Hack or pendulum squat":"Sentadilla Hack o péndulo","Leg extension (pause when squeezed)":"Extensión de cuádriceps (pausa en contracción)","Romanian deadlift or hip thrust":"Peso muerto rumano o hip thrust","Standing calf raise":"Gemelos de pie en máquina","Bench press":"Press banca","Weighted pull-ups":"Dominadas con lastre","Incline press":"Press inclinado","Squat (free or hack)":"Sentadilla (libre o Hack)","Conventional deadlift":"Peso muerto convencional","Leg curl":"Curl femoral","Straight-arm pulldown":"Jalón con brazos rectos",
 "Flat machine press":"Press plano en máquina","Cable triceps extension":"Extensión de tríceps en polea","Incline Smith press":"Press inclinado en Smith","Triceps pushdown":"Jalón de tríceps","Overhead cable extension":"Extensión sobre la cabeza en polea","Overhead dumbbell extension":"Extensión sobre la cabeza con mancuerna","Preacher curl":"Curl predicador","Cable curl":"Curl en polea","Dumbbell curl":"Curl con mancuernas","Single-leg extension":"Extensión unilateral","Leg extension with pause":"Extensión de cuádriceps con pausa","Lying leg curl":"Curl femoral tumbado","Single-leg seated curl":"Curl femoral sentado unilateral","Assisted Nordic curl":"Curl nórdico asistido",
 "Machine lateral raise":"Elevación lateral en máquina","Leaning cable lateral raise":"Elevación lateral en polea inclinado","Wide-grip pulldown":"Jalón con agarre ancho","Pull-ups":"Dominadas","Chin-ups":"Dominadas supinas","Machine pullover":"Pullover en máquina","Dumbbell pullover":"Pullover con mancuerna","Machine row":"Remo en máquina","One-arm cable row":"Remo unilateral en polea","Incline barbell press":"Press inclinado con barra","Smith bench press":"Press banca en Smith","Barbell back squat":"Sentadilla con barra","Seated calf raise":"Gemelos sentado","Leg press calf raise":"Gemelos en prensa","Machine crunch":"Crunch en máquina","Hanging knee raise":"Elevación de rodillas colgado","Workout calendar":"Calendario de entrenamientos","📅 Workout calendar":"📅 Calendario de entrenamientos","Save exercise":"Guardar ejercicio","Edit":"Editar","Done":"Hecho","Exercise saved":"Ejercicio guardado","Exercise saved · some sets were off the RIR target":"Ejercicio guardado · algunas series se salieron del objetivo de RIR","🧮 Plate calculator":"🧮 Calculadora de discos","red":"rojo","blue":"azul","green":"verde","yellow":"amarillo","orange":"naranja","white":"blanco","purple":"morado","Target kg":"Kg objetivo","Bar kg":"Kg de la barra","Enter the target weight":"Escribe el peso objetivo","Target is lower than the bar":"El objetivo es menor que la barra","Just the bar":"Solo la barra"};
+const DX3={"Weekly volume": "Volumen semanal", "📈 Weekly volume": "📈 Volumen semanal", "Recovery": "Recuperación", "🔋 Recovery": "🔋 Recuperación", "Upper": "Superior", "Lower": "Inferior", "Direct": "Directas", "Indirect": "Indirectas", "Below target": "Por debajo del objetivo", "On target": "En el objetivo", "Above target, recovery cost": "Por encima del objetivo, coste de recuperación", "Covered indirectly": "Cubierto indirectamente", "No sets": "Sin series", "This week": "Esta semana", "Auto": "Auto", "✎ Muscle": "✎ Músculo", "Previous week": "Semana anterior", "Next week": "Semana siguiente", "Start deload": "Empezar descarga", "Recovery OK": "Recuperación bien", "Watch recovery": "Vigila tu recuperación", "Consider a deload week": "Considera una semana de descarga", "Not enough data yet": "Aún no hay suficientes datos", "Deload week in progress": "Semana de descarga en curso", "Biceps exceed back": "El bíceps supera a la espalda", "Triceps exceed chest and shoulders": "El tríceps supera a pecho y hombro", "No exercises counted yet.": "Aún no hay ejercicios contados.", "Nothing is flagging in the last 7 days.": "Nada preocupa en los últimos 7 días.", "Log sleep on 3 days, plus stress or mood, or train a few weeks, to get a reading.": "Registra el sueño en 3 días, más el estrés o el ánimo, o entrena unas semanas, para tener una lectura.", "Based on the last 7 days of sleep, stress, mood and how your lifts are trending. A guide, not a diagnosis.": "Según los últimos 7 días de sueño, estrés, ánimo y la tendencia de tus levantamientos. Es una guía, no un diagnóstico.", "Sets at 5+ reps from failure do not count. Indirect sets from presses and rows count half. Tap a muscle for details.": "Las series a 5 o más repeticiones del fallo no cuentan. Las series indirectas de press y remos cuentan la mitad. Toca un músculo para ver el detalle.", "You finished a deload in the last 7 days": "Terminaste una descarga en los últimos 7 días", "Lateral delts": "Hombro lateral", "Front delts": "Hombro frontal", "Rear delts": "Hombro posterior", "Lats": "Dorsales", "Upper back": "Espalda alta", "Quads": "Cuádriceps", "Hamstrings": "Isquios", "Abs": "Abdomen", "Biceps": "Bíceps", "Triceps": "Tríceps"};for(const k in DX3)if(D[k]===undefined)D[k]=DX3[k];
 const DK=Object.keys(D).filter(k=>k.length>=7).sort((a,b)=>b.length-a.length),DY={Mon:'Lun',Tue:'Mar',Wed:'Mié',Thu:'Jue',Fri:'Vie',Sat:'Sáb',Sun:'Dom'};
 const R=[[/^Last time: (.*)$/,'Última vez: $1'],[/^Missing ([\d.]+) (lb|kg) per side, need micro plates$/,(m,a,u)=>'Faltan '+a.replace('.',',')+' '+u+' por lado: necesitas microdiscos'],[/^Per side: (.*)$/,'Por lado: $1'],[/^(.*) · closest load (.*) kg$/,'$1 · carga más cercana $2 kg'],[/^Target RIR (.+)$/,'RIR objetivo $1'],[/^dropping across (\d+) sessions$/,'bajando en $1 sesiones'],[/^no new best in (\d+) sessions$/,'sin nuevo récord en $1 sesiones'],[/^(\d+) sessions$/,'$1 sesiones'],[/^1 session$/,'1 sesión'],[/^Your sleep averaged ([\d.]+) h this week, below the 7–9 h target\.$/,'Tu sueño promedió $1 h esta semana, por debajo de la meta de 7–9 h.'],[/^Your stress averaged ([\d.]+) out of 5 this week\.$/,'Tu estrés promedió $1 de 5 esta semana.'],[/^(\d[\d,]*) steps to reach 8,000$/,(m,a)=>a.replace(',','.')+' pasos para llegar a 8.000'],[/(\d+) glass(?:es)? to go/,(m,a)=>a+(a==1?' vaso':' vasos')+' por beber'],[/· next at/,'· próximo a las'],[/^🔔 Your (\d+) glasses of (\d+) ml, (\S+) to (\S+)$/,'🔔 Tus $1 vasos de $2 ml, de $3 a $4'],
 [/^([\d.]+) kg × 32\.5 ml(, \+10% for men)?$/,(m,a,b)=>a+' kg × 32,5 ml'+(b?', +10 % hombres':'')],[/^(\d+) min logged, \+425 ml per 30 min$/,'$1 min registrados, +425 ml por cada 30 min'],[/^Adds (\d+) ml$/,'Suma $1 ml'],[/^\+(\d+) kcal burned$/,'+$1 kcal quemadas'],
@@ -1336,6 +1540,11 @@ const R=[[/^Last time: (.*)$/,'Última vez: $1'],[/^Missing ([\d.]+) (lb|kg) per
 [/Protein is averaging (\d+) g against a (\d+) g target\. Aim for about (\d+) g extra per day\./,'Tu proteína promedia $1 g frente a una meta de $2 g. Intenta sumar unos $3 g extra por día.'],[/^on target on (\d+) of (\d+) logged days$/,'en objetivo $1 de $2 días registrados'],[/^weight change \((.+)\)$/,'cambio de peso ($1)'],
 [/^📝 Log workout: (.+)$/,(m,a)=>'📝 Registrar entrenamiento: '+ts(a)],[/^About (\d+) min$/,'Unos $1 min'],[/^last (.*) · next$/,'última vez $1 · siguiente'],[/^pick a load you can lift for (.+) reps$/,'elige una carga con la que puedas hacer $1 repeticiones'],
 [/^Saved: (.+)$/,(m,a)=>'Guardado: '+ts(a)],[/^(\d+) exercises · volume (.+) kg$/,'$1 ejercicios · volumen $2 kg'],[/· rest$/,'· descanso'],[/\b(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b/g,m=>DY[m]]];
+const gvEs=e=>{const k=Object.keys(GVL).find(g=>GVL[g][0].toLowerCase()==e.toLowerCase());return k?GVL[k][1].toLowerCase():e},gvC=x=>x.replace('.',',');
+R.push([/^More than (\d+) sets for (.+) in one session$/,(m,n,a)=>'Más de '+n+' series para '+gvEs(a)+' en una sesión'],[/^More than (\d+) exercises for (.+) in one session$/,(m,n,a)=>'Más de '+n+' ejercicios para '+gvEs(a)+' en una sesión'],
+[/^Sleep averaged ([\d.]+) h$/,(m,a)=>'Sueño promedio de '+gvC(a)+' h'],[/^Stress averaged ([\d.]+) out of 5$/,(m,a)=>'Estrés promedio de '+gvC(a)+' de 5'],[/^Mood low (\d+) of (\d+) days$/,'Ánimo bajo $1 de $2 días'],
+[/^(\d+) lifts? dropping$/,(m,a)=>a+(a==1?' levantamiento a la baja':' levantamientos a la baja')],[/^(\d+) lifts? stalling$/,(m,a)=>a+(a==1?' levantamiento estancado':' levantamientos estancados')],
+[/^Effective sets done \/ planned\. Target (\d+)-(\d+) per muscle per week\.$/,'Series efectivas hechas / planeadas. Objetivo $1-$2 por músculo a la semana.'],[/^Effective sets done \(planned for reference\)\. Target (\d+)-(\d+) per muscle per week\.$/,'Series efectivas hechas (planeadas como referencia). Objetivo $1-$2 por músculo a la semana.']);
 function ts(s){const t=s.trim();if(!t||!/[A-Za-z]/.test(t))return s;const i=s.indexOf(t),l=s.slice(0,i),r=s.slice(i+t.length);if(D[t]!==undefined)return l+D[t]+r;let x=t;for(const[re,f]of R)x=x.replace(re,f);for(const k of DK)if(x.includes(k))x=x.split(k).join(D[k]);return x===t?s:l+x+r}
 const TA=['placeholder','aria-label','title'];
 function tr(n){if(n.nodeType==3){if(LANG!='es'&&n.__o===undefined)return;const v=n.nodeValue;if(v===n.__t&&n.__l===LANG)return;const o=v===n.__t&&n.__o!==undefined?n.__o:v,g=LANG=='es'?ts(o):o;n.__o=o;n.__t=g;n.__l=LANG;if(g!==v)n.nodeValue=g}

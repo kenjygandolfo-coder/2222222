@@ -1,0 +1,26 @@
+{
+ "id": "FEAT-003",
+ "type": "feat",
+ "description": "Mirror to gymapp.html where feasible, bump versions, and verify with the real-plan harness render. Depends on FEAT-002.",
+ "status": "completed",
+ "steps": [
+  "Inspect gymapp.html (simpler Gym tab, kg only, no warm-ups; grep muscleOf, gMuscleSets, gdl, galert, rcv, 'Gym stats'). Port the pure functions and the Weekly volume + Recovery cards where its data model allows (it may lack S.slp/S.str/S.journal, then Recovery uses only available inputs; if the Gym tab structure makes a port infeasible, document precisely why in findings and skip). Keep its own ES dictionary entries in sync.",
+  "Bump sw.js CACHE to forma-v105 and BUILD_VER='forma-v105' in index.html and gymapp.html; set BUILD_TS in both to the real current UTC time (run `date -u +%Y-%m-%dT%H:%M:%SZ`).",
+  "Using /projects/sandbox/_h harness (copy a similar script into /projects/sandbox/_h, NOT the repo) load /projects/sandbox/forma-backup-3dias.json with 'now' set to 2026-11-09 (week of its latest logs; check dates, the sessions are 2026-10-29..2026-11-08) and also a week with data and the current week; render the Gym tab and extract the Weekly volume and Recovery cards in EN and ES. Assert no 'undefined'/'NaN'. Print per-muscle planned weekly sets for the user's real 3-day plan and logged weekly sets for each logged week, plus the readiness result and warnings, into findings.",
+  "Run chk.sh, all tools/*.test.mjs including build-info.test.mjs.",
+  "Commit locally on main (git add specific files: index.html gymapp.html sw.js tools/gym-volume.test.mjs and .agents/tasks/task-gym-weekly-volume/**), message 'feat: weekly volume per muscle + recovery readiness card, ES, tests, v105'. Do not push. Leave .kiro/ untracked."
+ ],
+ "acceptance_criteria": [
+  "sw.js CACHE, index.html and gymapp.html BUILD_VER all 'forma-v105'; BUILD_TS is a real recent UTC time; tools/build-info.test.mjs passes",
+  "All tools/*.test.mjs pass; chk.sh syntax ok",
+  "Harness render of the real sample state shows both cards in EN and ES without 'undefined'/'NaN'",
+  "git log shows the new local commit; git status shows only .kiro/ untracked"
+ ],
+ "verification": [
+  "bash /projects/sandbox/_h/chk.sh",
+  "for f in tools/*.test.mjs; do node $f || exit 1; done",
+  "git status --short"
+ ],
+ "blocked_reason": null,
+ "findings": "gymapp.html: PORTED (feasible). Copied verbatim from index.html: MUSG/MUSL/MMAP/MRX/MRX_ES/muscleOf, whole GV block (pure fns, wrappers, gvolCard, grecCard), CSS (.gv*, .hst.ok/.r, .cap, .bar.tg), DX3 dictionary, R regexes (gvEs etc), click actions gvw/gvm/gvmu/gvmp plus refresh list. Only 2 lines differ: gvPlanItems builds from the static routine GR[gdn()] with gnm() swaps and myo:false (gymapp has no S.gym.plan/gPlan/gday/myo), gvCtx has mx:{}. Cards inserted after the Gym stats card. gymapp lacks custom plan and myo, so planned numbers come from its built-in D3/D4/D5 (3 days = Full body), NOT the user's custom 3-day plan; logs still use snapshots so logged weeks match index. Pre-existing, not touched: the user backup has S.gym.inc='myo' which gymapp's older Progression card cannot render (INC lacks myo); the harness sets inc='std' for gymapp. VERSIONS: sw.js CACHE, BUILD_VER in both HTML = forma-v105; BUILD_TS=2026-11-17T03:11:07Z in both. TESTS: tools/gym-volume.test.mjs now 27 tests (5 new gymapp tests: block evaluates, planned from GR, swaps, snapshot logging, helpers identical to index.html). chk.sh syntax ok, all tools/*.test.mjs pass incl build-info. HARNESS (/projects/sandbox/_h/gvf.mjs, gva.mjs, port.py; now=2026-11-09, forma-backup-3dias.json): index and gymapp cards render EN and ES for weeks 0,-1,-2 without undefined/NaN; gymapp full gview contains both cards. REAL 3-DAY PLAN (index) planned weekly effective sets: chest 12 (all direct), back 18 (direct), side delts 9, rear delts 4.5 (indirect only), biceps 18 (9 direct + 9 indirect), triceps 9 (direct), quads 18, hamstrings 13.5 (9 dir + 4.5 ind), glutes 13.5 (9 dir + 4.5 ind), front delts 0, calves 0, abs 0. LOGGED weeks (identical both weeks, 3 sessions each): Mon 2026-10-26 and Mon 2026-11-02: chest 12, triceps 15 (9 dir + 6 ind), front delts 6 (indirect, shows Covered indirectly), glutes 13.5, hamstrings 13.5, back 18, biceps 18 (9 dir + 9 ind), rear delts 4.5 (ind), quads 18, side delts 9. Week of 2026-11-09 has no logs. FLAGS/WARNINGS: none for planned week, 10-26 or 11-02 (no session over 7 sets, no muscle over 2 direct exercises, biceps<=back, triceps<=chest+shoulders). Status: back/biceps/quads 18 = Above target (high, amber, not red since not >18), chest, glutes, hamstrings, triceps(15 logged) on or above band, side delts 9 and rear delts below. READINESS at now=2026-11-09: inputs sleep [7.5] (1 day, under the 3 day minimum), stress none, mood none, dec 0, stall 5 -> k='watch', pts 1, why ['5 lifts stalling'] ('Watch recovery'). gymapp planned (static Full body 3 day routine, for reference): quads 9, glutes 7, chest 9, triceps 6, front delts 3, back 18, hamstrings 6.5, side delts 6, biceps 4.5."
+}
