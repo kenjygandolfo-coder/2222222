@@ -44,6 +44,7 @@ const FNS = ['muscleOf', 'gvCredit', 'gvAdd', 'gvLog', 'gvPlan', 'gvStatus', 'gv
 const CONSTS = ['r1', 'fmt', 'GV', 'MUSG', 'MUSL', 'GVUP', 'GVL', 'gvLbl', 'gvDay', 'gvMon', 'gvMus', 'gvSets', 'gvAgg', 'gvRatio', 'gvNorm'];
 const code = [
   "const H='H',I='I';let LANG='en';",
+  src.match(/^const gwDone=.*$/m)[0],
   block('MMAP'), block('MRX'), block('MRX_ES'),
   ...CONSTS.map(konst), ...FNS.map(fn),
   'return{' + [...FNS, ...CONSTS.filter(c => c != 'GVUP'), 'GVUP', 'GVLO', 'MMAP', 'MRX', 'MRX_ES', 'setLang:v=>{LANG=v}', 'setPlan:(p,m)=>{PLAN=p;MX=m||{}}'].join(',') + '}',
@@ -299,6 +300,7 @@ const gsrc = fs.readFileSync(new URL('../gymapp.html', import.meta.url), 'utf8')
 const X = extractor(gsrc);
 const gcode = [
   "let LANG='en';const S={gym:{days:3,ch:{}}},gkind=n=>(/bench|squat|row/i.test(n)?H:I);",
+  gsrc.match(/^const gwDone=.*$/m)[0],
   X.konst('E'), 
   ...['D3', 'D4', 'D5'].map(n => X.block(n)), X.konst('GR'), X.konst('gdn'),
   X.block('MMAP'), X.block('MRX'), X.block('MRX_ES'),
